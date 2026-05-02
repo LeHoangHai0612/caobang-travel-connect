@@ -402,6 +402,9 @@ footer { background: var(--teal-dark); color: rgba(255,255,255,.85); padding: 60
 }
 .team-zalo-btn:hover { background: #0054cc; transform: translateY(-2px); box-shadow: 0 6px 16px rgba(0,104,255,.35); }
 .team-zalo-btn svg { flex-shrink: 0; }
+.team-card-img-wrap { position: relative; }
+.team-card-img-wrap:hover .team-card-hover-overlay { background: rgba(0,0,0,.18) !important; }
+.team-card-img-wrap:hover .team-card-view-label { opacity: 1 !important; }
 
 /* =====================================================
    USER AUTH BUTTON – nav

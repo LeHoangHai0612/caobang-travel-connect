@@ -11,6 +11,9 @@ const EMPTY_FORM = {
   rating: 5,
   image_url: "",
   zalo_number: "",
+  bio: "",
+  years_experience: 1,
+  languages: "Tiếng Việt",
   is_active: true,
 };
 
@@ -52,6 +55,9 @@ export default function GuidesAdmin() {
       rating: guide.rating,
       image_url: guide.image_url,
       zalo_number: guide.zalo_number ?? "",
+      bio: guide.bio ?? "",
+      years_experience: guide.years_experience ?? 1,
+      languages: guide.languages ?? "Tiếng Việt",
       is_active: guide.is_active,
     });
     setError("");
@@ -262,6 +268,39 @@ export default function GuidesAdmin() {
                     <span className="admin-form-label" style={{ marginBottom: 0 }}>Hiển thị trên trang chủ</span>
                   </label>
                 </div>
+              </div>
+
+              <div className="admin-form-row">
+                <div className="admin-form-group">
+                  <label className="admin-form-label">Kinh nghiệm (năm)</label>
+                  <input
+                    className="admin-form-input"
+                    type="number" min={0} max={50}
+                    value={form.years_experience}
+                    onChange={(e) => setForm({ ...form, years_experience: parseInt(e.target.value) || 1 })}
+                  />
+                </div>
+                <div className="admin-form-group">
+                  <label className="admin-form-label">Ngôn ngữ</label>
+                  <input
+                    className="admin-form-input"
+                    value={form.languages}
+                    onChange={(e) => setForm({ ...form, languages: e.target.value })}
+                    placeholder="Tiếng Việt, English"
+                  />
+                </div>
+              </div>
+
+              <div className="admin-form-group">
+                <label className="admin-form-label">Giới thiệu (Bio)</label>
+                <textarea
+                  className="admin-form-input"
+                  rows={4}
+                  value={form.bio}
+                  onChange={(e) => setForm({ ...form, bio: e.target.value })}
+                  placeholder="Mô tả ngắn về HDV, kinh nghiệm, phong cách dẫn tour..."
+                  style={{ resize: "vertical", fontFamily: "inherit" }}
+                />
               </div>
 
               {error && (

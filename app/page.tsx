@@ -597,10 +597,15 @@ export default function CaoBangEcoTour() {
             <div className="team-grid">
               {guides.map((member) => (
                 <article key={member.id} className="team-card fade-up">
-                  <div className="team-card-img-wrap">
+                  <a href={`/hdv/${member.id}`} className="team-card-img-wrap" aria-label={`Xem hồ sơ ${member.name}`} style={{ display: "block", textDecoration: "none", cursor: "pointer" }}>
                     <img className="team-card-img" src={member.image_url} alt={`HDV ${member.name}`} loading="lazy" />
                     <span className="team-card-badge">{member.rating}★</span>
-                  </div>
+                    <span style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0)", transition: "background .25s", borderRadius: "inherit", display: "flex", alignItems: "center", justifyContent: "center" }} className="team-card-hover-overlay">
+                      <span style={{ background: "rgba(38,92,89,.85)", color: "white", padding: "7px 16px", borderRadius: 20, fontSize: ".75rem", fontWeight: 700, opacity: 0, transition: "opacity .25s" }} className="team-card-view-label">
+                        <i className="fa-solid fa-eye" style={{ marginRight: 5 }} />Xem hồ sơ
+                      </span>
+                    </span>
+                  </a>
                   <h3>{member.name}</h3>
                   <p>{member.specialty}</p>
                   <p className="hdv-role">{member.role}</p>

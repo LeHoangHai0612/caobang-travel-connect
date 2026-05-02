@@ -6,6 +6,9 @@ export interface Guide {
   rating: number;
   image_url: string;
   zalo_number: string;
+  bio: string;
+  years_experience: number;
+  languages: string;
   is_active: boolean;
   created_at: string;
 }
