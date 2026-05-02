@@ -37,6 +37,17 @@ export interface GalleryImage {
   created_at: string;
 }
 
+export interface UserProfile {
+  id: string;
+  full_name: string;
+  phone: string;
+  points: number;
+  tier: 'bronze' | 'silver' | 'gold' | 'diamond';
+  is_admin: boolean;
+  created_at: string;
+  updated_at: string;
+}
+
 export interface Booking {
   id: string;
   package_type: string;
@@ -46,6 +57,10 @@ export interface Booking {
   preferred_date?: string;
   message?: string;
   status: 'pending' | 'confirmed' | 'cancelled';
+  user_id?: string;
+  guide_id?: string;
+  points_earned: number;
+  discount_pct: number;
   created_at: string;
 }
 

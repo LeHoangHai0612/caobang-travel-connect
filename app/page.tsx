@@ -2,7 +2,9 @@
 
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
-import type { Guide, Destination, Review, GalleryImage } from "@/lib/database.types";
+import type { Session } from "@supabase/supabase-js";
+import type { Guide, Destination, Review, GalleryImage, UserProfile } from "@/lib/database.types";
+import { getTier, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BONUS_PCT } from "@/lib/loyalty";
 
 // ── Fallback data (hiển thị ngay khi chờ Supabase) ──────────────────────────
 const FALLBACK_GUIDES: Guide[] = [
@@ -78,6 +80,18 @@ export default function CaoBangEcoTour() {
   const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(FALLBACK_GALLERY);
 
+  // Site settings
+  const [heroBg, setHeroBg] = useState("");
+
+  // Auth state
+  const [userSession, setUserSession] = useState<Session | null>(null);
+  const [userProfile, setUserProfile] = useState<UserProfile | null>(null);
+
+  // Booking extras
+  const [bookingGuideId, setBookingGuideId] = useState<string>("");
+  const [guideBookingCount, setGuideBookingCount] = useState<number>(0);
+  const [bookingPointsInfo, setBookingPointsInfo] = useState<{ earned: number; newTotal: number; newTier: string } | null>(null);
+
   // Booking modal state
   const [isBookingOpen, setIsBookingOpen] = useState(false);
   const [bookingPackage, setBookingPackage] = useState("");
@@ -105,16 +119,21 @@ export default function CaoBangEcoTour() {
   useEffect(() => {
     // Tải dữ liệu từ Supabase
     async function loadData() {
-      const [{ data: g }, { data: d }, { data: r }, { data: gal }] = await Promise.all([
+      const [{ data: g }, { data: d }, { data: r }, { data: gal }, { data: settings }] = await Promise.all([
         supabase.from("guides").select("*").eq("is_active", true).order("rating", { ascending: false }).limit(8),
         supabase.from("destinations").select("*").order("sort_order").limit(6),
         supabase.from("reviews").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(6),
         supabase.from("gallery_images").select("*").order("sort_order").limit(12),
+        supabase.from("site_settings").select("key,value"),
       ]);
       if (g && g.length > 0) setGuides(g);
       if (d && d.length > 0) setDestinations(d);
       if (r && r.length > 0) setReviews(r);
       if (gal && gal.length > 0) setGalleryImages(gal);
+      if (settings) {
+        const hero = settings.find((s: { key: string; value: string }) => s.key === "hero_bg");
+        if (hero?.value) setHeroBg(hero.value);
+      }
     }
     loadData();
 
@@ -162,6 +181,37 @@ export default function CaoBangEcoTour() {
     return () => fadeObserver.disconnect();
   }, [guides, destinations, reviews]);
 
+  // Auth state listener
+  useEffect(() => {
+    supabase.auth.getSession().then(({ data: { session } }) => {
+      setUserSession(session);
+      if (session) loadUserProfile(session.user.id);
+    });
+    const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
+      setUserSession(session);
+      if (session) loadUserProfile(session.user.id);
+      else { setUserProfile(null); }
+    });
+    return () => subscription.unsubscribe();
+  }, []);
+
+  async function loadUserProfile(uid: string) {
+    const { data } = await supabase.from("user_profiles").select("*").eq("id", uid).single();
+    if (data) setUserProfile(data);
+  }
+
+  // Check guide loyalty count when guide changes
+  useEffect(() => {
+    if (!userSession || !bookingGuideId) { setGuideBookingCount(0); return; }
+    supabase
+      .from("bookings")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", userSession.user.id)
+      .eq("guide_id", bookingGuideId)
+      .eq("status", "confirmed")
+      .then(({ count }) => setGuideBookingCount(count ?? 0));
+  }, [userSession, bookingGuideId]);
+
   // ── Helpers ──────────────────────────────────────────────────────────────
   const scrollToSection = (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => {
     e.preventDefault();
@@ -177,7 +227,13 @@ export default function CaoBangEcoTour() {
     setBookingPackage(pkg);
     setBookingSuccess(false);
     setBookingError("");
-    setBookingName(""); setBookingPhone(""); setBookingEmail(""); setBookingDate(""); setBookingNote("");
+    setBookingGuideId("");
+    setBookingPointsInfo(null);
+    setBookingName(userProfile?.full_name || "");
+    setBookingPhone(userProfile?.phone || "");
+    setBookingEmail(userSession?.user.email || "");
+    setBookingDate("");
+    setBookingNote("");
     setIsBookingOpen(true);
   };
 
@@ -185,10 +241,20 @@ export default function CaoBangEcoTour() {
     e.preventDefault();
     setBookingLoading(true);
     setBookingError("");
+
+    const tierDiscount = userProfile ? getTier(userProfile.points).discount : 0;
+    const loyaltyBonus = userSession && bookingGuideId && guideBookingCount >= GUIDE_LOYALTY_THRESHOLD
+      ? GUIDE_LOYALTY_BONUS_PCT : 0;
+    const totalDiscount = tierDiscount + loyaltyBonus;
+
+    const headers: Record<string, string> = { "Content-Type": "application/json" };
+    const session = userSession;
+    if (session?.access_token) headers["Authorization"] = `Bearer ${session.access_token}`;
+
     try {
       const res = await fetch("/api/booking", {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers,
         body: JSON.stringify({
           package_type: bookingPackage,
           client_name: bookingName,
@@ -196,11 +262,19 @@ export default function CaoBangEcoTour() {
           email: bookingEmail,
           preferred_date: bookingDate || undefined,
           message: bookingNote,
+          user_id: session?.user.id,
+          guide_id: bookingGuideId || undefined,
+          discount_pct: totalDiscount,
         }),
       });
       if (res.ok) {
+        const data = await res.json();
+        if (data.points_earned) {
+          setBookingPointsInfo({ earned: data.points_earned, newTotal: data.new_points, newTier: data.new_tier });
+          setUserProfile((prev) => prev ? { ...prev, points: data.new_points, tier: data.new_tier } : prev);
+        }
         setBookingSuccess(true);
-        setTimeout(() => setIsBookingOpen(false), 2500);
+        setTimeout(() => setIsBookingOpen(false), 3500);
       } else {
         const data = await res.json();
         setBookingError(data.error || "Đã có lỗi xảy ra. Vui lòng thử lại.");
@@ -280,6 +354,17 @@ export default function CaoBangEcoTour() {
                   <p style={{ color: "var(--text-mid)", fontSize: ".87rem", lineHeight: 1.6 }}>
                     Chúng tôi sẽ liên hệ xác nhận với bạn trong vòng <strong>24 giờ</strong>.
                   </p>
+                  {bookingPointsInfo && (
+                    <div style={{ marginTop: 16, background: "rgba(38,92,89,.08)", borderRadius: 10, padding: "12px 16px" }}>
+                      <p style={{ margin: 0, fontWeight: 800, color: "var(--teal-dark)", fontSize: ".9rem" }}>
+                        <i className="fa-solid fa-star" style={{ color: "#E5A919", marginRight: 6 }} />
+                        +{bookingPointsInfo.earned} điểm tích lũy!
+                      </p>
+                      <p style={{ margin: "4px 0 0", color: "#6b8888", fontSize: ".8rem" }}>
+                        Tổng: {bookingPointsInfo.newTotal} điểm · Hạng: {getTier(bookingPointsInfo.newTotal).label}
+                      </p>
+                    </div>
+                  )}
                 </div>
               ) : (
                 <form onSubmit={handleBookingSubmit} style={{ display: "flex", flexDirection: "column", gap: 14 }}>
@@ -303,6 +388,58 @@ export default function CaoBangEcoTour() {
                     <label htmlFor="b-note">Ghi chú</label>
                     <input id="b-note" type="text" value={bookingNote} onChange={(e) => setBookingNote(e.target.value)} placeholder="Số người, yêu cầu đặc biệt..." />
                   </div>
+
+                  {/* Chọn HDV */}
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label htmlFor="b-guide">Chọn Hướng Dẫn Viên</label>
+                    <select
+                      id="b-guide"
+                      value={bookingGuideId}
+                      onChange={(e) => setBookingGuideId(e.target.value)}
+                      style={{ width: "100%", padding: "10px 12px", border: "1.5px solid #e0e0e0", borderRadius: 8, fontSize: ".88rem", background: "white" }}
+                    >
+                      <option value="">-- Chưa chọn --</option>
+                      {guides.map((g) => (
+                        <option key={g.id} value={g.id}>{g.name} · {g.specialty}</option>
+                      ))}
+                    </select>
+                  </div>
+
+                  {/* Loyalty discount banner (chỉ hiện khi đăng nhập) */}
+                  {userSession && userProfile && (() => {
+                    const tierDiscount = getTier(userProfile.points).discount;
+                    const tierInfo = getTier(userProfile.points);
+                    const hasLoyalty = bookingGuideId && guideBookingCount >= GUIDE_LOYALTY_THRESHOLD;
+                    const total = tierDiscount + (hasLoyalty ? GUIDE_LOYALTY_BONUS_PCT : 0);
+                    if (total === 0 && !bookingGuideId) return null;
+                    return (
+                      <div style={{ background: "rgba(38,92,89,.07)", borderRadius: 10, padding: "12px 14px", display: "flex", flexDirection: "column", gap: 6 }}>
+                        {tierDiscount > 0 && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: ".82rem" }}>
+                            <i className={`fa-solid ${tierInfo.icon}`} style={{ color: tierInfo.color }} />
+                            <span style={{ color: "#265C59", fontWeight: 700 }}>Hạng {tierInfo.label}: giảm {tierDiscount}%</span>
+                          </div>
+                        )}
+                        {hasLoyalty && (
+                          <div style={{ display: "flex", alignItems: "center", gap: 8, fontSize: ".82rem" }}>
+                            <i className="fa-solid fa-heart" style={{ color: "#E5A919" }} />
+                            <span style={{ color: "#c48d10", fontWeight: 700 }}>Khách thân thiết HDV: giảm thêm {GUIDE_LOYALTY_BONUS_PCT}%</span>
+                          </div>
+                        )}
+                        {bookingGuideId && guideBookingCount > 0 && guideBookingCount < GUIDE_LOYALTY_THRESHOLD && (
+                          <div style={{ fontSize: ".78rem", color: "#6b8888" }}>
+                            Đã book HDV này {guideBookingCount} lần · Cần {GUIDE_LOYALTY_THRESHOLD - guideBookingCount} lần nữa để nhận -5%
+                          </div>
+                        )}
+                        {total > 0 && (
+                          <div style={{ borderTop: "1px solid rgba(38,92,89,.15)", paddingTop: 6, fontWeight: 800, color: "#265C59", fontSize: ".88rem" }}>
+                            Tổng giảm: {total}%
+                          </div>
+                        )}
+                      </div>
+                    );
+                  })()}
+
                   {bookingError && (
                     <p style={{ color: "#dc2626", fontSize: ".82rem", textAlign: "center", margin: 0 }}>{bookingError}</p>
                   )}
@@ -321,12 +458,10 @@ export default function CaoBangEcoTour() {
         <div className="container">
           <nav role="navigation" aria-label="Điều hướng chính">
             <a href="#hero" className="nav-logo" onClick={(e) => scrollToSection(e, "hero")}>
-              <div className="nav-logo-icon" aria-hidden="true">
-                <i className="fa-solid fa-mountain-sun" />
-              </div>
+              <img src="/logo.png" alt="Cao Bằng Travel Connect" style={{ height: 38, width: 38, objectFit: "contain", mixBlendMode: "multiply" }} />
               <div className="nav-logo-text">
                 <strong>Cao Bằng</strong>
-                <span>Eco Tour</span>
+                <span>Travel Connect</span>
               </div>
             </a>
 
@@ -350,6 +485,19 @@ export default function CaoBangEcoTour() {
             <a href="#pricing" className="btn-cta" onClick={(e) => scrollToSection(e, "pricing")}>
               <i className="fa-solid fa-calendar-check" aria-hidden="true" /> ĐẶT HDV NGAY
             </a>
+
+            {userSession ? (
+              <a href="/tai-khoan" className="nav-user-btn">
+                <i className={`fa-solid ${userProfile ? getTier(userProfile.points).icon : "fa-award"}`}
+                   style={{ color: userProfile ? getTier(userProfile.points).color : "#cd7f32" }} />
+                <span>Tài Khoản</span>
+              </a>
+            ) : (
+              <a href="/dang-nhap" className="nav-user-btn">
+                <i className="fa-solid fa-user" />
+                <span>Đăng Nhập</span>
+              </a>
+            )}
 
             <button
               className={`hamburger ${isMobileMenuOpen ? "open" : ""}`}
@@ -383,7 +531,12 @@ export default function CaoBangEcoTour() {
       <main>
         {/* ==================== HERO ==================== */}
         <section className="hero" id="hero" aria-label="Ảnh bìa - Khám phá Cao Bằng">
-          <div className="hero-bg" role="img" aria-label="Thác Bản Giốc Cao Bằng" />
+          <div
+            className="hero-bg"
+            role="img"
+            aria-label="Thác Bản Giốc Cao Bằng"
+            style={heroBg ? { backgroundImage: `url('${heroBg}')` } : undefined}
+          />
           <div className="hero-overlay" aria-hidden="true" />
           <div className="hero-content">
             <div className="hero-badge">

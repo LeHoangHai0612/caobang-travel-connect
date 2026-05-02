@@ -11,13 +11,26 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const pathname = usePathname();
 
   useEffect(() => {
-    supabase.auth.getSession().then(({ data: { session } }) => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
       if (!session) {
         window.location.href = "/login";
-      } else {
-        setUserEmail(session.user.email ?? "");
-        setChecking(false);
+        return;
       }
+      // Kiểm tra quyền admin
+      const { data: profile } = await supabase
+        .from("user_profiles")
+        .select("is_admin")
+        .eq("id", session.user.id)
+        .single();
+
+      if (!profile?.is_admin) {
+        await supabase.auth.signOut();
+        window.location.href = "/login?error=unauthorized";
+        return;
+      }
+
+      setUserEmail(session.user.email ?? "");
+      setChecking(false);
     });
   }, []);
 
@@ -38,16 +51,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   }
 
   const navLinks = [
-    { href: "/admin",         icon: "fa-chart-pie",    label: "Tổng Quan" },
-    { href: "/admin/guides",  icon: "fa-users",         label: "Hướng Dẫn Viên" },
-    { href: "/admin/gallery", icon: "fa-images",        label: "Thư Viện Ảnh" },
+    { href: "/admin",           icon: "fa-chart-pie",    label: "Tổng Quan" },
+    { href: "/admin/guides",    icon: "fa-users",         label: "Hướng Dẫn Viên" },
+    { href: "/admin/gallery",   icon: "fa-images",        label: "Thư Viện Ảnh" },
+    { href: "/admin/settings",  icon: "fa-sliders",       label: "Cài Đặt Website" },
   ];
 
   return (
     <div className="admin-layout">
       <aside className="admin-sidebar">
         <div className="admin-sidebar-logo">
-          <i className="fa-solid fa-mountain-sun" />
+          <img src="/logo.png" alt="Logo" style={{ width: 28, height: 28, objectFit: "contain", filter: "brightness(0) invert(1)", opacity: .9 }} />
           <span>Admin Panel</span>
         </div>
 
