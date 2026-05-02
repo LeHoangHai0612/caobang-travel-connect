@@ -33,13 +33,25 @@ function Field({
 }
 
 export default function DangNhapPage() {
-  const [tab, setTab] = useState<"login" | "register">("login");
+  const [tab, setTab] = useState<"login" | "register" | "forgot">("login");
   const [email, setEmail]       = useState("");
   const [password, setPassword] = useState("");
   const [fullName, setFullName] = useState("");
   const [phone, setPhone]       = useState("");
   const [loading, setLoading]   = useState(false);
   const [message, setMessage]   = useState<{ text: string; ok: boolean } | null>(null);
+
+  const handleForgot = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    if (!email.trim()) { setMessage({ text: "Vui lòng nhập email.", ok: false }); return; }
+    setLoading(true); setMessage(null);
+    const { error } = await supabase.auth.resetPasswordForEmail(email.trim(), {
+      redirectTo: `${window.location.origin}/doi-mat-khau`,
+    });
+    setLoading(false);
+    if (error) setMessage({ text: "Lỗi: " + error.message, ok: false });
+    else setMessage({ text: "Đã gửi email đặt lại mật khẩu! Kiểm tra hộp thư của bạn.", ok: true });
+  };
   const [loginBg, setLoginBg]   = useState("https://images.unsplash.com/photo-1602498456745-e9503b30470b?w=800&q=60");
 
   useEffect(() => {
@@ -265,25 +277,27 @@ export default function DangNhapPage() {
         {/* ── Right form panel ── */}
         <div className="auth-right">
           <div className="auth-right-head">
-            <h1>{tab === "login" ? "Chào mừng trở lại" : "Tạo tài khoản"}</h1>
+            <h1>{tab === "login" ? "Chào mừng trở lại" : tab === "register" ? "Tạo tài khoản" : "Quên mật khẩu"}</h1>
             <p>
-              {tab === "login"
-                ? "Đăng nhập để xem điểm tích lũy và ưu đãi của bạn"
-                : "Đăng ký ngay để bắt đầu tích điểm từ chuyến đi đầu tiên"}
+              {tab === "login" ? "Đăng nhập để xem điểm tích lũy và ưu đãi của bạn"
+                : tab === "register" ? "Đăng ký ngay để bắt đầu tích điểm từ chuyến đi đầu tiên"
+                : "Nhập email để nhận link đặt lại mật khẩu"}
             </p>
           </div>
 
           {/* Tabs */}
-          <div className="auth-tabs">
-            <button className={`auth-tab${tab === "login" ? " active" : ""}`}
-              onClick={() => { setTab("login"); setMessage(null); }}>
-              Đăng Nhập
-            </button>
-            <button className={`auth-tab${tab === "register" ? " active" : ""}`}
-              onClick={() => { setTab("register"); setMessage(null); }}>
-              Đăng Ký
-            </button>
-          </div>
+          {tab !== "forgot" && (
+            <div className="auth-tabs">
+              <button className={`auth-tab${tab === "login" ? " active" : ""}`}
+                onClick={() => { setTab("login"); setMessage(null); }}>
+                Đăng Nhập
+              </button>
+              <button className={`auth-tab${tab === "register" ? " active" : ""}`}
+                onClick={() => { setTab("register"); setMessage(null); }}>
+                Đăng Ký
+              </button>
+            </div>
+          )}
 
           {/* Form */}
           {tab === "login" ? (
@@ -298,8 +312,13 @@ export default function DangNhapPage() {
               <button type="submit" className="auth-submit" disabled={loading}>
                 {loading ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }} />Đang xử lý...</> : "ĐĂNG NHẬP"}
               </button>
+
+              <button type="button" onClick={() => { setTab("forgot"); setMessage(null); }}
+                style={{ background: "none", border: "none", color: "#94a3b8", fontSize: ".8rem", cursor: "pointer", textAlign: "right", fontFamily: "inherit", padding: 0 }}>
+                Quên mật khẩu?
+              </button>
             </form>
-          ) : (
+          ) : tab === "register" ? (
             <form className="auth-form" onSubmit={handleRegister}>
               <Field label="Họ và tên *" id="r-name" icon="fa-user"
                 value={fullName} onChange={setFullName} placeholder="Nguyễn Văn A" />
@@ -314,6 +333,22 @@ export default function DangNhapPage() {
 
               <button type="submit" className="auth-submit" disabled={loading}>
                 {loading ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }} />Đang xử lý...</> : "TẠO TÀI KHOẢN"}
+              </button>
+            </form>
+          ) : (
+            <form className="auth-form" onSubmit={handleForgot}>
+              <Field label="Email *" id="f-email" type="email" icon="fa-envelope"
+                value={email} onChange={setEmail} placeholder="email@example.com" />
+
+              {message && <p className={`auth-msg ${message.ok ? "ok" : "err"}`}>{message.text}</p>}
+
+              <button type="submit" className="auth-submit" disabled={loading}>
+                {loading ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }} />Đang gửi...</> : "GỬI LINK ĐẶT LẠI"}
+              </button>
+
+              <button type="button" onClick={() => { setTab("login"); setMessage(null); }}
+                style={{ background: "none", border: "none", color: "#265C59", fontSize: ".82rem", cursor: "pointer", fontFamily: "inherit", fontWeight: 700, padding: 0 }}>
+                ← Quay lại đăng nhập
               </button>
             </form>
           )}

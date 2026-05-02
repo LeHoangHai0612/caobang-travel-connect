@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 
 export default function LoginPage() {
@@ -8,6 +8,15 @@ export default function LoginPage() {
   const [password, setPassword] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState("");
+
+  useEffect(() => {
+    supabase.auth.getSession().then(async ({ data: { session } }) => {
+      if (!session) return;
+      const { data: profile } = await supabase
+        .from("user_profiles").select("is_admin").eq("id", session.user.id).single();
+      if (profile?.is_admin) window.location.href = "/admin";
+    });
+  }, []);
 
   const handleLogin = async (e: React.SyntheticEvent) => {
     e.preventDefault();
