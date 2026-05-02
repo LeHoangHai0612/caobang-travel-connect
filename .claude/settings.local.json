@@ -1,0 +1,9 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(npx tsc *)",
+      "Bash(dir /b /s app lib supabase)",
+      "Bash(findstr /v \"node_modules\")"
+    ]
+  }
+}
