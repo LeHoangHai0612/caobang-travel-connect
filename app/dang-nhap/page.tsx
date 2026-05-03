@@ -66,7 +66,7 @@ export default function DangNhapPage() {
       .then(({ data }) => { if (data?.value) setLoginBg(data.value); });
   }, []);
 
-  const handleLogin = async (e: React.FormEvent) => {
+  const handleLogin = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
@@ -76,12 +76,18 @@ export default function DangNhapPage() {
     setLoading(false);
   };
 
-  const handleRegister = async (e: React.FormEvent) => {
+  const handleRegister = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     if (!fullName.trim()) { setMessage({ text: "Vui lòng nhập họ và tên.", ok: false }); return; }
     setLoading(true);
     setMessage(null);
-    const { data, error } = await supabase.auth.signUp({ email, password });
+    const { data, error } = await supabase.auth.signUp({
+      email,
+      password,
+      options: {
+        emailRedirectTo: `${window.location.origin}/dang-nhap`,
+      },
+    });
     if (error) { setMessage({ text: "Lỗi: " + error.message, ok: false }); setLoading(false); return; }
     if (data.user) {
       await supabase.from("user_profiles").upsert({ id: data.user.id, full_name: fullName.trim(), phone: phone.trim() });
