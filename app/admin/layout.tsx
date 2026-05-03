@@ -10,6 +10,7 @@ const NAV = [
   { href: "/admin/guides",        icon: "fa-users",               label: "Hướng Dẫn Viên" },
   { href: "/admin/destinations",  icon: "fa-map-location-dot",    label: "Điểm Đến"        },
   { href: "/admin/gallery",       icon: "fa-images",              label: "Thư Viện Ảnh"    },
+  { href: "/admin/reviews",       icon: "fa-star",                label: "Đánh Giá"        },
   { href: "/admin/settings",      icon: "fa-sliders",             label: "Cài Đặt Website" },
 ];
 

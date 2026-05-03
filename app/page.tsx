@@ -119,6 +119,17 @@ export default function CaoBangEcoTour() {
 
   const totalPages = Math.ceil(reviews.length / cardsPerPage);
 
+  // Review form state
+  const [reviewOpen, setReviewOpen]       = useState(false);
+  const [reviewStars, setReviewStars]     = useState(5);
+  const [reviewHover, setReviewHover]     = useState(0);
+  const [reviewText, setReviewText]       = useState("");
+  const [reviewName, setReviewName]       = useState("");
+  const [reviewLocation, setReviewLocation] = useState("");
+  const [reviewLoading, setReviewLoading] = useState(false);
+  const [reviewSuccess, setReviewSuccess] = useState(false);
+  const [reviewError, setReviewError]     = useState("");
+
   // ── Effects ──────────────────────────────────────────────────────────────
   useEffect(() => {
     // Tải dữ liệu từ Supabase
@@ -228,6 +239,32 @@ export default function CaoBangEcoTour() {
     if (target && header) {
       window.scrollTo({ top: target.offsetTop - header.offsetHeight - 10, behavior: "smooth" });
     }
+  };
+
+  const openReview = () => {
+    setReviewText(""); setReviewStars(5); setReviewError(""); setReviewSuccess(false);
+    setReviewName(userProfile?.full_name || "");
+    setReviewLocation("");
+    setReviewOpen(true);
+  };
+
+  const handleReviewSubmit = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    if (!reviewText.trim()) { setReviewError("Vui lòng nhập nội dung đánh giá."); return; }
+    if (!reviewName.trim()) { setReviewError("Vui lòng nhập tên của bạn."); return; }
+    setReviewLoading(true); setReviewError("");
+    const { error } = await supabase.from("reviews").insert({
+      reviewer_name:     reviewName.trim(),
+      reviewer_location: reviewLocation.trim() || "Việt Nam",
+      stars:             reviewStars,
+      review_text:       reviewText.trim(),
+      avatar_url:        "",
+      is_approved:       false,
+      user_id:           userSession?.user.id ?? null,
+    });
+    setReviewLoading(false);
+    if (error) { setReviewError("Gửi thất bại. Vui lòng thử lại."); }
+    else { setReviewSuccess(true); setTimeout(() => setReviewOpen(false), 3000); }
   };
 
   const openBooking = (pkg: string) => {
@@ -453,6 +490,121 @@ export default function CaoBangEcoTour() {
                   <button type="submit" className="btn-price" disabled={bookingLoading} style={{ opacity: bookingLoading ? 0.7 : 1, marginTop: 4 }}>
                     {bookingLoading ? "Đang gửi..." : "XÁC NHẬN ĐẶT HDV"}
                   </button>
+                </form>
+              )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* ==================== REVIEW MODAL ==================== */}
+      {reviewOpen && (
+        <div
+          className="fixed inset-0 z-[2000] flex items-center justify-center p-4"
+          style={{ background: "rgba(0,0,0,.65)", backdropFilter: "blur(4px)" }}
+          onClick={(e) => { if (e.target === e.currentTarget) setReviewOpen(false); }}
+        >
+          <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md" style={{ maxHeight: "92vh", overflowY: "auto" }}>
+            {/* Header */}
+            <div style={{ background: "var(--teal-dark)", padding: "20px 28px", borderRadius: "16px 16px 0 0", display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+              <div>
+                <h3 style={{ color: "white", fontWeight: 800, fontSize: "1rem", letterSpacing: ".05em", textTransform: "uppercase", margin: 0 }}>
+                  Viết Đánh Giá
+                </h3>
+                <p style={{ color: "rgba(255,255,255,.7)", fontSize: ".78rem", margin: "4px 0 0" }}>Chia sẻ trải nghiệm của bạn</p>
+              </div>
+              <button onClick={() => setReviewOpen(false)}
+                style={{ background: "rgba(255,255,255,.15)", border: "none", color: "white", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: ".9rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                <i className="fa-solid fa-xmark" />
+              </button>
+            </div>
+
+            {/* Body */}
+            <div style={{ padding: "24px 28px" }}>
+              {reviewSuccess ? (
+                <div style={{ textAlign: "center", padding: "28px 0" }}>
+                  <div style={{ width: 64, height: 64, background: "rgba(42,148,144,.12)", borderRadius: "50%", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px", color: "var(--teal-dark)", fontSize: "1.8rem" }}>
+                    <i className="fa-solid fa-circle-check" />
+                  </div>
+                  <h4 style={{ fontWeight: 800, color: "var(--teal-dark)", marginBottom: 8, fontSize: "1.05rem" }}>Cảm ơn bạn!</h4>
+                  <p style={{ color: "var(--text-mid)", fontSize: ".87rem", lineHeight: 1.6 }}>
+                    Đánh giá của bạn đang chờ <strong>Admin duyệt</strong> và sẽ xuất hiện trên trang sớm nhất.
+                  </p>
+                </div>
+              ) : (
+                <form onSubmit={handleReviewSubmit} style={{ display: "flex", flexDirection: "column", gap: 16 }}>
+                  {/* Stars */}
+                  <div>
+                    <label style={{ display: "block", fontSize: ".75rem", fontWeight: 700, color: "var(--text-mid)", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>
+                      Đánh giá của bạn *
+                    </label>
+                    <div style={{ display: "flex", gap: 6, justifyContent: "center" }}>
+                      {[1,2,3,4,5].map((s) => (
+                        <button
+                          key={s} type="button"
+                          onMouseEnter={() => setReviewHover(s)}
+                          onMouseLeave={() => setReviewHover(0)}
+                          onClick={() => setReviewStars(s)}
+                          style={{ background: "none", border: "none", cursor: "pointer", fontSize: "2rem", padding: "0 2px", color: s <= (reviewHover || reviewStars) ? "#E5A919" : "#e2e8f0", transition: "color .15s, transform .1s", transform: s <= (reviewHover || reviewStars) ? "scale(1.15)" : "scale(1)" }}
+                        >
+                          <i className="fa-solid fa-star" />
+                        </button>
+                      ))}
+                    </div>
+                    <p style={{ textAlign: "center", fontSize: ".78rem", color: "#94a3b8", marginTop: 6 }}>
+                      {["", "Rất tệ", "Tệ", "Bình thường", "Tốt", "Xuất sắc"][reviewHover || reviewStars]}
+                    </p>
+                  </div>
+
+                  {/* Review text */}
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label htmlFor="rv-text">Nội dung đánh giá *</label>
+                    <textarea
+                      id="rv-text" rows={4}
+                      value={reviewText}
+                      onChange={(e) => setReviewText(e.target.value)}
+                      placeholder="Chia sẻ trải nghiệm của bạn về tour, hướng dẫn viên, phong cảnh..."
+                      style={{ width: "100%", padding: "10px 12px", border: "1.5px solid #e2e8f0", borderRadius: 8, fontFamily: "inherit", fontSize: ".88rem", resize: "vertical", outline: "none" }}
+                    />
+                  </div>
+
+                  {/* Name */}
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label htmlFor="rv-name">Họ và tên *</label>
+                    <input id="rv-name" type="text"
+                      value={reviewName}
+                      onChange={(e) => setReviewName(e.target.value)}
+                      placeholder="Nguyễn Văn A"
+                      readOnly={!!userProfile?.full_name}
+                      style={{ opacity: userProfile?.full_name ? 0.7 : 1 }}
+                    />
+                  </div>
+
+                  {/* Location */}
+                  <div className="form-group" style={{ margin: 0 }}>
+                    <label htmlFor="rv-loc">Địa điểm</label>
+                    <input id="rv-loc" type="text"
+                      value={reviewLocation}
+                      onChange={(e) => setReviewLocation(e.target.value)}
+                      placeholder="Du khách từ Hà Nội · Tháng 5/2025"
+                    />
+                  </div>
+
+                  {reviewError && (
+                    <p style={{ color: "#dc2626", fontSize: ".82rem", textAlign: "center", margin: 0 }}>{reviewError}</p>
+                  )}
+
+                  <button type="submit" className="btn-price" disabled={reviewLoading} style={{ opacity: reviewLoading ? 0.7 : 1, marginTop: 4 }}>
+                    {reviewLoading
+                      ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }} />Đang gửi...</>
+                      : <><i className="fa-solid fa-paper-plane" style={{ marginRight: 8 }} />Gửi Đánh Giá</>}
+                  </button>
+
+                  {!userSession && (
+                    <p style={{ textAlign: "center", fontSize: ".78rem", color: "#94a3b8" }}>
+                      <a href="/dang-nhap" style={{ color: "var(--teal-dark)", fontWeight: 700 }}>Đăng nhập</a> để đánh giá được liên kết với tài khoản của bạn
+                    </p>
+                  )}
                 </form>
               )}
             </div>
@@ -799,6 +951,19 @@ export default function CaoBangEcoTour() {
               <span className="section-tag">Khách Hàng Nói Gì</span>
               <h2 className="section-title" id="testi-heading">Ý Kiến Khách Hàng</h2>
               <p className="section-subtitle">Những chia sẻ chân thực từ du khách đã trải nghiệm dịch vụ của chúng tôi</p>
+              <button
+                onClick={openReview}
+                style={{
+                  marginTop: 16, display: "inline-flex", alignItems: "center", gap: 8,
+                  padding: "10px 22px", borderRadius: 30,
+                  background: "var(--teal-dark)", color: "white",
+                  border: "none", cursor: "pointer",
+                  fontFamily: "inherit", fontSize: ".84rem", fontWeight: 700,
+                  boxShadow: "0 4px 14px rgba(38,92,89,.3)", transition: "all .2s",
+                }}
+              >
+                <i className="fa-solid fa-star" /> Viết Đánh Giá
+              </button>
             </div>
 
             <div className="carousel-wrapper">
