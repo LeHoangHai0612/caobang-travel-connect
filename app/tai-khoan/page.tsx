@@ -80,15 +80,29 @@ export default function TaiKhoanPage() {
   const pct      = Math.min((pts / maxPts) * 100, 100);
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f1f4f1" }}>
+    <div style={{
+      minHeight: "100vh",
+      background: "#f1f4f1",
+      position: "relative",
+    }}>
+      {/* Fixed scenic background */}
+      <div style={{
+        position: "fixed", inset: 0, zIndex: 0,
+        backgroundImage: "url('https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=1600&q=70')",
+        backgroundSize: "cover", backgroundPosition: "center",
+        filter: "blur(2px) brightness(.45) saturate(.8)",
+        transform: "scale(1.04)",
+      }} />
+      <div style={{ position: "fixed", inset: 0, zIndex: 0, background: "rgba(10,30,25,.35)" }} />
 
       {/* ── Topbar ── */}
       <header style={{
-        background: "white", borderBottom: "1px solid #e4e8e4",
+        background: "rgba(255,255,255,.92)", backdropFilter: "blur(12px)",
+        borderBottom: "1px solid rgba(255,255,255,.3)",
         padding: "0 24px", height: 60,
         display: "flex", alignItems: "center", justifyContent: "space-between",
         position: "sticky", top: 0, zIndex: 100,
-        boxShadow: "0 1px 4px rgba(0,0,0,.05)",
+        boxShadow: "0 1px 20px rgba(0,0,0,.12)",
       }}>
         <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
           <Image src="/logo.png" alt="Logo" width={34} height={34} style={{ objectFit: "contain", mixBlendMode: "multiply" }} />
@@ -120,7 +134,7 @@ export default function TaiKhoanPage() {
         </div>
       )}
 
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 16px 64px", display: "flex", flexDirection: "column", gap: 16 }}>
+      <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 16px 64px", display: "flex", flexDirection: "column", gap: 16, position: "relative", zIndex: 1 }}>
 
         {/* ── Profile card ── */}
         <div style={{ background: "white", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,.06)" }}>

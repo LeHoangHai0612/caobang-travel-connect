@@ -8,14 +8,14 @@ import { getTier, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BONUS_PCT } from "@/lib
 
 // ── Fallback data (hiển thị ngay khi chờ Supabase) ──────────────────────────
 const FALLBACK_GUIDES: Guide[] = [
-  { id: "f1", name: "A Tùng",   specialty: "HDV · Văn Hóa Nùng",        role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face", zalo_number: "", is_active: true, created_at: "" },
-  { id: "f2", name: "Chị Hoa",  specialty: "HDV · Văn Hóa Tày",          role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face", zalo_number: "", is_active: true, created_at: "" },
-  { id: "f3", name: "Anh Minh", specialty: "HDV · Trekking & Sinh Thái", role: "Chuyên gia HDV Sinh Thái", rating: 4.9, image_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face", zalo_number: "", is_active: true, created_at: "" },
-  { id: "f4", name: "Chị Lan",  specialty: "HDV · Lịch Sử & Di Tích",   role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face", zalo_number: "", is_active: true, created_at: "" },
-  { id: "f5", name: "Anh Hùng", specialty: "HDV · Xe Máy Trekking",      role: "Chuyên gia HDV Xe Máy",   rating: 4.8, image_url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face", zalo_number: "", is_active: true, created_at: "" },
-  { id: "f6", name: "Chị Mai",  specialty: "HDV · Ẩm Thực & Văn Hóa",   role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face", zalo_number: "", is_active: true, created_at: "" },
-  { id: "f7", name: "Anh Việt", specialty: "HDV · Cắm Trại Rừng",        role: "Chuyên gia HDV Sinh Thái", rating: 4.9, image_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face", zalo_number: "", is_active: true, created_at: "" },
-  { id: "f8", name: "Chị Thu",  specialty: "HDV · Homestay & Bản Làng",  role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face", zalo_number: "", is_active: true, created_at: "" },
+  { id: "f1", name: "A Tùng",   specialty: "HDV · Văn Hóa Nùng",        role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=400&h=400&fit=crop&crop=face", zalo_number: "", bio: "", years_experience: 5, languages: "Tiếng Việt", is_active: true, created_at: "" },
+  { id: "f2", name: "Chị Hoa",  specialty: "HDV · Văn Hóa Tày",          role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1438761681033-6461ffad8d80?w=400&h=400&fit=crop&crop=face", zalo_number: "", bio: "", years_experience: 4, languages: "Tiếng Việt", is_active: true, created_at: "" },
+  { id: "f3", name: "Anh Minh", specialty: "HDV · Trekking & Sinh Thái", role: "Chuyên gia HDV Sinh Thái", rating: 4.9, image_url: "https://images.unsplash.com/photo-1500648767791-00dcc994a43e?w=400&h=400&fit=crop&crop=face", zalo_number: "", bio: "", years_experience: 6, languages: "Tiếng Việt, English", is_active: true, created_at: "" },
+  { id: "f4", name: "Chị Lan",  specialty: "HDV · Lịch Sử & Di Tích",   role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1494790108377-be9c29b29330?w=400&h=400&fit=crop&crop=face", zalo_number: "", bio: "", years_experience: 7, languages: "Tiếng Việt", is_active: true, created_at: "" },
+  { id: "f5", name: "Anh Hùng", specialty: "HDV · Xe Máy Trekking",      role: "Chuyên gia HDV Xe Máy",   rating: 4.8, image_url: "https://images.unsplash.com/photo-1506794778202-cad84cf45f1d?w=400&h=400&fit=crop&crop=face", zalo_number: "", bio: "", years_experience: 5, languages: "Tiếng Việt", is_active: true, created_at: "" },
+  { id: "f6", name: "Chị Mai",  specialty: "HDV · Ẩm Thực & Văn Hóa",   role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1544005313-94ddf0286df2?w=400&h=400&fit=crop&crop=face", zalo_number: "", bio: "", years_experience: 3, languages: "Tiếng Việt, English", is_active: true, created_at: "" },
+  { id: "f7", name: "Anh Việt", specialty: "HDV · Cắm Trại Rừng",        role: "Chuyên gia HDV Sinh Thái", rating: 4.9, image_url: "https://images.unsplash.com/photo-1560250097-0b93528c311a?w=400&h=400&fit=crop&crop=face", zalo_number: "", bio: "", years_experience: 4, languages: "Tiếng Việt", is_active: true, created_at: "" },
+  { id: "f8", name: "Chị Thu",  specialty: "HDV · Homestay & Bản Làng",  role: "Chuyên gia HDV Sinh Thái", rating: 5,   image_url: "https://images.unsplash.com/photo-1580489944761-15a19d654956?w=400&h=400&fit=crop&crop=face", zalo_number: "", bio: "", years_experience: 6, languages: "Tiếng Việt", is_active: true, created_at: "" },
 ];
 
 const FALLBACK_DESTINATIONS: Destination[] = [
@@ -81,7 +81,9 @@ export default function CaoBangEcoTour() {
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(FALLBACK_GALLERY);
 
   // Site settings
-  const [heroBg, setHeroBg] = useState("");
+  const [heroBg, setHeroBg]           = useState("");
+  const [destBg, setDestBg]           = useState("https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1600&q=75");
+  const [pricingBg, setPricingBg]     = useState("https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75");
 
   // Auth state
   const [userSession, setUserSession] = useState<Session | null>(null);
@@ -131,8 +133,10 @@ export default function CaoBangEcoTour() {
       if (r && r.length > 0) setReviews(r);
       if (gal && gal.length > 0) setGalleryImages(gal);
       if (settings) {
-        const hero = settings.find((s: { key: string; value: string }) => s.key === "hero_bg");
-        if (hero?.value) setHeroBg(hero.value);
+        const find = (k: string) => settings.find((s: { key: string; value: string }) => s.key === k)?.value;
+        if (find("hero_bg"))        setHeroBg(find("hero_bg")!);
+        if (find("destinations_bg")) setDestBg(find("destinations_bg")!);
+        if (find("pricing_bg"))     setPricingBg(find("pricing_bg")!);
       }
     }
     loadData();
@@ -630,7 +634,8 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== DESTINATIONS ==================== */}
-        <section className="destinations" id="destinations" aria-labelledby="dest-heading">
+        <section className="destinations" id="destinations" aria-labelledby="dest-heading"
+          style={{ backgroundImage: `linear-gradient(to bottom,rgba(20,52,52,.55),rgba(20,52,52,.62)),url('${destBg}')` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag" style={{ background: "rgba(38,92,89,.12)", color: "var(--teal-dark)" }}>Khám Phá Ngay</span>
@@ -686,7 +691,8 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== PRICING ==================== */}
-        <section className="pricing" id="pricing" aria-labelledby="pricing-heading">
+        <section className="pricing" id="pricing" aria-labelledby="pricing-heading"
+          style={{ backgroundImage: `linear-gradient(135deg,rgba(10,35,35,.90),rgba(26,60,55,.86),rgba(15,45,40,.90)),url('${pricingBg}')` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag">Bảng Giá Minh Bạch</span>

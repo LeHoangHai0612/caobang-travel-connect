@@ -6,10 +6,11 @@ import { usePathname } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 const NAV = [
-  { href: "/admin",          icon: "fa-chart-pie",   label: "Tổng Quan"       },
-  { href: "/admin/guides",   icon: "fa-users",        label: "Hướng Dẫn Viên" },
-  { href: "/admin/gallery",  icon: "fa-images",       label: "Thư Viện Ảnh"   },
-  { href: "/admin/settings", icon: "fa-sliders",      label: "Cài Đặt Website" },
+  { href: "/admin",               icon: "fa-chart-pie",          label: "Tổng Quan"       },
+  { href: "/admin/guides",        icon: "fa-users",               label: "Hướng Dẫn Viên" },
+  { href: "/admin/destinations",  icon: "fa-map-location-dot",    label: "Điểm Đến"        },
+  { href: "/admin/gallery",       icon: "fa-images",              label: "Thư Viện Ảnh"    },
+  { href: "/admin/settings",      icon: "fa-sliders",             label: "Cài Đặt Website" },
 ];
 
 export default function AdminLayout({ children }: { children: React.ReactNode }) {
