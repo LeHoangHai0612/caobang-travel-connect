@@ -967,21 +967,24 @@ export default function CaoBangEcoTour() {
             </div>
 
             <div className="carousel-wrapper">
-              <button className="carousel-btn prev" onClick={() => handlePageChange(currentPage - 1)} aria-label="Trang trước">
-                <i className="fa-solid fa-chevron-left" />
-              </button>
-
               <div className="carousel-track">
                 {reviews.map((review, i) => {
                   const isVisible = i >= currentPage * cardsPerPage && i < (currentPage + 1) * cardsPerPage;
+                  const initials = review.reviewer_name
+                    .split(" ").map((w: string) => w[0]).slice(-2).join("").toUpperCase();
                   return (
-                    <article key={review.id} className="review-card" style={{ display: isVisible ? "block" : "none" }}>
-                      <div className="review-stars">
+                    <article key={review.id} className="review-card" style={{ display: isVisible ? "flex" : "none" }}>
+                      <div className="review-stars" aria-label={`${review.stars} sao`}>
                         <StarIcons rating={review.stars} />
+                        <span style={{ fontSize: ".74rem", fontWeight: 700, color: "#94a3b8", marginLeft: 6 }}>
+                          {review.stars}.0
+                        </span>
                       </div>
                       <blockquote className="review-text">{review.review_text}</blockquote>
                       <footer className="reviewer">
-                        <img className="reviewer-avatar" src={review.avatar_url} alt={`Avatar ${review.reviewer_name}`} loading="lazy" />
+                        {review.avatar_url
+                          ? <img className="reviewer-avatar" src={review.avatar_url} alt={review.reviewer_name} loading="lazy" />
+                          : <div className="reviewer-initial">{initials}</div>}
                         <div className="reviewer-info">
                           <h4>{review.reviewer_name}</h4>
                           <span>{review.reviewer_location}</span>
@@ -991,21 +994,24 @@ export default function CaoBangEcoTour() {
                   );
                 })}
               </div>
-
-              <button className="carousel-btn next" onClick={() => handlePageChange(currentPage + 1)} aria-label="Trang tiếp theo">
-                <i className="fa-solid fa-chevron-right" />
-              </button>
             </div>
 
-            <div className="carousel-dots">
-              {Array.from({ length: totalPages }).map((_, i) => (
-                <button
-                  key={i}
-                  className={`carousel-dot ${i === currentPage ? "active" : ""}`}
-                  onClick={() => handlePageChange(i)}
-                  aria-label={`Trang ${i + 1}`}
-                />
-              ))}
+            <div className="carousel-nav">
+              <button className="carousel-btn prev" onClick={() => handlePageChange(currentPage - 1)}
+                disabled={currentPage === 0} aria-label="Trang trước">
+                <i className="fa-solid fa-chevron-left" />
+              </button>
+              <div className="carousel-dots">
+                {Array.from({ length: totalPages }).map((_, i) => (
+                  <button key={i}
+                    className={`carousel-dot${i === currentPage ? " active" : ""}`}
+                    onClick={() => handlePageChange(i)} aria-label={`Trang ${i + 1}`} />
+                ))}
+              </div>
+              <button className="carousel-btn next" onClick={() => handlePageChange(currentPage + 1)}
+                disabled={currentPage === totalPages - 1} aria-label="Trang tiếp theo">
+                <i className="fa-solid fa-chevron-right" />
+              </button>
             </div>
           </div>
         </section>
@@ -1028,7 +1034,7 @@ export default function CaoBangEcoTour() {
                 Kết nối du khách với những hướng dẫn viên địa phương am hiểu và tận tâm nhất tại Cao Bằng. Chúng tôi cam kết mang lại hành trình trọn vẹn và trải nghiệm chân thực nhất.
               </p>
               <address style={{ fontStyle: "normal" }}>
-                <div className="footer-contact-item"><i className="fa-solid fa-phone" /><span>+84 372 518 168</span></div>
+                <div className="footer-contact-item"><i className="fa-solid fa-phone" /><span>+84 365 128 823</span></div>
                 <div className="footer-contact-item"><i className="fa-solid fa-envelope" /><span>info@caobangecotour.com</span></div>
                 <div className="footer-contact-item"><i className="fa-solid fa-globe" /><span>www.caobangecotour.com</span></div>
                 <div className="footer-contact-item"><i className="fa-solid fa-location-dot" /><span>Tp. Cao Bằng, tỉnh Cao Bằng, Việt Nam</span></div>
