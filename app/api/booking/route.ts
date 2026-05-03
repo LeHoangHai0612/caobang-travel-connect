@@ -60,9 +60,14 @@ export async function POST(request: NextRequest) {
       .single();
 
     if (errorBasic) {
-      console.error('[booking] insert error:', errorBasic);
+      console.error('[booking] full error:', errorFull);
+      console.error('[booking] basic error:', errorBasic);
       return NextResponse.json(
-        { error: 'Không thể lưu đặt lịch. Vui lòng thử lại.' },
+        {
+          error: 'Không thể lưu đặt lịch. Vui lòng thử lại.',
+          detail: errorBasic.message,
+          code: errorBasic.code,
+        },
         { status: 500 }
       );
     }
