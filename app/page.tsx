@@ -381,7 +381,7 @@ export default function CaoBangEcoTour() {
               </div>
               <button
                 onClick={() => setIsBookingOpen(false)}
-                style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "white", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: ".9rem", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
+                style={{ background: "rgba(255,255,255,0.15)", border: "none", color: "white", width: 44, height: 44, borderRadius: "50%", cursor: "pointer", fontSize: ".9rem", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}
               >
                 <i className="fa-solid fa-xmark" />
               </button>
@@ -514,7 +514,7 @@ export default function CaoBangEcoTour() {
                 <p style={{ color: "rgba(255,255,255,.7)", fontSize: ".78rem", margin: "4px 0 0" }}>Chia sẻ trải nghiệm của bạn</p>
               </div>
               <button onClick={() => setReviewOpen(false)}
-                style={{ background: "rgba(255,255,255,.15)", border: "none", color: "white", width: 32, height: 32, borderRadius: "50%", cursor: "pointer", fontSize: ".9rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                style={{ background: "rgba(255,255,255,.15)", border: "none", color: "white", width: 44, height: 44, borderRadius: "50%", cursor: "pointer", fontSize: ".9rem", display: "flex", alignItems: "center", justifyContent: "center" }}>
                 <i className="fa-solid fa-xmark" />
               </button>
             </div>
