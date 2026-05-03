@@ -3,6 +3,7 @@
 import React, { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Session } from "@supabase/supabase-js";
+import MusicPlayer from "@/app/components/MusicPlayer";
 import type { Guide, Destination, Review, GalleryImage, UserProfile } from "@/lib/database.types";
 import { getTier, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BONUS_PCT } from "@/lib/loyalty";
 
@@ -81,9 +82,10 @@ export default function CaoBangEcoTour() {
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(FALLBACK_GALLERY);
 
   // Site settings
-  const [heroBg, setHeroBg]           = useState("");
-  const [destBg, setDestBg]           = useState("https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1600&q=75");
-  const [pricingBg, setPricingBg]     = useState("https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75");
+  const [heroBg, setHeroBg]       = useState("");
+  const [destBg, setDestBg]       = useState("https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1600&q=75");
+  const [pricingBg, setPricingBg] = useState("https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75");
+  const [musicSrc, setMusicSrc]   = useState("");
 
   // Auth state
   const [userSession, setUserSession] = useState<Session | null>(null);
@@ -134,9 +136,10 @@ export default function CaoBangEcoTour() {
       if (gal && gal.length > 0) setGalleryImages(gal);
       if (settings) {
         const find = (k: string) => settings.find((s: { key: string; value: string }) => s.key === k)?.value;
-        if (find("hero_bg"))        setHeroBg(find("hero_bg")!);
+        if (find("hero_bg"))         setHeroBg(find("hero_bg")!);
         if (find("destinations_bg")) setDestBg(find("destinations_bg")!);
-        if (find("pricing_bg"))     setPricingBg(find("pricing_bg")!);
+        if (find("pricing_bg"))      setPricingBg(find("pricing_bg")!);
+        if (find("background_music")) setMusicSrc(find("background_music")!);
       }
     }
     loadData();
@@ -241,7 +244,7 @@ export default function CaoBangEcoTour() {
     setIsBookingOpen(true);
   };
 
-  const handleBookingSubmit = async (e: React.FormEvent) => {
+  const handleBookingSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setBookingLoading(true);
     setBookingError("");
@@ -290,7 +293,7 @@ export default function CaoBangEcoTour() {
     }
   };
 
-  const handleContactSubmit = async (e: React.FormEvent) => {
+  const handleContactSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
     setContactLoading(true);
     setContactError("");
@@ -955,6 +958,8 @@ export default function CaoBangEcoTour() {
           </div>
         </div>
       </footer>
+
+      <MusicPlayer src={musicSrc} />
     </>
   );
 }
