@@ -3,7 +3,11 @@
     "allow": [
       "Bash(npx tsc *)",
       "Bash(dir /b /s app lib supabase)",
-      "Bash(findstr /v \"node_modules\")"
+      "Bash(findstr /v \"node_modules\")",
+      "Bash(git commit -m 'Add detailed error logging to booking API for debugging *)",
+      "Bash(git commit -m 'Simplify booking API: inline client, full try-catch, detailed errors *)",
+      "Bash(git commit -m 'Fix booking: dùng service role key bypass RLS cho server-side API *)",
+      "Bash(git commit -m 'Fix đăng ký: bỏ upsert sau signUp, dùng metadata + trigger thay thế *)"
     ]
   }
 }

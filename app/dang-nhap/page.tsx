@@ -81,17 +81,17 @@ export default function DangNhapPage() {
     if (!fullName.trim()) { setMessage({ text: "Vui lòng nhập họ và tên.", ok: false }); return; }
     setLoading(true);
     setMessage(null);
-    const { data, error } = await supabase.auth.signUp({
+    const { error } = await supabase.auth.signUp({
       email,
       password,
       options: {
         emailRedirectTo: `${window.location.origin}/dang-nhap`,
+        data: { full_name: fullName.trim(), phone: phone.trim() },
       },
     });
     if (error) { setMessage({ text: "Lỗi: " + error.message, ok: false }); setLoading(false); return; }
-    if (data.user) {
-      await supabase.from("user_profiles").upsert({ id: data.user.id, full_name: fullName.trim(), phone: phone.trim() });
-    }
+    // Không upsert user_profiles ở đây vì user chưa có session
+    // Trigger handle_new_user() sẽ tự tạo profile với full_name/phone từ metadata
     setMessage({ text: "Đăng ký thành công! Kiểm tra email để xác nhận tài khoản.", ok: true });
     setLoading(false);
   };
