@@ -54,9 +54,14 @@ export default function DangNhapPage() {
   };
   const [loginBg, setLoginBg]   = useState("https://images.unsplash.com/photo-1602498456745-e9503b30470b?w=800&q=60");
 
+  async function redirectByRole(userId: string) {
+    const { data } = await supabase.from("user_profiles").select("is_admin").eq("id", userId).single();
+    window.location.href = data?.is_admin ? "/admin" : "/tai-khoan";
+  }
+
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
-      if (session) window.location.href = "/tai-khoan";
+      if (session) redirectByRole(session.user.id);
     });
     supabase
       .from("site_settings")
@@ -70,10 +75,9 @@ export default function DangNhapPage() {
     e.preventDefault();
     setLoading(true);
     setMessage(null);
-    const { error } = await supabase.auth.signInWithPassword({ email, password });
-    if (error) setMessage({ text: "Sai email hoặc mật khẩu. Vui lòng thử lại.", ok: false });
-    else window.location.href = "/tai-khoan";
-    setLoading(false);
+    const { data, error } = await supabase.auth.signInWithPassword({ email, password });
+    if (error) { setMessage({ text: "Sai email hoặc mật khẩu. Vui lòng thử lại.", ok: false }); setLoading(false); return; }
+    await redirectByRole(data.user.id);
   };
 
   const handleRegister = async (e: React.SyntheticEvent) => {
