@@ -136,8 +136,8 @@ export default function AdminBookings() {
           <p style={{ fontWeight: 600 }}>Không có đặt lịch nào.</p>
         </div>
       ) : (
-        <div className="admin-card" style={{ padding: 0, overflow: "hidden" }}>
-          <div className="admin-table-wrap">
+        <div className="admin-card" style={{ padding: 0 }}>
+          <div className="admin-table-wrap" style={{ borderRadius: 12, overflow: "auto" }}>
             <table className="admin-table">
               <thead>
                 <tr>
