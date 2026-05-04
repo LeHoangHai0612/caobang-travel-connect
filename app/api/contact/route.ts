@@ -23,10 +23,10 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabase
     .from('contacts')
     .insert({
-      name: name.trim(),
-      email: email?.trim() || '',
-      phone: phone?.trim() || '',
-      message: message.trim(),
+      fullname: name.trim(),   // cột trong DB là fullname
+      email:    email?.trim()   || '',
+      phone:    phone?.trim()   || '',
+      message:  message.trim(),
     })
     .select('id')
     .single();

@@ -4,8 +4,8 @@ import { useEffect, useState } from "react";
 import { supabase } from "@/lib/supabase";
 
 interface Contact {
-  id: string;
-  name: string;
+  id: number;
+  fullname: string;
   email: string;
   phone: string;
   message: string;
@@ -35,7 +35,7 @@ export default function AdminContacts() {
 
   useEffect(() => { load(); }, []);
 
-  async function markRead(id: string, is_read: boolean) {
+  async function markRead(id: number, is_read: boolean) {
     await supabase.from("contacts").update({ is_read }).eq("id", id);
     setContacts((prev) => prev.map((c) => c.id === id ? { ...c, is_read } : c));
     if (detail?.id === id) setDetail((prev) => prev ? { ...prev, is_read } : prev);
@@ -70,7 +70,7 @@ export default function AdminContacts() {
     setReplying(false);
   }
 
-  async function handleDelete(id: string) {
+  async function handleDelete(id: number) {
     await supabase.from("contacts").delete().eq("id", id);
     setContacts((prev) => prev.filter((c) => c.id !== id));
     if (detail?.id === id) setDetail(null);
@@ -149,14 +149,14 @@ export default function AdminContacts() {
               {/* Avatar */}
               <div style={{ width: 42, height: 42, borderRadius: "50%", background: c.is_read ? "#f1f5f9" : "#265C59", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                 <span style={{ color: c.is_read ? "#94a3b8" : "white", fontWeight: 800, fontSize: ".85rem" }}>
-                  {(c.name || "?")[0].toUpperCase()}
+                  {(c.fullname || "?")[0].toUpperCase()}
                 </span>
               </div>
 
               {/* Content */}
               <div style={{ flex: 1, minWidth: 0 }}>
                 <div style={{ display: "flex", alignItems: "center", gap: 8, marginBottom: 3, flexWrap: "wrap" }}>
-                  <span style={{ fontWeight: c.is_read ? 600 : 800, color: "#0f172a", fontSize: ".9rem" }}>{c.name || "Ẩn danh"}</span>
+                  <span style={{ fontWeight: c.is_read ? 600 : 800, color: "#0f172a", fontSize: ".9rem" }}>{c.fullname || "Ẩn danh"}</span>
                   {!c.is_read && (
                     <span style={{ background: "#265C59", color: "white", borderRadius: 20, padding: "1px 8px", fontSize: ".68rem", fontWeight: 700 }}>MỚI</span>
                   )}
@@ -184,7 +184,7 @@ export default function AdminContacts() {
             {/* Header */}
             <div style={{ background: "#265C59", padding: "20px 24px", borderRadius: "16px 16px 0 0", display: "flex", justifyContent: "space-between", alignItems: "center" }}>
               <div>
-                <p style={{ color: "white", fontWeight: 800, fontSize: "1rem", margin: 0 }}>{detail.name || "Ẩn danh"}</p>
+                <p style={{ color: "white", fontWeight: 800, fontSize: "1rem", margin: 0 }}>{detail.fullname || "Ẩn danh"}</p>
                 <p style={{ color: "rgba(255,255,255,.65)", fontSize: ".78rem", margin: "4px 0 0" }}>
                   {new Date(detail.created_at).toLocaleString("vi-VN")}
                 </p>

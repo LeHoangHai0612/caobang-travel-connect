@@ -5,8 +5,8 @@ import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 
 interface Contact {
-  id: string;
-  name: string;
+  id: number;
+  fullname: string;
   message: string;
   created_at: string;
   admin_reply: string;
@@ -24,7 +24,7 @@ export default function TinNhanPage() {
     if (!id) return;
     supabase
       .from("contacts")
-      .select("id,name,message,created_at,admin_reply,replied_at,replied_by")
+      .select("id,fullname,message,created_at,admin_reply,replied_at,replied_by")
       .eq("id", id)
       .single()
       .then(({ data, error }) => {
@@ -83,7 +83,7 @@ export default function TinNhanPage() {
         ) : (
           <div className="tm-card">
             <div className="tm-header">
-              <h1>Tin nhắn của {contact.name}</h1>
+              <h1>Tin nhắn của {contact.fullname}</h1>
               <p>Cao Bằng Travel Connect · {new Date(contact.created_at).toLocaleDateString("vi-VN")}</p>
             </div>
             <div className="tm-body">
