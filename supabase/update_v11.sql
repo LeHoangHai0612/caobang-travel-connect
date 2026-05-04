@@ -22,10 +22,14 @@ CREATE TABLE IF NOT EXISTS public.schedule_logs (
 
 ALTER TABLE public.schedule_logs ENABLE ROW LEVEL SECURITY;
 
--- Admin đọc log
-CREATE POLICY "logs_admin_select" ON public.schedule_logs
-  FOR SELECT USING (public.is_admin());
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'schedule_logs' AND policyname = 'logs_admin_select') THEN
+    CREATE POLICY "logs_admin_select" ON public.schedule_logs FOR SELECT USING (public.is_admin());
+  END IF;
+END $$;
 
--- Hệ thống ghi log (service role hoặc admin)
-CREATE POLICY "logs_admin_insert" ON public.schedule_logs
-  FOR INSERT WITH CHECK (public.is_admin());
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'schedule_logs' AND policyname = 'logs_admin_insert') THEN
+    CREATE POLICY "logs_admin_insert" ON public.schedule_logs FOR INSERT WITH CHECK (public.is_admin());
+  END IF;
+END $$;
