@@ -69,20 +69,7 @@ export default function AdminBookings() {
     setUpdating(id);
     await supabase.from("bookings").update({ status }).eq("id", id);
 
-    // Gửi email xác nhận nếu có địa chỉ email
-    if (status === "confirmed") {
-      const booking = bookings.find((b) => b.id === id) ?? detail;
-      if (booking?.email) {
-        const { data: { session } } = await supabase.auth.getSession();
-        fetch("/api/send-confirmation", {
-          method: "POST",
-          headers: { "Content-Type": "application/json", ...(session?.access_token ? { Authorization: `Bearer ${session.access_token}` } : {}) },
-          body: JSON.stringify({ to: booking.email, client_name: booking.client_name, package_type: booking.package_type, preferred_date: booking.preferred_date, booking_id: booking.id }),
-        }).catch(() => null);
-      }
-    }
-
-    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
+setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
     if (detail?.id === id) setDetail((prev) => prev ? { ...prev, status } : prev);
     setUpdating(null);
   }
