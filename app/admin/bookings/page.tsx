@@ -71,25 +71,46 @@ export default function AdminBookings() {
 
     const booking = bookings.find((b) => b.id === id) ?? detail;
 
+    // Lấy admin hiện tại để ghi log
+    const { data: { session } } = await supabase.auth.getSession();
+    const adminId   = session?.user.id ?? "";
+    const { data: adminProfile } = adminId
+      ? await supabase.from("user_profiles").select("full_name").eq("id", adminId).single()
+      : { data: null };
+    const adminName = adminProfile?.full_name || session?.user.email || "Admin";
+
     if (status === "confirmed" && booking?.guide_id && booking?.preferred_date) {
-      // Đánh dấu ngày đó là đã đặt trong lịch HDV
+      const date = booking.preferred_date.slice(0, 10);
       await supabase.from("guide_schedules").upsert({
-        guide_id:   booking.guide_id,
-        date:       booking.preferred_date.slice(0, 10),
-        status:     "booked",
+        guide_id: booking.guide_id, date, status: "booked",
         booking_id: booking.id,
-        note:       `${booking.client_name} — ${booking.package_type}`,
+        note: `${booking.client_name} — ${booking.package_type}`,
+        created_by: adminId, created_by_name: adminName,
       }, { onConflict: "guide_id,date" });
+      // Ghi log
+      const { data: g } = await supabase.from("guides").select("name").eq("id", booking.guide_id).single();
+      await supabase.from("schedule_logs").insert({
+        guide_id: booking.guide_id, guide_name: g?.name ?? "",
+        date, action: "booked", admin_id: adminId, admin_name: adminName,
+        note: `${booking.client_name} — ${booking.package_type}`,
+      });
     }
 
     if (status === "cancelled" && booking?.guide_id && booking?.preferred_date) {
-      // Xóa lịch đặt khỏi lịch HDV khi hủy
+      const date = booking.preferred_date.slice(0, 10);
       await supabase.from("guide_schedules")
         .delete()
         .eq("guide_id", booking.guide_id)
-        .eq("date", booking.preferred_date.slice(0, 10))
+        .eq("date", date)
         .eq("status", "booked")
         .eq("booking_id", booking.id);
+      // Ghi log
+      const { data: g } = await supabase.from("guides").select("name").eq("id", booking.guide_id).single();
+      await supabase.from("schedule_logs").insert({
+        guide_id: booking.guide_id, guide_name: g?.name ?? "",
+        date, action: "cancelled", admin_id: adminId, admin_name: adminName,
+        note: `${booking.client_name} — ${booking.package_type}`,
+      });
     }
 
     setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
