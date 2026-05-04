@@ -32,12 +32,25 @@ const STATUS_LABEL: Record<string, string> = {
   cancelled: "Đã hủy",
 };
 
+interface Toast { id: number; text: string; ok: boolean; }
+
+function useToast() {
+  const [toasts, setToasts] = useState<Toast[]>([]);
+  const show = (text: string, ok = true) => {
+    const id = Date.now();
+    setToasts((prev) => [...prev, { id, text, ok }]);
+    setTimeout(() => setToasts((prev) => prev.filter((t) => t.id !== id)), 3500);
+  };
+  return { toasts, show };
+}
+
 export default function AdminBookings() {
   const [bookings, setBookings]     = useState<Booking[]>([]);
   const [filter, setFilter]         = useState("all");
   const [loading, setLoading]       = useState(true);
   const [updating, setUpdating]     = useState<string | null>(null);
   const [detail, setDetail]         = useState<Booking | null>(null);
+  const { toasts, show: showToast } = useToast();
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -115,6 +128,10 @@ export default function AdminBookings() {
 
     setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
     if (detail?.id === id) setDetail((prev) => prev ? { ...prev, status } : prev);
+    showToast(
+      status === "confirmed" ? "✓ Đã xác nhận lịch thành công" : "✓ Đã hủy lịch",
+      status === "confirmed"
+    );
     setUpdating(null);
   }
 
@@ -127,6 +144,24 @@ export default function AdminBookings() {
 
   return (
     <div className="admin-content">
+      {/* Toast notifications */}
+      <div style={{ position: "fixed", bottom: 24, right: 24, zIndex: 9999, display: "flex", flexDirection: "column", gap: 10 }}>
+        {toasts.map((t) => (
+          <div key={t.id} style={{
+            background: t.ok ? "#265C59" : "#dc2626",
+            color: "white", padding: "12px 20px", borderRadius: 12,
+            fontWeight: 700, fontSize: ".85rem",
+            boxShadow: "0 4px 20px rgba(0,0,0,.2)",
+            animation: "slideIn .25s ease",
+            display: "flex", alignItems: "center", gap: 8,
+          }}>
+            <i className={`fa-solid ${t.ok ? "fa-circle-check" : "fa-circle-xmark"}`} />
+            {t.text}
+          </div>
+        ))}
+      </div>
+      <style>{`@keyframes slideIn { from { opacity:0; transform:translateX(40px) } to { opacity:1; transform:translateX(0) } }`}</style>
+
       <div className="admin-header">
         <div>
           <h1 className="admin-header-title">Quản Lý Đặt Lịch</h1>

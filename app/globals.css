@@ -590,7 +590,9 @@ footer { background: var(--teal-dark); color: rgba(255,255,255,.85); padding: 60
 .admin-card {
   background: white; border-radius: 14px;
   box-shadow: 0 1px 3px rgba(0,0,0,.06), 0 1px 2px rgba(0,0,0,.04);
-  overflow: hidden; padding: 22px;
+  padding: 22px;
+  /* Không dùng overflow: hidden ở đây để tránh clip bảng.
+     Các card cần clip ảnh thêm overflow: hidden inline. */
 }
 .admin-card + .admin-card { margin-top: 20px; }
 
@@ -600,7 +602,7 @@ footer { background: var(--teal-dark); color: rgba(255,255,255,.85); padding: 60
 @media (max-width: 600px)  { .admin-stat-grid { grid-template-columns: 1fr; } }
 
 /* ── Table ── */
-.admin-table-wrap { overflow-x: auto; margin: -22px; }
+.admin-table-wrap { overflow-x: auto; margin: -22px; border-radius: 14px; }
 .admin-table { width: 100%; border-collapse: collapse; font-size: .83rem; }
 .admin-table th {
   text-align: left; padding: 11px 18px;
