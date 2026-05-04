@@ -250,6 +250,7 @@ export default function CaoBangEcoTour() {
 
   const handleReviewSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    if (reviewLoading) return;
     if (!reviewText.trim()) { setReviewError("Vui lòng nhập nội dung đánh giá."); return; }
     if (!reviewName.trim()) { setReviewError("Vui lòng nhập tên của bạn."); return; }
     setReviewLoading(true); setReviewError("");
@@ -283,6 +284,7 @@ export default function CaoBangEcoTour() {
 
   const handleBookingSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    if (bookingLoading) return;
     setBookingLoading(true);
     setBookingError("");
 
@@ -332,6 +334,7 @@ export default function CaoBangEcoTour() {
 
   const handleContactSubmit = async (e: React.SyntheticEvent) => {
     e.preventDefault();
+    if (contactLoading) return;
     setContactLoading(true);
     setContactError("");
     try {
@@ -1046,10 +1049,10 @@ export default function CaoBangEcoTour() {
               <h4>Liên Hệ</h4>
               <form onSubmit={handleContactSubmit}>
                 <div className="footer-form-group">
-                  <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Họ và tên" autoComplete="name" />
+                  <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Họ và tên" autoComplete="name" required />
                 </div>
                 <div className="footer-form-group">
-                  <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="Địa chỉ Email" autoComplete="email" />
+                  <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="Địa chỉ Email" autoComplete="email" required />
                 </div>
                 <div className="footer-form-group">
                   <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} placeholder="Số điện thoại" autoComplete="tel" />

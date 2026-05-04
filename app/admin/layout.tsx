@@ -7,6 +7,7 @@ import { supabase } from "@/lib/supabase";
 
 const NAV = [
   { href: "/admin",               icon: "fa-chart-pie",          label: "Tổng Quan"       },
+  { href: "/admin/bookings",      icon: "fa-calendar-check",     label: "Đặt Lịch"        },
   { href: "/admin/guides",        icon: "fa-users",               label: "Hướng Dẫn Viên" },
   { href: "/admin/destinations",  icon: "fa-map-location-dot",    label: "Điểm Đến"        },
   { href: "/admin/gallery",       icon: "fa-images",              label: "Thư Viện Ảnh"    },
@@ -41,7 +42,7 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
     window.location.href = "/login";
   };
 
-  const currentNav = NAV.find((n) => n.href === pathname);
+  const currentNav = NAV.find((n) => pathname === n.href || (n.href !== "/admin" && pathname.startsWith(n.href)));
 
   if (checking) return (
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f0f2f5" }}>

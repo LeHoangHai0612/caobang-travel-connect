@@ -30,6 +30,7 @@ export interface Review {
   review_text: string;
   avatar_url: string;
   is_approved: boolean;
+  user_id?: string | null;
   created_at: string;
 }
 
