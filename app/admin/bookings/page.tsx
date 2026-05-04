@@ -17,6 +17,9 @@ interface Booking {
   created_at: string;
   guide_id: string | null;
   guide_name?: string;
+  cancelled_by_name?: string;
+  cancelled_note?: string;
+  cancelled_at?: string;
 }
 
 const STATUS_OPTIONS = [
@@ -45,12 +48,14 @@ function useToast() {
 }
 
 export default function AdminBookings() {
-  const [bookings, setBookings]     = useState<Booking[]>([]);
-  const [filter, setFilter]         = useState("all");
-  const [loading, setLoading]       = useState(true);
-  const [updating, setUpdating]     = useState<string | null>(null);
-  const [detail, setDetail]         = useState<Booking | null>(null);
-  const { toasts, show: showToast } = useToast();
+  const [bookings, setBookings]       = useState<Booking[]>([]);
+  const [filter, setFilter]           = useState("all");
+  const [loading, setLoading]         = useState(true);
+  const [updating, setUpdating]       = useState<string | null>(null);
+  const [detail, setDetail]           = useState<Booking | null>(null);
+  const { toasts, show: showToast }   = useToast();
+  const [cancelTarget, setCancelTarget] = useState<Booking | null>(null);
+  const [cancelNote, setCancelNote]     = useState("");
 
   const load = useCallback(async () => {
     setLoading(true);
@@ -78,21 +83,22 @@ export default function AdminBookings() {
 
   useEffect(() => { load(); }, [load]);
 
-  async function updateStatus(id: string, status: "confirmed" | "cancelled") {
+  async function getAdminInfo() {
+    const { data: { session } } = await supabase.auth.getSession();
+    const adminId = session?.user.id ?? "";
+    const { data: p } = adminId
+      ? await supabase.from("user_profiles").select("full_name").eq("id", adminId).single()
+      : { data: null };
+    return { adminId, adminName: p?.full_name || session?.user.email || "Admin" };
+  }
+
+  async function updateStatus(id: string, status: "confirmed") {
     setUpdating(id);
+    const { adminId, adminName } = await getAdminInfo();
     await supabase.from("bookings").update({ status }).eq("id", id);
 
     const booking = bookings.find((b) => b.id === id) ?? detail;
-
-    // Lấy admin hiện tại để ghi log
-    const { data: { session } } = await supabase.auth.getSession();
-    const adminId   = session?.user.id ?? "";
-    const { data: adminProfile } = adminId
-      ? await supabase.from("user_profiles").select("full_name").eq("id", adminId).single()
-      : { data: null };
-    const adminName = adminProfile?.full_name || session?.user.email || "Admin";
-
-    if (status === "confirmed" && booking?.guide_id && booking?.preferred_date) {
+    if (booking?.guide_id && booking?.preferred_date) {
       const date = booking.preferred_date.slice(0, 10);
       await supabase.from("guide_schedules").upsert({
         guide_id: booking.guide_id, date, status: "booked",
@@ -100,7 +106,6 @@ export default function AdminBookings() {
         note: `${booking.client_name} — ${booking.package_type}`,
         created_by: adminId, created_by_name: adminName,
       }, { onConflict: "guide_id,date" });
-      // Ghi log
       const { data: g } = await supabase.from("guides").select("name").eq("id", booking.guide_id).single();
       await supabase.from("schedule_logs").insert({
         guide_id: booking.guide_id, guide_name: g?.name ?? "",
@@ -109,7 +114,25 @@ export default function AdminBookings() {
       });
     }
 
-    if (status === "cancelled" && booking?.guide_id && booking?.preferred_date) {
+    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
+    if (detail?.id === id) setDetail((prev) => prev ? { ...prev, status } : prev);
+    showToast("✓ Đã xác nhận lịch thành công");
+    setUpdating(null);
+  }
+
+  async function doCancel(booking: Booking, note: string) {
+    setUpdating(booking.id);
+    const { adminId, adminName } = await getAdminInfo();
+    const cancelledAt = new Date().toISOString();
+
+    await supabase.from("bookings").update({
+      status: "cancelled",
+      cancelled_by_name: adminName,
+      cancelled_note:    note.trim(),
+      cancelled_at:      cancelledAt,
+    }).eq("id", booking.id);
+
+    if (booking.guide_id && booking.preferred_date) {
       const date = booking.preferred_date.slice(0, 10);
       await supabase.from("guide_schedules")
         .delete()
@@ -117,21 +140,20 @@ export default function AdminBookings() {
         .eq("date", date)
         .eq("status", "booked")
         .eq("booking_id", booking.id);
-      // Ghi log
       const { data: g } = await supabase.from("guides").select("name").eq("id", booking.guide_id).single();
       await supabase.from("schedule_logs").insert({
         guide_id: booking.guide_id, guide_name: g?.name ?? "",
         date, action: "cancelled", admin_id: adminId, admin_name: adminName,
-        note: `${booking.client_name} — ${booking.package_type}`,
+        note: `${booking.client_name}${note.trim() ? " — " + note.trim() : ""}`,
       });
     }
 
-    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
-    if (detail?.id === id) setDetail((prev) => prev ? { ...prev, status } : prev);
-    showToast(
-      status === "confirmed" ? "✓ Đã xác nhận lịch thành công" : "✓ Đã hủy lịch",
-      status === "confirmed"
-    );
+    const updated = { ...booking, status: "cancelled" as const, cancelled_by_name: adminName, cancelled_note: note.trim(), cancelled_at: cancelledAt };
+    setBookings((prev) => prev.map((b) => b.id === booking.id ? updated : b));
+    if (detail?.id === booking.id) setDetail(updated);
+    setCancelTarget(null);
+    setCancelNote("");
+    showToast("✓ Đã hủy lịch", false);
     setUpdating(null);
   }
 
@@ -281,7 +303,7 @@ export default function AdminBookings() {
                       )}
                       {b.status !== "cancelled" && (
                         <button
-                          onClick={() => updateStatus(b.id, "cancelled")}
+                          onClick={() => { setCancelTarget(b); setCancelNote(""); }}
                           disabled={updating === b.id}
                           style={{
                             padding: "5px 12px", borderRadius: 8, border: "none",
@@ -347,6 +369,17 @@ export default function AdminBookings() {
                 valueColor={detail.status === "confirmed" ? "#16a34a" : detail.status === "cancelled" ? "#dc2626" : "#b45309"} />
               <Row icon="fa-calendar-plus" label="Ngày đặt"
                 value={new Date(detail.created_at).toLocaleString("vi-VN")} />
+              {detail.status === "cancelled" && detail.cancelled_by_name && (
+                <>
+                  <Row icon="fa-user-slash" label="Người hủy" value={detail.cancelled_by_name} valueColor="#dc2626" />
+                  {detail.cancelled_at && (
+                    <Row icon="fa-clock" label="Thời gian hủy" value={new Date(detail.cancelled_at).toLocaleString("vi-VN")} />
+                  )}
+                  {detail.cancelled_note && (
+                    <Row icon="fa-comment-slash" label="Lý do hủy" value={detail.cancelled_note} />
+                  )}
+                </>
+              )}
 
               {/* Actions */}
               {detail.status !== "confirmed" && detail.status !== "cancelled" && (
@@ -359,7 +392,7 @@ export default function AdminBookings() {
                     {updating === detail.id ? <i className="fa-solid fa-spinner fa-spin" /> : "Xác nhận lịch"}
                   </button>
                   <button
-                    onClick={() => updateStatus(detail.id, "cancelled")}
+                    onClick={() => { setCancelTarget(detail); setCancelNote(""); }}
                     disabled={updating === detail.id}
                     style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "2px solid #fee2e2", background: "white", color: "#dc2626", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}
                   >
@@ -369,13 +402,60 @@ export default function AdminBookings() {
               )}
               {detail.status === "confirmed" && (
                 <button
-                  onClick={() => updateStatus(detail.id, "cancelled")}
+                  onClick={() => { setCancelTarget(detail); setCancelNote(""); }}
                   disabled={updating === detail.id}
                   style={{ width: "100%", padding: "10px 0", borderRadius: 10, border: "2px solid #fee2e2", background: "white", color: "#dc2626", fontWeight: 700, fontSize: ".88rem", cursor: "pointer", marginTop: 8 }}
                 >
                   Hủy lịch đã xác nhận
                 </button>
               )}
+            </div>
+          </div>
+        </div>
+      )}
+
+      {/* Cancel confirmation dialog */}
+      {cancelTarget && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,.55)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+          onClick={() => setCancelTarget(null)}>
+          <div style={{ background: "white", borderRadius: 16, width: "100%", maxWidth: 440, boxShadow: "0 20px 60px rgba(0,0,0,.25)" }}
+            onClick={(e) => e.stopPropagation()}>
+            <div style={{ padding: "24px 24px 0" }}>
+              <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <i className="fa-solid fa-triangle-exclamation" style={{ color: "#dc2626", fontSize: 20 }} />
+              </div>
+              <h3 style={{ fontWeight: 800, fontSize: "1rem", color: "#1a2e2e", textAlign: "center", marginBottom: 8 }}>
+                Xác nhận hủy lịch?
+              </h3>
+              <p style={{ fontSize: ".83rem", color: "#64748b", textAlign: "center", lineHeight: 1.6, marginBottom: 16 }}>
+                Hủy lịch của <strong>{cancelTarget.client_name}</strong> — <strong>{cancelTarget.package_type}</strong>.
+                Thao tác này sẽ được ghi lại kèm tên của bạn.
+              </p>
+              <div style={{ marginBottom: 20 }}>
+                <label style={{ display: "block", fontSize: ".7rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>
+                  Lý do hủy (không bắt buộc)
+                </label>
+                <input
+                  className="admin-form-input"
+                  style={{ marginBottom: 0 }}
+                  placeholder="VD: Khách báo không đi được, thời tiết xấu..."
+                  value={cancelNote}
+                  onChange={(e) => setCancelNote(e.target.value)}
+                  onKeyDown={(e) => e.key === "Enter" && doCancel(cancelTarget, cancelNote)}
+                  autoFocus
+                />
+              </div>
+            </div>
+            <div style={{ display: "flex", gap: 10, padding: "0 24px 24px" }}>
+              <button onClick={() => setCancelTarget(null)}
+                style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "white", color: "#475569", fontWeight: 700, fontSize: ".85rem", cursor: "pointer" }}>
+                Không hủy
+              </button>
+              <button onClick={() => doCancel(cancelTarget, cancelNote)}
+                disabled={!!updating}
+                style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "none", background: "#dc2626", color: "white", fontWeight: 700, fontSize: ".85rem", cursor: "pointer", opacity: updating ? .6 : 1 }}>
+                {updating ? <i className="fa-solid fa-spinner fa-spin" /> : "Xác nhận hủy"}
+              </button>
             </div>
           </div>
         </div>
