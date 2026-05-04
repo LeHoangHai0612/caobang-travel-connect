@@ -20,14 +20,21 @@ export async function POST(request: NextRequest) {
   }
 
   const supabase = getAdminClient();
-  const { error } = await supabase
+  const { data, error } = await supabase
     .from('contacts')
-    .insert({ name: name.trim(), email: email?.trim() || '', phone: phone?.trim() || '', message: message.trim() });
+    .insert({
+      name: name.trim(),
+      email: email?.trim() || '',
+      phone: phone?.trim() || '',
+      message: message.trim(),
+    })
+    .select('id')
+    .single();
 
   if (error) {
     console.error('[contact] insert error:', error);
-    return NextResponse.json({ error: 'Không thể lưu tin nhắn. Vui lòng thử lại.' }, { status: 500 });
+    return NextResponse.json({ error: 'Không thể lưu tin nhắn: ' + error.message }, { status: 500 });
   }
 
-  return NextResponse.json({ success: true });
+  return NextResponse.json({ success: true, contact_id: data.id });
 }

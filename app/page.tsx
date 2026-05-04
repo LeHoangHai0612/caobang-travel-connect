@@ -117,6 +117,7 @@ export default function CaoBangEcoTour() {
   const [contactLoading, setContactLoading] = useState(false);
   const [contactSuccess, setContactSuccess] = useState(false);
   const [contactError, setContactError] = useState("");
+  const [contactId, setContactId] = useState("");
 
   const totalPages = Math.ceil(reviews.length / cardsPerPage);
 
@@ -357,7 +358,9 @@ export default function CaoBangEcoTour() {
         body: JSON.stringify({ name: contactName, email: contactEmail, phone: contactPhone, message: contactMessage }),
       });
       if (res.ok) {
+        const data = await res.json();
         setContactSuccess(true);
+        setContactId(data.contact_id || "");
         setContactName(""); setContactEmail(""); setContactPhone(""); setContactMessage("");
       } else {
         const data = await res.json();
@@ -1080,9 +1083,19 @@ export default function CaoBangEcoTour() {
                   <input type="text" value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} placeholder="Nội dung tin nhắn..." required />
                 </div>
                 {contactSuccess && (
-                  <p style={{ color: "#a8e6d0", fontSize: ".82rem", marginBottom: 8 }}>
-                    <i className="fa-solid fa-circle-check" /> Gửi thành công! Chúng tôi sẽ liên hệ sớm.
-                  </p>
+                  <div style={{ background: "rgba(255,255,255,.08)", borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
+                    <p style={{ color: "#a8e6d0", fontSize: ".82rem", marginBottom: contactId ? 8 : 0 }}>
+                      <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />
+                      Gửi thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.
+                    </p>
+                    {contactId && (
+                      <a href={`/tin-nhan/${contactId}`} target="_blank" rel="noopener noreferrer"
+                        style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#5eead4", fontSize: ".78rem", fontWeight: 700, textDecoration: "none", marginTop: 4 }}>
+                        <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: ".7rem" }} />
+                        Xem phản hồi từ chúng tôi tại đây
+                      </a>
+                    )}
+                  </div>
                 )}
                 {contactError && (
                   <p style={{ color: "#f87171", fontSize: ".82rem", marginBottom: 8 }}>{contactError}</p>

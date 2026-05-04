@@ -11,13 +11,18 @@ interface Contact {
   message: string;
   is_read: boolean;
   created_at: string;
+  admin_reply?: string;
+  replied_at?: string;
+  replied_by?: string;
 }
 
 export default function AdminContacts() {
-  const [contacts, setContacts] = useState<Contact[]>([]);
-  const [loading, setLoading]   = useState(true);
-  const [filter, setFilter]     = useState<"all" | "unread" | "read">("all");
-  const [detail, setDetail]     = useState<Contact | null>(null);
+  const [contacts, setContacts]   = useState<Contact[]>([]);
+  const [loading, setLoading]     = useState(true);
+  const [filter, setFilter]       = useState<"all" | "unread" | "read">("all");
+  const [detail, setDetail]       = useState<Contact | null>(null);
+  const [replyText, setReplyText] = useState("");
+  const [replying, setReplying]   = useState(false);
 
   async function load() {
     const { data } = await supabase
@@ -39,6 +44,30 @@ export default function AdminContacts() {
   async function openDetail(c: Contact) {
     setDetail(c);
     if (!c.is_read) await markRead(c.id, true);
+  }
+
+  async function sendReply(contact: Contact) {
+    if (!replyText.trim()) return;
+    setReplying(true);
+    const { data: { session } } = await supabase.auth.getSession();
+    const { data: profile } = session
+      ? await supabase.from("user_profiles").select("full_name").eq("id", session.user.id).single()
+      : { data: null };
+    const adminName = profile?.full_name || session?.user.email || "Admin";
+    const repliedAt = new Date().toISOString();
+
+    await supabase.from("contacts").update({
+      admin_reply: replyText.trim(),
+      replied_at:  repliedAt,
+      replied_by:  adminName,
+      is_read:     true,
+    }).eq("id", contact.id);
+
+    const updated = { ...contact, admin_reply: replyText.trim(), replied_at: repliedAt, replied_by: adminName, is_read: true };
+    setContacts((prev) => prev.map((c) => c.id === contact.id ? updated : c));
+    setDetail(updated);
+    setReplyText("");
+    setReplying(false);
   }
 
   async function handleDelete(id: string) {
@@ -197,6 +226,45 @@ export default function AdminContacts() {
               </div>
 
               {/* Actions */}
+              {/* Reply đã gửi */}
+              {detail.admin_reply && (
+                <div style={{ background: "#f0faf9", border: "1.5px solid #b2dfdb", borderRadius: 12, padding: 14 }}>
+                  <p style={{ margin: "0 0 6px", fontSize: ".68rem", fontWeight: 800, color: "#265C59", textTransform: "uppercase" }}>
+                    <i className="fa-solid fa-reply" style={{ marginRight: 5 }} />
+                    Đã phản hồi · {detail.replied_by}
+                    {detail.replied_at && <span style={{ fontWeight: 400, opacity: .7, marginLeft: 6 }}>· {new Date(detail.replied_at).toLocaleString("vi-VN")}</span>}
+                  </p>
+                  <p style={{ margin: 0, fontSize: ".85rem", color: "#1e293b", lineHeight: 1.7 }}>{detail.admin_reply}</p>
+                  <a href={`/tin-nhan/${detail.id}`} target="_blank" rel="noopener noreferrer"
+                    style={{ display: "inline-flex", alignItems: "center", gap: 5, marginTop: 8, fontSize: ".72rem", color: "#265C59", fontWeight: 700, textDecoration: "none" }}>
+                    <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: ".65rem" }} />
+                    Link xem phản hồi của khách
+                  </a>
+                </div>
+              )}
+
+              {/* Ô nhập reply */}
+              <div style={{ background: "#f8fafc", borderRadius: 12, padding: 14 }}>
+                <p style={{ margin: "0 0 8px", fontSize: ".68rem", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase" }}>
+                  {detail.admin_reply ? "Sửa phản hồi" : "Viết phản hồi cho khách"}
+                </p>
+                <textarea
+                  className="admin-form-input"
+                  rows={3}
+                  style={{ resize: "vertical", fontFamily: "inherit", marginBottom: 8 }}
+                  placeholder="Nhập nội dung phản hồi... Khách hàng sẽ thấy tại link /tin-nhan/[id]"
+                  value={replyText}
+                  onChange={(e) => setReplyText(e.target.value)}
+                  defaultValue={detail.admin_reply || ""}
+                />
+                <button onClick={() => sendReply(detail)} disabled={replying || !replyText.trim()}
+                  style={{ width: "100%", padding: "9px 0", borderRadius: 10, border: "none", background: "#265C59", color: "white", fontWeight: 700, fontSize: ".84rem", cursor: "pointer", opacity: !replyText.trim() ? .5 : 1 }}>
+                  {replying
+                    ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 6 }} />Đang gửi...</>
+                    : <><i className="fa-solid fa-reply" style={{ marginRight: 6 }} />{detail.admin_reply ? "Cập nhật phản hồi" : "Gửi phản hồi"}</>}
+                </button>
+              </div>
+
               <div style={{ display: "flex", gap: 10 }}>
                 <button
                   onClick={() => markRead(detail.id, !detail.is_read)}
