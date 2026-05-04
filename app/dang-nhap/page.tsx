@@ -55,7 +55,13 @@ export default function DangNhapPage() {
   const [loginBg, setLoginBg]   = useState("https://images.unsplash.com/photo-1602498456745-e9503b30470b?w=800&q=60");
 
   async function redirectByRole(userId: string) {
-    const { data } = await supabase.from("user_profiles").select("is_admin").eq("id", userId).single();
+    const { data } = await supabase.from("user_profiles").select("is_admin,is_blocked").eq("id", userId).single();
+    if (data?.is_blocked) {
+      await supabase.auth.signOut();
+      setMessage({ text: "Tài khoản của bạn đã bị khóa. Vui lòng liên hệ quản trị viên.", ok: false });
+      setLoading(false);
+      return;
+    }
     window.location.href = data?.is_admin ? "/admin" : "/tai-khoan";
   }
 

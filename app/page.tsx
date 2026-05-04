@@ -120,6 +120,14 @@ export default function CaoBangEcoTour() {
   const [contactId, setContactId] = useState("");
   const [unreadReplies, setUnreadReplies] = useState(0);
 
+  // HDV filter
+  const [guideSearch, setGuideSearch] = useState("");
+  const [guideFilterLang, setGuideFilterLang] = useState("");
+  const [guideFilterRating, setGuideFilterRating] = useState("");
+
+  // Weather
+  const [weather, setWeather] = useState<{ temp: number; code: number; wind: number } | null>(null);
+
   const totalPages = Math.ceil(reviews.length / cardsPerPage);
 
   // Review form state
@@ -157,6 +165,13 @@ export default function CaoBangEcoTour() {
       }
     }
     loadData();
+
+    // Thời tiết Cao Bằng (Open-Meteo, không cần API key)
+    fetch("https://api.open-meteo.com/v1/forecast?latitude=22.67&longitude=106.27&current=temperature_2m,weather_code,wind_speed_10m&timezone=Asia/Ho_Chi_Minh")
+      .then((r) => r.json())
+      .then((d) => {
+        if (d?.current) setWeather({ temp: Math.round(d.current.temperature_2m), code: d.current.weather_code, wind: Math.round(d.current.wind_speed_10m) });
+      }).catch(() => null);
 
     // Shadow header khi cuộn
     const handleScroll = () => setIsScrolled(window.scrollY > 20);
@@ -387,6 +402,26 @@ export default function CaoBangEcoTour() {
   };
 
   const today = new Date().toISOString().split("T")[0];
+
+  // Filtered guides
+  const filteredGuides = guides.filter((g) => {
+    const q = guideSearch.toLowerCase();
+    const matchSearch = !q || g.name.toLowerCase().includes(q) || g.specialty.toLowerCase().includes(q);
+    const matchLang   = !guideFilterLang   || g.languages?.toLowerCase().includes(guideFilterLang.toLowerCase());
+    const matchRating = !guideFilterRating || g.rating >= parseFloat(guideFilterRating);
+    return matchSearch && matchLang && matchRating;
+  });
+
+  // Weather icon from WMO code
+  const weatherIcon = (code: number) => {
+    if (code === 0) return { icon: "fa-sun", label: "Nắng đẹp", color: "#F59E0B" };
+    if (code <= 3)  return { icon: "fa-cloud-sun", label: "Có mây", color: "#6B7280" };
+    if (code <= 49) return { icon: "fa-cloud", label: "Nhiều mây", color: "#9CA3AF" };
+    if (code <= 69) return { icon: "fa-cloud-rain", label: "Mưa", color: "#3B82F6" };
+    if (code <= 79) return { icon: "fa-snowflake", label: "Tuyết", color: "#93C5FD" };
+    if (code <= 99) return { icon: "fa-cloud-bolt", label: "Giông bão", color: "#7C3AED" };
+    return { icon: "fa-cloud", label: "Nhiều mây", color: "#9CA3AF" };
+  };
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
@@ -762,6 +797,21 @@ export default function CaoBangEcoTour() {
                 <div className="hero-stat"><strong>5★</strong><span>Đánh Giá TB</span></div>
               </div>
             </div>
+
+            {/* Weather widget */}
+            {weather && (() => {
+              const w = weatherIcon(weather.code);
+              return (
+                <div style={{ position: "absolute", bottom: 24, right: 24, background: "rgba(0,0,0,.45)", backdropFilter: "blur(8px)", borderRadius: 14, padding: "10px 16px", display: "flex", alignItems: "center", gap: 12, color: "white", border: "1px solid rgba(255,255,255,.15)" }}>
+                  <i className={`fa-solid ${w.icon}`} style={{ fontSize: 22, color: w.color }} />
+                  <div>
+                    <p style={{ margin: 0, fontWeight: 800, fontSize: "1.1rem", lineHeight: 1 }}>{weather.temp}°C</p>
+                    <p style={{ margin: "3px 0 0", fontSize: ".68rem", opacity: .75 }}>{w.label} · Gió {weather.wind} km/h</p>
+                    <p style={{ margin: "1px 0 0", fontSize: ".62rem", opacity: .55 }}>Cao Bằng, Việt Nam</p>
+                  </div>
+                </div>
+              );
+            })()}
           </div>
         </section>
 
@@ -797,8 +847,45 @@ export default function CaoBangEcoTour() {
               <h2 className="section-title" id="team-heading">Đội Ngũ Hướng Dẫn Viên Biểu Tượng</h2>
               <p className="section-subtitle">Những hướng dẫn viên giàu kinh nghiệm, tận tâm và am hiểu sâu về vùng đất Cao Bằng</p>
             </div>
+            {/* Search & filter */}
+            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 28, justifyContent: "center" }}>
+              <div style={{ position: "relative", flex: "1 1 220px", maxWidth: 300 }}>
+                <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", fontSize: 13 }} />
+                <input
+                  type="text" value={guideSearch} onChange={(e) => { setGuideSearch(e.target.value); setCurrentPage(0); }}
+                  placeholder="Tìm theo tên, chuyên môn..."
+                  style={{ width: "100%", padding: "10px 14px 10px 36px", border: "1.5px solid rgba(255,255,255,.2)", borderRadius: 10, background: "rgba(255,255,255,.12)", color: "white", fontSize: ".84rem", outline: "none", backdropFilter: "blur(4px)" }}
+                />
+              </div>
+              <select value={guideFilterLang} onChange={(e) => { setGuideFilterLang(e.target.value); setCurrentPage(0); }}
+                style={{ padding: "10px 14px", border: "1.5px solid rgba(255,255,255,.2)", borderRadius: 10, background: "rgba(255,255,255,.12)", color: "white", fontSize: ".84rem", outline: "none", backdropFilter: "blur(4px)", cursor: "pointer" }}>
+                <option value="" style={{ color: "#1a2e2e" }}>Ngôn ngữ</option>
+                <option value="English" style={{ color: "#1a2e2e" }}>English</option>
+                <option value="Tiếng Việt" style={{ color: "#1a2e2e" }}>Tiếng Việt</option>
+              </select>
+              <select value={guideFilterRating} onChange={(e) => { setGuideFilterRating(e.target.value); setCurrentPage(0); }}
+                style={{ padding: "10px 14px", border: "1.5px solid rgba(255,255,255,.2)", borderRadius: 10, background: "rgba(255,255,255,.12)", color: "white", fontSize: ".84rem", outline: "none", backdropFilter: "blur(4px)", cursor: "pointer" }}>
+                <option value="" style={{ color: "#1a2e2e" }}>Đánh giá</option>
+                <option value="5" style={{ color: "#1a2e2e" }}>5 sao</option>
+                <option value="4.5" style={{ color: "#1a2e2e" }}>4.5+ sao</option>
+                <option value="4" style={{ color: "#1a2e2e" }}>4+ sao</option>
+              </select>
+              {(guideSearch || guideFilterLang || guideFilterRating) && (
+                <button onClick={() => { setGuideSearch(""); setGuideFilterLang(""); setGuideFilterRating(""); }}
+                  style={{ padding: "10px 14px", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 10, background: "transparent", color: "rgba(255,255,255,.7)", fontSize: ".82rem", cursor: "pointer" }}>
+                  <i className="fa-solid fa-xmark" style={{ marginRight: 5 }} />Xóa lọc
+                </button>
+              )}
+            </div>
+
             <div className="team-grid">
-              {guides.map((member) => (
+              {filteredGuides.length === 0 ? (
+                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px 0", color: "rgba(255,255,255,.55)" }}>
+                  <i className="fa-solid fa-person-hiking" style={{ fontSize: 36, marginBottom: 12, display: "block" }} />
+                  <p style={{ fontWeight: 700 }}>Không tìm thấy HDV phù hợp</p>
+                  <p style={{ fontSize: ".82rem", marginTop: 4 }}>Thử điều chỉnh bộ lọc của bạn</p>
+                </div>
+              ) : filteredGuides.map((member) => (
                 <article key={member.id} className="team-card fade-up">
                   <a href={`/hdv/${member.id}`} className="team-card-img-wrap" aria-label={`Xem hồ sơ ${member.name}`} style={{ display: "block", textDecoration: "none", cursor: "pointer" }}>
                     <img className="team-card-img" src={member.image_url} alt={`HDV ${member.name}`} loading="lazy" />
@@ -827,6 +914,42 @@ export default function CaoBangEcoTour() {
                     </a>
                   )}
                 </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ==================== SOS / KHẨN CẤP ==================== */}
+        <section style={{ background: "#1a2e2e", padding: "40px 0" }}>
+          <div className="container">
+            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
+              <div style={{ width: 44, height: 44, borderRadius: 12, background: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                <i className="fa-solid fa-triangle-exclamation" style={{ color: "white", fontSize: 18 }} />
+              </div>
+              <div>
+                <h2 style={{ color: "white", fontWeight: 800, fontSize: "1rem", margin: 0 }}>Hotline Khẩn Cấp tại Cao Bằng</h2>
+                <p style={{ color: "rgba(255,255,255,.55)", fontSize: ".78rem", margin: "3px 0 0" }}>Lưu lại các số điện thoại này trước khi lên đường</p>
+              </div>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+              {[
+                { icon: "fa-shield-halved", label: "Công An Cao Bằng",    num: "069.259.3068", color: "#3B82F6" },
+                { icon: "fa-truck-medical", label: "Cấp Cứu 115",          num: "115",          color: "#EF4444" },
+                { icon: "fa-fire-extinguisher", label: "Phòng Cháy 114",   num: "114",          color: "#F97316" },
+                { icon: "fa-hospital",      label: "BV Đa Khoa Cao Bằng",  num: "0206.3852.021",color: "#10B981" },
+                { icon: "fa-person-hiking", label: "Ban Quản Lý Du Lịch",  num: "0206.3853.726",color: "#8B5CF6" },
+                { icon: "fa-headset",       label: "Hỗ Trợ Tour 24/7",     num: "1800.CAOBANG", color: "#265C59" },
+              ].map((c) => (
+                <a key={c.label} href={`tel:${c.num.replace(/\./g,"")}`}
+                  style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, padding: "14px 16px", textDecoration: "none", transition: "background .15s", cursor: "pointer" }}>
+                  <div style={{ width: 38, height: 38, borderRadius: 10, background: c.color + "22", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                    <i className={`fa-solid ${c.icon}`} style={{ color: c.color, fontSize: 15 }} />
+                  </div>
+                  <div>
+                    <p style={{ color: "rgba(255,255,255,.65)", fontSize: ".68rem", margin: 0 }}>{c.label}</p>
+                    <p style={{ color: "white", fontWeight: 800, fontSize: ".88rem", margin: "2px 0 0", fontFamily: "monospace" }}>{c.num}</p>
+                  </div>
+                </a>
               ))}
             </div>
           </div>

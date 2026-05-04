@@ -34,6 +34,8 @@ export default function TaiKhoanPage() {
   const [editing, setEditing]     = useState(false);
   const [saving, setSaving]       = useState(false);
   const [toast, setToast]         = useState("");
+  const [cancelId, setCancelId]   = useState<string | null>(null);
+  const [cancelling, setCancelling] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -81,6 +83,16 @@ export default function TaiKhoanPage() {
   const logout = async () => {
     await supabase.auth.signOut();
     window.location.href = "/";
+  };
+
+  const cancelBooking = async (id: string) => {
+    setCancelling(true);
+    await supabase.from("bookings").update({ status: "cancelled" }).eq("id", id);
+    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status: "cancelled" } : b));
+    setCancelId(null);
+    setCancelling(false);
+    setToast("Đã hủy lịch đặt.");
+    setTimeout(() => setToast(""), 2500);
   };
 
   if (loading) return (
@@ -332,7 +344,7 @@ export default function TaiKhoanPage() {
               <table style={{ width: "100%", borderCollapse: "collapse" }}>
                 <thead>
                   <tr style={{ background: "#f8fafc" }}>
-                    {["Gói tour", "HDV", "Trạng thái", "Điểm", "Giảm giá", "Ngày"].map((h) => (
+                    {["Gói tour", "HDV", "Trạng thái", "Điểm", "Giảm giá", "Ngày", ""].map((h) => (
                       <th key={h} style={{ padding: "10px 18px", textAlign: "left", fontSize: ".67rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".07em", borderBottom: "1px solid #f1f5f9", whiteSpace: "nowrap" }}>{h}</th>
                     ))}
                   </tr>
@@ -352,6 +364,14 @@ export default function TaiKhoanPage() {
                         <td style={{ padding: "13px 18px", color: "#94a3b8", fontSize: ".8rem", whiteSpace: "nowrap" }}>
                           {new Date(b.created_at).toLocaleDateString("vi-VN")}
                         </td>
+                        <td style={{ padding: "13px 18px" }}>
+                          {b.status === "pending" && (
+                            <button onClick={() => setCancelId(b.id)}
+                              style={{ padding: "5px 12px", borderRadius: 8, border: "1.5px solid #fca5a5", background: "white", color: "#dc2626", fontWeight: 700, fontSize: ".72rem", cursor: "pointer", whiteSpace: "nowrap" }}>
+                              Hủy
+                            </button>
+                          )}
+                        </td>
                       </tr>
                     );
                   })}
@@ -360,6 +380,33 @@ export default function TaiKhoanPage() {
             </div>
           )}
         </div>
+
+        {/* ── Cancel confirmation ── */}
+        {cancelId && (
+          <div style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+            onClick={() => setCancelId(null)}>
+            <div style={{ background: "white", borderRadius: 16, padding: 28, maxWidth: 380, width: "100%", boxShadow: "0 16px 48px rgba(0,0,0,.2)" }}
+              onClick={(e) => e.stopPropagation()}>
+              <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
+                <i className="fa-solid fa-calendar-xmark" style={{ color: "#dc2626", fontSize: 20 }} />
+              </div>
+              <h3 style={{ textAlign: "center", fontWeight: 800, color: "#1a2e2e", marginBottom: 8 }}>Hủy đặt lịch?</h3>
+              <p style={{ textAlign: "center", fontSize: ".84rem", color: "#64748b", lineHeight: 1.6, marginBottom: 20 }}>
+                Bạn có chắc muốn hủy lịch này? Sau khi hủy sẽ không thể hoàn tác.
+              </p>
+              <div style={{ display: "flex", gap: 10 }}>
+                <button onClick={() => setCancelId(null)}
+                  style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "white", fontWeight: 700, fontSize: ".85rem", cursor: "pointer", color: "#475569" }}>
+                  Không hủy
+                </button>
+                <button onClick={() => cancelBooking(cancelId)} disabled={cancelling}
+                  style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "none", background: "#dc2626", color: "white", fontWeight: 700, fontSize: ".85rem", cursor: "pointer", opacity: cancelling ? .6 : 1 }}>
+                  {cancelling ? <i className="fa-solid fa-spinner fa-spin" /> : "Xác nhận hủy"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
 
         {/* ── Tin nhắn & phản hồi ── */}
         <div style={{ background: "white", borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.05)" }}>

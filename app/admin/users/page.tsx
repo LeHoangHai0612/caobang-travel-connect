@@ -12,6 +12,7 @@ interface UserRow {
   points: number;
   tier: string;
   is_admin: boolean;
+  is_blocked: boolean;
   booking_count: number;
   created_at: string;
 }
@@ -47,19 +48,21 @@ export default function AdminUsers() {
     load();
   }, []);
 
-  async function toggleAdmin(userId: string, currentIsAdmin: boolean) {
+  async function patchUser(userId: string, fields: { is_admin?: boolean; is_blocked?: boolean }) {
     setToggling(userId);
     const { data: { session } } = await supabase.auth.getSession();
     if (!session) return;
-
     await fetch("/api/admin/users", {
       method: "PATCH",
       headers: { Authorization: `Bearer ${session.access_token}`, "Content-Type": "application/json" },
-      body: JSON.stringify({ user_id: userId, is_admin: !currentIsAdmin }),
+      body: JSON.stringify({ user_id: userId, ...fields }),
     });
-    setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, is_admin: !currentIsAdmin } : u));
+    setUsers((prev) => prev.map((u) => u.id === userId ? { ...u, ...fields } : u));
     setToggling(null);
   }
+
+  function toggleAdmin(userId: string, cur: boolean) { patchUser(userId, { is_admin: !cur }); }
+  function toggleBlock(userId: string, cur: boolean) { patchUser(userId, { is_blocked: !cur }); }
 
   const filtered = users.filter((u) =>
     !search.trim() ||
@@ -119,6 +122,7 @@ export default function AdminUsers() {
                   <th>Hạng</th>
                   <th style={{ textAlign: "center" }}>Đặt tour</th>
                   <th style={{ textAlign: "center" }}>Admin</th>
+                  <th style={{ textAlign: "center" }}>Khóa</th>
                   <th>Ngày đăng ký</th>
                 </tr>
               </thead>
@@ -171,6 +175,24 @@ export default function AdminUsers() {
                           <span style={{
                             position: "absolute", top: 3, width: 16, height: 16, borderRadius: "50%", background: "white",
                             transition: "left .2s", left: u.is_admin ? 16 : 2,
+                            boxShadow: "0 1px 3px rgba(0,0,0,.2)",
+                          }} />
+                        </button>
+                      </td>
+                      <td style={{ textAlign: "center" }}>
+                        <button
+                          onClick={() => toggleBlock(u.id, u.is_blocked)}
+                          disabled={toggling === u.id || u.is_admin}
+                          title={u.is_admin ? "Không thể khóa Admin" : u.is_blocked ? "Mở khóa tài khoản" : "Khóa tài khoản"}
+                          style={{
+                            width: 36, height: 22, borderRadius: 11, border: "none", cursor: u.is_admin ? "not-allowed" : "pointer",
+                            background: u.is_blocked ? "#dc2626" : "#e2e8f0",
+                            position: "relative", transition: "background .2s",
+                            opacity: toggling === u.id || u.is_admin ? .4 : 1,
+                          }}>
+                          <span style={{
+                            position: "absolute", top: 3, width: 16, height: 16, borderRadius: "50%", background: "white",
+                            transition: "left .2s", left: u.is_blocked ? 16 : 2,
                             boxShadow: "0 1px 3px rgba(0,0,0,.2)",
                           }} />
                         </button>
