@@ -1,9 +1,142 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Guide } from "@/lib/database.types";
+
+const VI_DAYS_SHORT = ["CN","T2","T3","T4","T5","T6","T7"];
+const VI_MONTHS_FULL = ["Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6",
+                        "Tháng 7","Tháng 8","Tháng 9","Tháng 10","Tháng 11","Tháng 12"];
+
+function GuideCalendar({ guideId }: { guideId: string }) {
+  const today = new Date();
+  const todayKey = today.toISOString().slice(0, 10);
+  const [viewYear, setViewYear]   = useState(today.getFullYear());
+  const [viewMonth, setViewMonth] = useState(today.getMonth());
+  const [busyDates, setBusyDates] = useState<Set<string>>(new Set());
+  const [loading, setLoading]     = useState(true);
+
+  const load = useCallback(async () => {
+    setLoading(true);
+    const { data } = await supabase
+      .from("guide_schedules")
+      .select("date")
+      .eq("guide_id", guideId)
+      .gte("date", `${viewYear}-01-01`)
+      .lte("date", `${viewYear}-12-31`);
+    setBusyDates(new Set((data ?? []).map((d: { date: string }) => d.date)));
+    setLoading(false);
+  }, [guideId, viewYear]);
+
+  useEffect(() => { load(); }, [load]);
+
+  function prev() {
+    if (viewMonth === 0) { setViewMonth(11); setViewYear((y) => y - 1); }
+    else setViewMonth((m) => m - 1);
+  }
+  function next() {
+    if (viewMonth === 11) { setViewMonth(0); setViewYear((y) => y + 1); }
+    else setViewMonth((m) => m + 1);
+  }
+
+  const firstDay    = new Date(viewYear, viewMonth, 1).getDay();
+  const daysInMonth = new Date(viewYear, viewMonth + 1, 0).getDate();
+  const cells: (number | null)[] = [
+    ...Array(firstDay).fill(null),
+    ...Array.from({ length: daysInMonth }, (_, i) => i + 1),
+  ];
+  while (cells.length % 7 !== 0) cells.push(null);
+
+  const busyThisMonth = cells.filter((d) => {
+    if (!d) return false;
+    const k = `${viewYear}-${String(viewMonth + 1).padStart(2,"0")}-${String(d).padStart(2,"0")}`;
+    return busyDates.has(k);
+  }).length;
+  const freeThisMonth = daysInMonth - busyThisMonth;
+
+  return (
+    <div>
+      {/* Month nav */}
+      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+        <button onClick={prev}
+          style={{ background: "#f0faf9", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#265C59", fontWeight: 800, fontSize: "1rem" }}>
+          ‹
+        </button>
+        <div style={{ textAlign: "center" }}>
+          <p style={{ fontWeight: 800, fontSize: ".92rem", color: "#1a2e2e", margin: 0 }}>
+            {VI_MONTHS_FULL[viewMonth]} {viewYear}
+          </p>
+          {!loading && (
+            <p style={{ fontSize: ".68rem", color: "#94a3b8", margin: "2px 0 0" }}>
+              {freeThisMonth} ngày trống · {busyThisMonth} ngày bận
+            </p>
+          )}
+        </div>
+        <button onClick={next}
+          style={{ background: "#f0faf9", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#265C59", fontWeight: 800, fontSize: "1rem" }}>
+          ›
+        </button>
+      </div>
+
+      {/* Day headers */}
+      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3, marginBottom: 3 }}>
+        {VI_DAYS_SHORT.map((d) => (
+          <div key={d} style={{ textAlign: "center", fontSize: ".62rem", fontWeight: 700, color: "#94a3b8", padding: "3px 0" }}>{d}</div>
+        ))}
+      </div>
+
+      {/* Grid */}
+      {loading ? (
+        <div style={{ textAlign: "center", padding: "24px 0", color: "#94a3b8" }}>
+          <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 18 }} />
+        </div>
+      ) : (
+        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3 }}>
+          {cells.map((day, i) => {
+            if (!day) return <div key={i} />;
+            const k       = `${viewYear}-${String(viewMonth + 1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
+            const isPast  = k < todayKey;
+            const isToday = k === todayKey;
+            const isBusy  = busyDates.has(k);
+
+            let bg     = "white";
+            let color  = "#1e293b";
+            let border = "1.5px solid #e2e8f0";
+            let label  = "";
+
+            if (isPast)    { bg = "#f8fafc"; color = "#cbd5e1"; border = "1.5px solid #f1f5f9"; }
+            if (isBusy && !isPast) { bg = "#fee2e2"; color = "#dc2626"; border = "1.5px solid #fca5a5"; label = "Bận"; }
+            if (isToday)   { border = "2px solid #265C59"; }
+            if (!isBusy && !isPast) { bg = "#f0fdf4"; color = "#166534"; border = "1.5px solid #bbf7d0"; }
+
+            return (
+              <div key={i} title={isBusy && !isPast ? "HDV đã có lịch ngày này" : (!isPast ? "Còn trống" : "")}
+                style={{ background: bg, color, border, borderRadius: 7, padding: "5px 0 4px", textAlign: "center", fontSize: ".75rem", fontWeight: isToday ? 800 : 600 }}>
+                {day}
+                {label && <div style={{ fontSize: ".52rem", lineHeight: 1, marginTop: 1 }}>{label}</div>}
+              </div>
+            );
+          })}
+        </div>
+      )}
+
+      {/* Legend */}
+      <div style={{ display: "flex", gap: 14, marginTop: 12, justifyContent: "center", flexWrap: "wrap" }}>
+        {[
+          { bg: "#f0fdf4", border: "#bbf7d0", label: "Còn trống" },
+          { bg: "#fee2e2", border: "#fca5a5", label: "Đã có lịch" },
+          { bg: "#f8fafc", border: "#f1f5f9", label: "Đã qua" },
+        ].map((l) => (
+          <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
+            <div style={{ width: 12, height: 12, borderRadius: 3, background: l.bg, border: `1.5px solid ${l.border}` }} />
+            <span style={{ fontSize: ".68rem", color: "#64748b", fontWeight: 600 }}>{l.label}</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
 
 function StarRow({ rating }: { rating: number }) {
   return (
@@ -218,6 +351,20 @@ export default function GuideProfilePage() {
               <div className="hdv-tags">
                 {specialties.map((s, i) => <span key={i} className="hdv-tag">{s}</span>)}
               </div>
+            </div>
+
+            {/* Lịch làm việc */}
+            <div className="hdv-card">
+              <p className="hdv-card-title">
+                <i className="fa-solid fa-calendar-days" /> Lịch Làm Việc
+              </p>
+              <p style={{ fontSize: ".78rem", color: "#64748b", marginBottom: 14, lineHeight: 1.6 }}>
+                Xem ngày HDV còn trống để chọn thời gian phù hợp khi đặt lịch.
+              </p>
+              <GuideCalendar guideId={guide.id} />
+              <a href="/#pricing" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, marginTop: 16, padding: "10px", borderRadius: 10, background: "#265C59", color: "white", textDecoration: "none", fontWeight: 700, fontSize: ".82rem", fontFamily: "inherit" }}>
+                <i className="fa-solid fa-calendar-check" /> Đặt Lịch Ngay
+              </a>
             </div>
 
             {/* CTA */}
