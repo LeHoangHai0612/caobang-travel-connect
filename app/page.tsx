@@ -95,6 +95,7 @@ export default function CaoBangEcoTour() {
   const [bookingGuideId, setBookingGuideId] = useState<string>("");
   const [guideBookingCount, setGuideBookingCount] = useState<number>(0);
   const [bookingPointsInfo, setBookingPointsInfo] = useState<{ earned: number; newTotal: number; newTier: string } | null>(null);
+  const [guideBusyDates, setGuideBusyDates] = useState<Set<string>>(new Set());
 
   // Booking modal state
   const [isBookingOpen, setIsBookingOpen] = useState(false);
@@ -218,16 +219,28 @@ export default function CaoBangEcoTour() {
     if (data) setUserProfile(data);
   }
 
-  // Check guide loyalty count when guide changes
+  // Check guide loyalty count + busy dates when guide changes
   useEffect(() => {
-    if (!userSession || !bookingGuideId) { setGuideBookingCount(0); return; }
+    if (!bookingGuideId) { setGuideBookingCount(0); setGuideBusyDates(new Set()); return; }
+    if (userSession) {
+      supabase
+        .from("bookings")
+        .select("id", { count: "exact", head: true })
+        .eq("user_id", userSession.user.id)
+        .eq("guide_id", bookingGuideId)
+        .eq("status", "confirmed")
+        .then(({ count }) => setGuideBookingCount(count ?? 0));
+    }
+    // Lấy ngày bận của HDV trong 3 tháng tới
+    const from = new Date().toISOString().slice(0, 10);
+    const to   = new Date(Date.now() + 90 * 86400000).toISOString().slice(0, 10);
     supabase
-      .from("bookings")
-      .select("id", { count: "exact", head: true })
-      .eq("user_id", userSession.user.id)
+      .from("guide_schedules")
+      .select("date")
       .eq("guide_id", bookingGuideId)
-      .eq("status", "confirmed")
-      .then(({ count }) => setGuideBookingCount(count ?? 0));
+      .gte("date", from)
+      .lte("date", to)
+      .then(({ data }) => setGuideBusyDates(new Set((data ?? []).map((d: { date: string }) => d.date))));
   }, [userSession, bookingGuideId]);
 
   // ── Helpers ──────────────────────────────────────────────────────────────
@@ -430,6 +443,12 @@ export default function CaoBangEcoTour() {
                   <div className="form-group" style={{ margin: 0 }}>
                     <label htmlFor="b-date">Ngày dự kiến</label>
                     <input id="b-date" type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} min={today} />
+                    {bookingDate && guideBusyDates.has(bookingDate) && (
+                      <p style={{ margin: "6px 0 0", fontSize: ".78rem", color: "#b45309", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 7, padding: "6px 10px", display: "flex", alignItems: "center", gap: 6 }}>
+                        <i className="fa-solid fa-triangle-exclamation" />
+                        HDV đã có lịch vào ngày này. Vui lòng chọn ngày khác hoặc chúng tôi sẽ liên hệ xác nhận lại.
+                      </p>
+                    )}
                   </div>
                   <div className="form-group" style={{ margin: 0 }}>
                     <label htmlFor="b-note">Ghi chú</label>

@@ -69,7 +69,30 @@ export default function AdminBookings() {
     setUpdating(id);
     await supabase.from("bookings").update({ status }).eq("id", id);
 
-setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
+    const booking = bookings.find((b) => b.id === id) ?? detail;
+
+    if (status === "confirmed" && booking?.guide_id && booking?.preferred_date) {
+      // Đánh dấu ngày đó là đã đặt trong lịch HDV
+      await supabase.from("guide_schedules").upsert({
+        guide_id:   booking.guide_id,
+        date:       booking.preferred_date.slice(0, 10),
+        status:     "booked",
+        booking_id: booking.id,
+        note:       `${booking.client_name} — ${booking.package_type}`,
+      }, { onConflict: "guide_id,date" });
+    }
+
+    if (status === "cancelled" && booking?.guide_id && booking?.preferred_date) {
+      // Xóa lịch đặt khỏi lịch HDV khi hủy
+      await supabase.from("guide_schedules")
+        .delete()
+        .eq("guide_id", booking.guide_id)
+        .eq("date", booking.preferred_date.slice(0, 10))
+        .eq("status", "booked")
+        .eq("booking_id", booking.id);
+    }
+
+    setBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
     if (detail?.id === id) setDetail((prev) => prev ? { ...prev, status } : prev);
     setUpdating(null);
   }
