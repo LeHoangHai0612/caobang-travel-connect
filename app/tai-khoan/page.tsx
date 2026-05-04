@@ -8,6 +8,15 @@ import type { UserProfile, Booking } from "@/lib/database.types";
 
 type BookingRow = Booking & { guides?: { name: string } | null };
 
+interface ContactRow {
+  id: number;
+  message: string;
+  admin_reply: string;
+  replied_at: string | null;
+  replied_by: string;
+  created_at: string;
+}
+
 const STATUS: Record<string, { label: string; color: string; bg: string }> = {
   pending:   { label: "Chờ xử lý",   color: "#b45309", bg: "#fef3c7" },
   confirmed: { label: "Đã xác nhận", color: "#15803d", bg: "#dcfce7" },
@@ -18,6 +27,7 @@ export default function TaiKhoanPage() {
   const [profile, setProfile]     = useState<UserProfile | null>(null);
   const [email, setEmail]         = useState("");
   const [bookings, setBookings]   = useState<BookingRow[]>([]);
+  const [contacts, setContacts]   = useState<ContactRow[]>([]);
   const [loading, setLoading]     = useState(true);
   const [editName, setEditName]   = useState("");
   const [editPhone, setEditPhone] = useState("");
@@ -30,15 +40,21 @@ export default function TaiKhoanPage() {
       const { data: { session } } = await supabase.auth.getSession();
       if (!session) { window.location.href = "/dang-nhap"; return; }
       setEmail(session.user.email ?? "");
-      const [{ data: prof }, { data: bk }] = await Promise.all([
+      const [{ data: prof }, { data: bk }, { data: ct }] = await Promise.all([
         supabase.from("user_profiles").select("*").eq("id", session.user.id).single(),
         supabase.from("bookings").select("*, guides(name)")
           .eq("user_id", session.user.id)
           .order("created_at", { ascending: false })
           .limit(20),
+        supabase.from("contacts")
+          .select("id,message,admin_reply,replied_at,replied_by,created_at")
+          .eq("user_id", session.user.id)
+          .order("created_at", { ascending: false })
+          .limit(10),
       ]);
       setProfile(prof ?? null);
       setBookings(bk ?? []);
+      setContacts(ct ?? []);
       setLoading(false);
     })();
   }, []);
@@ -344,6 +360,62 @@ export default function TaiKhoanPage() {
             </div>
           )}
         </div>
+
+        {/* ── Tin nhắn & phản hồi ── */}
+        {contacts.length > 0 && (
+          <div style={{ background: "white", borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.05)" }}>
+            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+              <p style={{ fontSize: ".68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".09em" }}>Tin Nhắn Liên Hệ</p>
+              <p style={{ fontSize: ".88rem", fontWeight: 800, color: "#0f172a", marginTop: 2 }}>{contacts.length} tin nhắn</p>
+            </div>
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              {contacts.map((c, i) => (
+                <div key={c.id} style={{ padding: "18px 24px", borderBottom: i < contacts.length - 1 ? "1px solid #f8fafc" : "none" }}>
+                  {/* Tin nhắn của khách */}
+                  <div style={{ display: "flex", gap: 12, marginBottom: c.admin_reply ? 12 : 0 }}>
+                    <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                      <i className="fa-solid fa-user" style={{ color: "#94a3b8", fontSize: 13 }} />
+                    </div>
+                    <div style={{ flex: 1 }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                        <span style={{ fontSize: ".72rem", fontWeight: 700, color: "#64748b" }}>Tin nhắn của bạn</span>
+                        <span style={{ fontSize: ".7rem", color: "#94a3b8" }}>{new Date(c.created_at).toLocaleDateString("vi-VN")}</span>
+                      </div>
+                      <p style={{ fontSize: ".85rem", color: "#334155", lineHeight: 1.7, margin: 0 }}>{c.message}</p>
+                    </div>
+                  </div>
+
+                  {/* Phản hồi admin */}
+                  {c.admin_reply ? (
+                    <div style={{ display: "flex", gap: 12, marginLeft: 8 }}>
+                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#265C59", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                        <i className="fa-solid fa-headset" style={{ color: "white", fontSize: 13 }} />
+                      </div>
+                      <div style={{ flex: 1, background: "#f0faf9", borderRadius: 12, padding: "12px 16px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                          <span style={{ fontSize: ".72rem", fontWeight: 700, color: "#265C59" }}>
+                            {c.replied_by || "Cao Bằng Travel Connect"}
+                          </span>
+                          {c.replied_at && (
+                            <span style={{ fontSize: ".7rem", color: "#94a3b8" }}>{new Date(c.replied_at).toLocaleDateString("vi-VN")}</span>
+                          )}
+                        </div>
+                        <p style={{ fontSize: ".85rem", color: "#1e293b", lineHeight: 1.7, margin: 0 }}>{c.admin_reply}</p>
+                      </div>
+                    </div>
+                  ) : (
+                    <div style={{ marginLeft: 46, background: "#fffbeb", borderRadius: 10, padding: "10px 14px" }}>
+                      <p style={{ fontSize: ".78rem", color: "#92400e", margin: 0 }}>
+                        <i className="fa-solid fa-clock" style={{ marginRight: 6 }} />
+                        Chưa có phản hồi — chúng tôi sẽ trả lời sớm nhất có thể.
+                      </p>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
       </div>
     </div>

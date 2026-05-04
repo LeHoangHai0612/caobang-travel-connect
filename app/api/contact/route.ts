@@ -10,7 +10,7 @@ function getAdminClient() {
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
-  const { name, email, phone, message } = body;
+  const { name, email, phone, message, user_id } = body;
 
   if (!name?.trim()) {
     return NextResponse.json({ error: 'Vui lòng nhập họ và tên.' }, { status: 400 });
@@ -23,10 +23,11 @@ export async function POST(request: NextRequest) {
   const { data, error } = await supabase
     .from('contacts')
     .insert({
-      fullname: name.trim(),   // cột trong DB là fullname
-      email:    email?.trim()   || '',
-      phone:    phone?.trim()   || '',
+      fullname: name.trim(),
+      email:    email?.trim()  || '',
+      phone:    phone?.trim()  || '',
       message:  message.trim(),
+      ...(user_id ? { user_id } : {}),
     })
     .select('id')
     .single();

@@ -118,6 +118,7 @@ export default function CaoBangEcoTour() {
   const [contactSuccess, setContactSuccess] = useState(false);
   const [contactError, setContactError] = useState("");
   const [contactId, setContactId] = useState("");
+  const [unreadReplies, setUnreadReplies] = useState(0);
 
   const totalPages = Math.ceil(reviews.length / cardsPerPage);
 
@@ -218,6 +219,14 @@ export default function CaoBangEcoTour() {
   async function loadUserProfile(uid: string) {
     const { data } = await supabase.from("user_profiles").select("*").eq("id", uid).single();
     if (data) setUserProfile(data);
+    // Đếm tin nhắn có reply chưa đọc
+    const { count } = await supabase
+      .from("contacts")
+      .select("id", { count: "exact", head: true })
+      .eq("user_id", uid)
+      .not("admin_reply", "is", null)
+      .neq("admin_reply", "");
+    setUnreadReplies(count ?? 0);
   }
 
   // Check guide loyalty count + busy dates when guide changes
@@ -355,7 +364,7 @@ export default function CaoBangEcoTour() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: contactName, email: contactEmail, phone: contactPhone, message: contactMessage }),
+        body: JSON.stringify({ name: contactName, email: contactEmail, phone: contactPhone, message: contactMessage, user_id: userSession?.user.id }),
       });
       if (res.ok) {
         const data = await res.json();
@@ -671,10 +680,20 @@ export default function CaoBangEcoTour() {
             </a>
 
             {userSession ? (
-              <a href="/tai-khoan" className="nav-user-btn">
+              <a href="/tai-khoan" className="nav-user-btn" style={{ position: "relative" }}>
                 <i className={`fa-solid ${userProfile ? getTier(userProfile.points).icon : "fa-award"}`}
                    style={{ color: userProfile ? getTier(userProfile.points).color : "#cd7f32" }} />
                 <span>Tài Khoản</span>
+                {unreadReplies > 0 && (
+                  <span style={{
+                    position: "absolute", top: -4, right: -4,
+                    background: "#dc2626", color: "white",
+                    borderRadius: "50%", width: 17, height: 17,
+                    fontSize: ".6rem", fontWeight: 800,
+                    display: "flex", alignItems: "center", justifyContent: "center",
+                    border: "2px solid white",
+                  }}>{unreadReplies}</span>
+                )}
               </a>
             ) : (
               <a href="/dang-nhap" className="nav-user-btn">
@@ -1082,16 +1101,22 @@ export default function CaoBangEcoTour() {
                 <div className="footer-form-group">
                   <input type="text" value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} placeholder="Nội dung tin nhắn..." required />
                 </div>
+                {!userSession && (
+                  <p style={{ color: "rgba(255,255,255,.5)", fontSize: ".74rem", fontStyle: "italic", marginBottom: 8, lineHeight: 1.5 }}>
+                    <i className="fa-solid fa-circle-info" style={{ marginRight: 5 }} />
+                    Khi chưa đăng nhập, bạn không thể xem phản hồi từ trang web. Chúng tôi sẽ liên hệ đến bạn qua điện thoại sớm nhất có thể.
+                  </p>
+                )}
                 {contactSuccess && (
                   <div style={{ background: "rgba(255,255,255,.08)", borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
-                    <p style={{ color: "#a8e6d0", fontSize: ".82rem", marginBottom: contactId ? 8 : 0 }}>
+                    <p style={{ color: "#a8e6d0", fontSize: ".82rem", marginBottom: userSession ? 8 : 0 }}>
                       <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />
                       Gửi thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.
                     </p>
-                    {contactId && (
-                      <a href={`/tin-nhan/${contactId}`} target="_blank" rel="noopener noreferrer"
+                    {userSession && (
+                      <a href="/tai-khoan"
                         style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#5eead4", fontSize: ".78rem", fontWeight: 700, textDecoration: "none", marginTop: 4 }}>
-                        <i className="fa-solid fa-arrow-up-right-from-square" style={{ fontSize: ".7rem" }} />
+                        <i className="fa-solid fa-envelope-open-text" style={{ fontSize: ".7rem" }} />
                         Xem phản hồi từ chúng tôi tại đây
                       </a>
                     )}
