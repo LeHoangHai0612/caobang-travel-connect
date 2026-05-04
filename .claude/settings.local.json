@@ -7,7 +7,9 @@
       "Bash(git commit -m 'Add detailed error logging to booking API for debugging *)",
       "Bash(git commit -m 'Simplify booking API: inline client, full try-catch, detailed errors *)",
       "Bash(git commit -m 'Fix booking: dùng service role key bypass RLS cho server-side API *)",
-      "Bash(git commit -m 'Fix đăng ký: bỏ upsert sau signUp, dùng metadata + trigger thay thế *)"
+      "Bash(git commit -m 'Fix đăng ký: bỏ upsert sau signUp, dùng metadata + trigger thay thế *)",
+      "Bash(git commit -m ' *)",
+      "Bash(git commit -m 'Fix booking table left column clipped by border-radius overflow *)"
     ]
   }
 }

@@ -19,13 +19,27 @@ const ICONS: Record<string, string> = {
 };
 
 function SettingSlot({ setting, onSaved }: { setting: Setting; onSaved: (key: string, value: string) => void }) {
-  const [url, setUrl]       = useState(setting.value);
+  const [url, setUrl]         = useState(setting.value);
   const [preview, setPreview] = useState(setting.value);
-  const [saving, setSaving] = useState(false);
-  const [saved, setSaved]   = useState(false);
-  const [imgErr, setImgErr] = useState(false);
+  const [saving, setSaving]   = useState(false);
+  const [saved, setSaved]     = useState(false);
+  const [imgErr, setImgErr]   = useState(false);
+  const [uploading, setUploading] = useState(false);
 
   const isAudio = AUDIO_KEYS.includes(setting.key);
+
+  async function handleFileUpload(file: File) {
+    if (!file) return;
+    setUploading(true);
+    const ext  = file.name.split(".").pop() ?? "mp3";
+    const path = `music_${Date.now()}.${ext}`;
+    const { error } = await supabase.storage.from("audio").upload(path, file, { upsert: true, contentType: file.type });
+    if (error) { alert("Upload thất bại: " + error.message); setUploading(false); return; }
+    const { data: { publicUrl } } = supabase.storage.from("audio").getPublicUrl(path);
+    setUrl(publicUrl);
+    setPreview(publicUrl);
+    setUploading(false);
+  }
 
   const handleSave = async () => {
     const v = url.trim();
@@ -83,6 +97,29 @@ function SettingSlot({ setting, onSaved }: { setting: Setting; onSaved: (key: st
             onKeyDown={(e) => e.key === "Enter" && handleSave()}
           />
         </div>
+
+        {/* Upload file MP3 (chỉ audio) */}
+        {isAudio && (
+          <div>
+            <label style={{ display: "block", fontSize: ".68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>
+              Hoặc tải file MP3 trực tiếp
+            </label>
+            <label style={{
+              display: "flex", alignItems: "center", justifyContent: "center", gap: 8,
+              padding: "10px 0", borderRadius: 10, border: "2px dashed #cbd5e1",
+              background: "#f8fafc", cursor: uploading ? "wait" : "pointer",
+              color: "#64748b", fontWeight: 600, fontSize: ".82rem",
+              transition: "border-color .15s",
+            }}>
+              {uploading
+                ? <><i className="fa-solid fa-spinner fa-spin" /> Đang upload...</>
+                : <><i className="fa-solid fa-cloud-arrow-up" /> Chọn file MP3 / OGG</>}
+              <input type="file" accept="audio/*" style={{ display: "none" }}
+                disabled={uploading}
+                onChange={(e) => { const f = e.target.files?.[0]; if (f) handleFileUpload(f); e.target.value = ""; }} />
+            </label>
+          </div>
+        )}
 
         <div style={{ display: "flex", gap: 8 }}>
           {!isAudio && (

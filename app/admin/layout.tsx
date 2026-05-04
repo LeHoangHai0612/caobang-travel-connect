@@ -8,10 +8,12 @@ import { supabase } from "@/lib/supabase";
 const NAV = [
   { href: "/admin",               icon: "fa-chart-pie",          label: "Tổng Quan"       },
   { href: "/admin/bookings",      icon: "fa-calendar-check",     label: "Đặt Lịch"        },
-  { href: "/admin/guides",        icon: "fa-users",               label: "Hướng Dẫn Viên" },
+  { href: "/admin/contacts",      icon: "fa-envelope",            label: "Liên Hệ"         },
+  { href: "/admin/guides",        icon: "fa-person-hiking",       label: "Hướng Dẫn Viên" },
   { href: "/admin/destinations",  icon: "fa-map-location-dot",    label: "Điểm Đến"        },
   { href: "/admin/gallery",       icon: "fa-images",              label: "Thư Viện Ảnh"    },
   { href: "/admin/reviews",       icon: "fa-star",                label: "Đánh Giá"        },
+  { href: "/admin/users",         icon: "fa-users-gear",          label: "Tài Khoản"       },
   { href: "/admin/settings",      icon: "fa-sliders",             label: "Cài Đặt Website" },
 ];
 
