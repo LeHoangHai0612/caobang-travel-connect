@@ -1,19 +1,31 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { supabase } from '@/lib/supabase';
+import { createClient } from '@supabase/supabase-js';
+
+function getAdminClient() {
+  const url = process.env.NEXT_PUBLIC_SUPABASE_URL!;
+  const key = process.env.SUPABASE_SERVICE_ROLE_KEY!;
+  if (!url || !key) throw new Error('Missing Supabase env vars');
+  return createClient(url, key, { auth: { persistSession: false } });
+}
 
 export async function POST(request: NextRequest) {
   const body = await request.json();
   const { name, email, phone, message } = body;
 
+  if (!name?.trim()) {
+    return NextResponse.json({ error: 'Vui lòng nhập họ và tên.' }, { status: 400 });
+  }
   if (!message?.trim()) {
     return NextResponse.json({ error: 'Vui lòng nhập nội dung tin nhắn.' }, { status: 400 });
   }
 
+  const supabase = getAdminClient();
   const { error } = await supabase
     .from('contacts')
-    .insert({ name: name?.trim(), email: email?.trim(), phone: phone?.trim(), message: message.trim() });
+    .insert({ name: name.trim(), email: email?.trim() || '', phone: phone?.trim() || '', message: message.trim() });
 
   if (error) {
+    console.error('[contact] insert error:', error);
     return NextResponse.json({ error: 'Không thể lưu tin nhắn. Vui lòng thử lại.' }, { status: 500 });
   }
 
