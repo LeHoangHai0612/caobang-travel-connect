@@ -362,17 +362,36 @@ export default function TaiKhoanPage() {
         </div>
 
         {/* ── Tin nhắn & phản hồi ── */}
-        {contacts.length > 0 && (
-          <div style={{ background: "white", borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.05)" }}>
-            <div style={{ padding: "20px 24px", borderBottom: "1px solid #f1f5f9" }}>
+        <div style={{ background: "white", borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.05)" }}>
+          <div style={{ padding: "20px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9" }}>
+            <div>
               <p style={{ fontSize: ".68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".09em" }}>Tin Nhắn Liên Hệ</p>
-              <p style={{ fontSize: ".88rem", fontWeight: 800, color: "#0f172a", marginTop: 2 }}>{contacts.length} tin nhắn</p>
+              <p style={{ fontSize: ".88rem", fontWeight: 800, color: "#0f172a", marginTop: 2 }}>
+                {contacts.length > 0 ? `${contacts.length} tin nhắn` : "Chưa có tin nhắn nào"}
+              </p>
             </div>
+            <a href="/#lien-he" style={{
+              display: "inline-flex", alignItems: "center", gap: 6,
+              padding: "8px 16px", borderRadius: 9,
+              border: "1.5px solid #265C59", color: "#265C59",
+              textDecoration: "none", fontSize: ".79rem", fontWeight: 700, background: "white",
+            }}>
+              <i className="fa-solid fa-paper-plane" /> Gửi tin nhắn
+            </a>
+          </div>
+
+          {contacts.length === 0 ? (
+            <div style={{ padding: "40px 24px", textAlign: "center", color: "#94a3b8" }}>
+              <i className="fa-solid fa-comments" style={{ fontSize: 32, marginBottom: 12, display: "block" }} />
+              <p style={{ fontWeight: 600, marginBottom: 4, color: "#64748b" }}>Bạn chưa gửi tin nhắn nào</p>
+              <p style={{ fontSize: ".82rem" }}>Gửi tin nhắn để được tư vấn và nhận phản hồi tại đây.</p>
+            </div>
+          ) : (
             <div style={{ display: "flex", flexDirection: "column" }}>
               {contacts.map((c, i) => (
                 <div key={c.id} style={{ padding: "18px 24px", borderBottom: i < contacts.length - 1 ? "1px solid #f8fafc" : "none" }}>
                   {/* Tin nhắn của khách */}
-                  <div style={{ display: "flex", gap: 12, marginBottom: c.admin_reply ? 12 : 0 }}>
+                  <div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
                     <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                       <i className="fa-solid fa-user" style={{ color: "#94a3b8", fontSize: 13 }} />
                     </div>
@@ -387,17 +406,18 @@ export default function TaiKhoanPage() {
 
                   {/* Phản hồi admin */}
                   {c.admin_reply ? (
-                    <div style={{ display: "flex", gap: 12, marginLeft: 8 }}>
+                    <div style={{ display: "flex", gap: 12 }}>
                       <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#265C59", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
                         <i className="fa-solid fa-headset" style={{ color: "white", fontSize: 13 }} />
                       </div>
-                      <div style={{ flex: 1, background: "#f0faf9", borderRadius: 12, padding: "12px 16px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                      <div style={{ flex: 1, background: "#f0faf9", border: "1.5px solid #b2dfdb", borderRadius: 12, padding: "12px 16px" }}>
+                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
                           <span style={{ fontSize: ".72rem", fontWeight: 700, color: "#265C59" }}>
+                            <i className="fa-solid fa-circle" style={{ fontSize: 6, marginRight: 5, verticalAlign: "middle" }} />
                             {c.replied_by || "Cao Bằng Travel Connect"}
                           </span>
                           {c.replied_at && (
-                            <span style={{ fontSize: ".7rem", color: "#94a3b8" }}>{new Date(c.replied_at).toLocaleDateString("vi-VN")}</span>
+                            <span style={{ fontSize: ".7rem", color: "#94a3b8" }}>{new Date(c.replied_at).toLocaleString("vi-VN")}</span>
                           )}
                         </div>
                         <p style={{ fontSize: ".85rem", color: "#1e293b", lineHeight: 1.7, margin: 0 }}>{c.admin_reply}</p>
@@ -414,8 +434,8 @@ export default function TaiKhoanPage() {
                 </div>
               ))}
             </div>
-          </div>
-        )}
+          )}
+        </div>
 
       </div>
     </div>
