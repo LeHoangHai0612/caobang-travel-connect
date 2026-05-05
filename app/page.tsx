@@ -94,10 +94,16 @@ export default function CaoBangEcoTour() {
   const [tours, setTours] = useState<Tour[]>([]);
 
   // Site settings
-  const [heroBg, setHeroBg]       = useState("");
-  const [destBg, setDestBg]       = useState("https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1600&q=75");
-  const [pricingBg, setPricingBg] = useState("https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75");
-  const [musicSrc, setMusicSrc]   = useState("");
+  const [heroBg, setHeroBg]             = useState("");
+  const [destBg, setDestBg]             = useState("https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1600&q=75");
+  const [pricingBg, setPricingBg]       = useState("https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75");
+  const [whyusBg, setWhyusBg]           = useState("https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=75");
+  const [teamBg, setTeamBg]             = useState("https://images.unsplash.com/photo-1512314889357-e157c22f938d?w=1600&q=75");
+  const [toursBg, setToursBg]           = useState("https://images.unsplash.com/photo-1523987355523-c7b5b0dd90a7?w=1600&q=75");
+  const [galleryBg, setGalleryBg]       = useState("https://images.unsplash.com/photo-1542640244-7e672d6cb466?w=1600&q=75");
+  const [testimonialsBg, setTestimonialsBg] = useState("https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75");
+  const [sosBg, setSosBg]               = useState("https://images.unsplash.com/photo-1469854523086-cc02fe5d8800?w=1600&q=75");
+  const [musicSrc, setMusicSrc]         = useState("");
 
   // Auth state
   const [userSession, setUserSession] = useState<Session | null>(null);
@@ -180,9 +186,15 @@ export default function CaoBangEcoTour() {
       if (t && t.length > 0) setTours(t);
       if (settings) {
         const find = (k: string) => settings.find((s: { key: string; value: string }) => s.key === k)?.value;
-        if (find("hero_bg"))         setHeroBg(find("hero_bg")!);
-        if (find("destinations_bg")) setDestBg(find("destinations_bg")!);
-        if (find("pricing_bg"))      setPricingBg(find("pricing_bg")!);
+        if (find("hero_bg"))          setHeroBg(find("hero_bg")!);
+        if (find("destinations_bg"))  setDestBg(find("destinations_bg")!);
+        if (find("pricing_bg"))       setPricingBg(find("pricing_bg")!);
+        if (find("whyus_bg"))         setWhyusBg(find("whyus_bg")!);
+        if (find("team_bg"))          setTeamBg(find("team_bg")!);
+        if (find("tours_bg"))         setToursBg(find("tours_bg")!);
+        if (find("gallery_bg"))       setGalleryBg(find("gallery_bg")!);
+        if (find("testimonials_bg"))  setTestimonialsBg(find("testimonials_bg")!);
+        if (find("sos_bg"))           setSosBg(find("sos_bg")!);
         if (find("background_music")) setMusicSrc(find("background_music")!);
       }
     }
@@ -867,7 +879,8 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== WHY CHOOSE US ==================== */}
-        <section className="why-us" id="why-us" aria-labelledby="why-heading">
+        <section className="why-us" id="why-us" aria-labelledby="why-heading"
+          style={{ background: `linear-gradient(rgba(237,231,218,.90),rgba(237,231,218,.90)),url('${whyusBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag">Vì Sao Chọn Chúng Tôi</span>
@@ -891,7 +904,8 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== TEAM ==================== */}
-        <section className="team" id="team" aria-labelledby="team-heading">
+        <section className="team" id="team" aria-labelledby="team-heading"
+          style={{ background: `linear-gradient(rgba(255,255,255,.91),rgba(255,255,255,.91)),url('${teamBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag">Đội Ngũ Chuyên Nghiệp</span>
@@ -981,7 +995,7 @@ export default function CaoBangEcoTour() {
 
         {/* ==================== DESTINATIONS ==================== */}
         <section className="destinations" id="destinations" aria-labelledby="dest-heading"
-          style={{ backgroundImage: `linear-gradient(to bottom,rgba(20,52,52,.55),rgba(20,52,52,.62)),url('${destBg}')` }}>
+          style={{ background: `linear-gradient(to bottom,rgba(20,52,52,.55),rgba(20,52,52,.62)),url('${destBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag" style={{ background: "rgba(38,92,89,.12)", color: "var(--teal-dark)" }}>Khám Phá Ngay</span>
@@ -1057,7 +1071,7 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== TOURS ==================== */}
-        <section id="tours" style={{ padding: "72px 0" }}>
+        <section id="tours" style={{ padding: "72px 0", background: `linear-gradient(rgba(248,249,248,.91),rgba(248,249,248,.91)),url('${toursBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag">Khám Phá Ngay</span>
@@ -1116,7 +1130,8 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== GALLERY ==================== */}
-        <section className="gallery" id="gallery" aria-labelledby="gallery-heading">
+        <section className="gallery" id="gallery" aria-labelledby="gallery-heading"
+          style={{ background: `linear-gradient(rgba(255,255,255,.89),rgba(255,255,255,.89)),url('${galleryBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag" style={{ background: "rgba(229,169,25,.12)", color: "#c48d10" }}>Góc Nhìn Chân Thực</span>
@@ -1138,7 +1153,7 @@ export default function CaoBangEcoTour() {
 
         {/* ==================== PRICING ==================== */}
         <section className="pricing" id="pricing" aria-labelledby="pricing-heading"
-          style={{ backgroundImage: `linear-gradient(135deg,rgba(10,35,35,.90),rgba(26,60,55,.86),rgba(15,45,40,.90)),url('${pricingBg}')` }}>
+          style={{ background: `linear-gradient(135deg,rgba(10,35,35,.90),rgba(26,60,55,.86),rgba(15,45,40,.90)),url('${pricingBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag">Bảng Giá Minh Bạch</span>
@@ -1236,7 +1251,8 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== TESTIMONIALS ==================== */}
-        <section className="testimonials" id="testimonials" aria-labelledby="testi-heading">
+        <section className="testimonials" id="testimonials" aria-labelledby="testi-heading"
+          style={{ background: `linear-gradient(150deg,rgba(13,40,38,.88),rgba(26,60,58,.85),rgba(17,46,44,.88)),url('${testimonialsBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag">Khách Hàng Nói Gì</span>
@@ -1308,7 +1324,7 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== SOS / KHẨN CẤP ==================== */}
-        <section id="sos" style={{ padding: "40px 0" }}>
+        <section id="sos" style={{ padding: "40px 0", background: `linear-gradient(rgba(20,40,40,.92),rgba(20,40,40,.92)),url('${sosBg}') center/cover no-repeat` }}>
           <div className="container">
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>

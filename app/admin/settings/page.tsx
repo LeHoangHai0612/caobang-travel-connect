@@ -15,6 +15,13 @@ const ICONS: Record<string, string> = {
   login_bg:         "fa-right-to-bracket",
   destinations_bg:  "fa-map-location-dot",
   pricing_bg:       "fa-tag",
+  booking_bg:       "fa-calendar-check",
+  whyus_bg:         "fa-star",
+  team_bg:          "fa-person-hiking",
+  tours_bg:         "fa-map",
+  gallery_bg:       "fa-images",
+  testimonials_bg:  "fa-comments",
+  sos_bg:           "fa-triangle-exclamation",
   background_music: "fa-music",
 };
 
