@@ -438,7 +438,7 @@ export default function CaoBangEcoTour() {
       const res = await fetch("/api/contact", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ name: contactName || "Khách hàng", email: contactEmail, phone: "", message: "Đăng ký nhận tin tức", user_id: userSession?.user.id }),
+        body: JSON.stringify({ name: contactName || "Khách hàng", email: contactEmail, phone: "", message: contactMessage || "Đăng ký nhận tin tức", user_id: userSession?.user.id }),
       });
       if (res.ok) {
         setContactSuccess(true);
@@ -1451,26 +1451,30 @@ export default function CaoBangEcoTour() {
 
             {/* ĐĂNG KÝ + SOCIAL */}
             <div className="ftv2-col">
-              <h5 className="ftv2-heading">ĐĂNG KÝ NHẬN TIN</h5>
+              <h5 className="ftv2-heading">Liên Hệ Chúng Tôi</h5>
               <form onSubmit={handleFooterSignup}>
                 <input
                   type="text" value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
                   placeholder="Họ và tên" className="ftv2-input"
                 />
-                <div className="ftv2-email-row">
-                  <input
-                    type="email" value={contactEmail}
-                    onChange={(e) => setContactEmail(e.target.value)}
-                    placeholder="Địa chỉ Email" className="ftv2-input ftv2-input-flex"
-                    required
-                  />
-                  <button type="submit" className="ftv2-send-btn" disabled={contactLoading}>
-                    {contactLoading
-                      ? <i className="fa-solid fa-spinner fa-spin" />
-                      : <i className="fa-solid fa-arrow-right" />}
-                  </button>
-                </div>
+                <input
+                  type="email" value={contactEmail}
+                  onChange={(e) => setContactEmail(e.target.value)}
+                  placeholder="Địa chỉ Email" className="ftv2-input"
+                  required
+                />
+                <textarea
+                  value={contactMessage}
+                  onChange={(e) => setContactMessage(e.target.value)}
+                  placeholder="Tin nhắn của bạn..." className="ftv2-input ftv2-textarea"
+                  rows={3}
+                />
+                <button type="submit" className="ftv2-send-btn ftv2-send-full" disabled={contactLoading}>
+                  {contactLoading
+                    ? <><i className="fa-solid fa-spinner fa-spin" /> Đang gửi...</>
+                    : <><i className="fa-solid fa-paper-plane" /> Gửi Tin Nhắn</>}
+                </button>
                 {contactSuccess && (
                   <p style={{ fontSize: ".74rem", color: "#265C59", marginTop: 6, fontWeight: 700 }}>
                     <i className="fa-solid fa-circle-check" style={{ marginRight: 4 }} /> Đăng ký thành công!
