@@ -1,6 +1,6 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
+import React, { useState, useEffect, useRef } from "react";
 import { supabase } from "@/lib/supabase";
 import type { Session } from "@supabase/supabase-js";
 import MusicPlayer from "@/app/components/MusicPlayer";
@@ -158,6 +158,9 @@ export default function CaoBangEcoTour() {
   const [reviewSuccess, setReviewSuccess] = useState(false);
   const [reviewError, setReviewError]     = useState("");
 
+  // Parallax refs
+  const heroMistRef = useRef<HTMLDivElement>(null);
+
   // ── Effects ──────────────────────────────────────────────────────────────
   useEffect(() => {
     // Tải dữ liệu từ Supabase
@@ -192,9 +195,16 @@ export default function CaoBangEcoTour() {
         if (d?.current) setWeather({ temp: Math.round(d.current.temperature_2m), code: d.current.weather_code, wind: Math.round(d.current.wind_speed_10m) });
       }).catch(() => null);
 
-    // Shadow header khi cuộn
-    const handleScroll = () => setIsScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", handleScroll);
+    // Shadow header + parallax mist
+    const handleScroll = () => {
+      const y = window.scrollY;
+      setIsScrolled(y > 20);
+      if (heroMistRef.current && y < window.innerHeight * 1.2) {
+        heroMistRef.current.style.transform = `translateY(${y * 0.22}px)`;
+        heroMistRef.current.style.opacity = String(Math.max(0, 1 - y / 650));
+      }
+    };
+    window.addEventListener("scroll", handleScroll, { passive: true });
 
     // Số thẻ carousel
     const handleResize = () => setCardsPerPage(window.innerWidth <= 768 ? 1 : 3);
@@ -815,6 +825,7 @@ export default function CaoBangEcoTour() {
             style={heroBg ? { backgroundImage: `url('${heroBg}')` } : undefined}
           />
           <div className="hero-overlay" aria-hidden="true" />
+          <div ref={heroMistRef} className="hero-mist" aria-hidden="true" />
           <div className="hero-content">
             <div className="hero-badge">
               <i className="fa-solid fa-leaf" /> Hướng Dẫn Viên Địa Phương · Cao Bằng, Việt Nam
@@ -1297,7 +1308,7 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== SOS / KHẨN CẤP ==================== */}
-        <section style={{ background: "#1a2e2e", padding: "40px 0" }}>
+        <section id="sos" style={{ background: "#1a2e2e", padding: "40px 0" }}>
           <div className="container">
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
