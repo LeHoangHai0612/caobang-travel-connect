@@ -323,7 +323,7 @@ export default function TaiKhoanPage() {
               <p style={{ fontSize: ".68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".09em" }}>Lịch Sử Đặt Tour</p>
               <p style={{ fontSize: ".88rem", fontWeight: 800, color: "#0f172a", marginTop: 2 }}>{bookings.length} booking</p>
             </div>
-            <a href="/#pricing" style={{
+            <a href="/dat-lich" style={{
               display: "inline-flex", alignItems: "center", gap: 6,
               padding: "8px 16px", borderRadius: 9,
               background: "#265C59", color: "white",
