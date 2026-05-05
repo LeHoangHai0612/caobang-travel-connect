@@ -149,8 +149,8 @@ nav { display: flex; align-items: center; justify-content: space-between; height
    ═══════════════════════════════════════════════════ */
 #why-us {
   position: relative; z-index: 2;
-  border-radius: 52px 52px 0 0; overflow: hidden;
-  padding-top: 88px;
+  margin-top: -36px; border-radius: 52px 52px 0 0; overflow: hidden;
+  box-shadow: 0 -8px 40px rgba(0,0,0,.10); padding-top: 96px;
 }
 #team {
   position: relative; z-index: 3;
