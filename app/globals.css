@@ -103,7 +103,7 @@ nav { display: flex; align-items: center; justify-content: space-between; height
 .mobile-nav .btn-cta { margin-top: 12px; justify-content: center; }
 
 /* HERO SECTION */
-.hero { position: relative; min-height: calc(100vh + 80px); display: flex; flex-direction: column; align-items: stretch; overflow: hidden; background: var(--teal-dark); }
+.hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: stretch; overflow: hidden; background: var(--teal-dark); }
 .hero-bg { position: absolute; inset: -5%; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Ban_Gioc%E2%80%93Detian_Falls.jpg/1280px-Ban_Gioc%E2%80%93Detian_Falls.jpg'); background-size: cover; background-position: center 40%; background-repeat: no-repeat; animation: heroZoom 20s ease-in-out infinite alternate; }
 @keyframes heroZoom { from { transform: scale(1.00); background-position: center 36%; } to { transform: scale(1.06); background-position: center 46%; } }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.12) 0%, rgba(0,0,0,.22) 50%, rgba(0,0,0,.60) 100%); }
@@ -154,8 +154,8 @@ nav { display: flex; align-items: center; justify-content: space-between; height
    ═══════════════════════════════════════════════════ */
 #why-us {
   position: relative; z-index: 2;
-  margin-top: -36px; border-radius: 52px 52px 0 0; overflow: hidden;
-  box-shadow: 0 -8px 40px rgba(0,0,0,.10); padding-top: 96px;
+  border-radius: 52px 52px 0 0; overflow: hidden;
+  box-shadow: 0 -6px 32px rgba(0,0,0,.12); padding-top: 88px;
 }
 #team {
   position: relative; z-index: 3;
