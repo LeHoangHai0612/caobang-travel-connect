@@ -1057,7 +1057,7 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== TOURS ==================== */}
-        <section id="tours" style={{ background: "#f8f9f8", padding: "72px 0" }}>
+        <section id="tours" style={{ padding: "72px 0" }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag">Khám Phá Ngay</span>
@@ -1308,7 +1308,7 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== SOS / KHẨN CẤP ==================== */}
-        <section id="sos" style={{ background: "#1a2e2e", padding: "40px 0" }}>
+        <section id="sos" style={{ padding: "40px 0" }}>
           <div className="container">
             <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
               <div style={{ width: 44, height: 44, borderRadius: 12, background: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
