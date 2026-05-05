@@ -117,7 +117,7 @@ nav { display: flex; align-items: center; justify-content: space-between; height
 .btn-hero-primary:hover { background: rgba(255,255,255,.32); transform: translateY(-2px); box-shadow: 0 12px 36px rgba(0,0,0,.22); }
 .btn-hero-outline { display: inline-flex; align-items: center; gap: 9px; background: var(--teal-dark); color: white !important; font-size: .85rem; font-weight: 700; letter-spacing: .10em; padding: 15px 36px; border-radius: 50px; border: none; cursor: pointer; transition: all var(--transition); }
 .btn-hero-outline:hover { background: var(--teal-mid); transform: translateY(-2px); box-shadow: 0 12px 36px rgba(38,92,89,.4); }
-.hero-stats { margin: 60px auto 0; width: fit-content; justify-content: center; z-index: 3; display: flex; gap: 1px; background: rgba(255,255,255,.10); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius-md); overflow: hidden; }
+.hero-stats { position: absolute; bottom: 80px; left: 50%; transform: translateX(-50%); width: fit-content; white-space: nowrap; z-index: 3; display: flex; gap: 1px; background: rgba(255,255,255,.10); backdrop-filter: blur(16px); border: 1px solid rgba(255,255,255,.22); border-radius: var(--radius-md); overflow: hidden; }
 .hero-stat { text-align: center; color: white; padding: 14px 28px; }
 .hero-stat + .hero-stat { border-left: 1px solid rgba(255,255,255,.15); }
 .hero-stat strong { display: block; font-size: 1.4rem; font-weight: 800; }

@@ -852,14 +852,16 @@ export default function CaoBangEcoTour() {
               <a href="#destinations" className="btn-hero-outline" onClick={(e) => scrollToSection(e, "destinations")}>
                 <i className="fa-solid fa-map-location-dot" aria-hidden="true" /> KHÁM PHÁ ĐIỂM ĐẾN
               </a>
-              <div className="hero-stats" aria-label="Thống kê dịch vụ">
-                <div className="hero-stat"><strong>50+</strong><span>Hướng Dẫn Viên</span></div>
-                <div className="hero-stat"><strong>2000+</strong><span>Du Khách Hài Lòng</span></div>
-                <div className="hero-stat"><strong>30+</strong><span>Điểm Tham Quan</span></div>
-                <div className="hero-stat"><strong>5★</strong><span>Đánh Giá TB</span></div>
-              </div>
             </div>
 
+          </div>
+
+          {/* Stats — absolute ở đáy hero */}
+          <div className="hero-stats" aria-label="Thống kê dịch vụ">
+            <div className="hero-stat"><strong>50+</strong><span>Hướng Dẫn Viên</span></div>
+            <div className="hero-stat"><strong>2000+</strong><span>Du Khách Hài Lòng</span></div>
+            <div className="hero-stat"><strong>30+</strong><span>Điểm Tham Quan</span></div>
+            <div className="hero-stat"><strong>5★</strong><span>Đánh Giá TB</span></div>
           </div>
 
           {/* Weather widget — ngoài hero-content, không đè lên stats */}
