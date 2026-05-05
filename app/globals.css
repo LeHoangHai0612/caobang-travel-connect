@@ -290,32 +290,34 @@ nav { display: flex; align-items: center; justify-content: space-between; height
 .carousel-dot { width: 8px; height: 8px; border-radius: 50%; background: rgba(255,255,255,.25); cursor: pointer; transition: all .22s; border: none; }
 .carousel-dot.active { background: white; width: 24px; border-radius: 4px; }
 
-/* FOOTER */
-footer { background: var(--teal-dark); color: rgba(255,255,255,.85); padding: 60px 0 0; }
-.footer-grid { display: grid; grid-template-columns: 1.2fr 1fr 1fr; gap: 40px; padding-bottom: 48px; }
-.footer-logo { display: flex; align-items: center; gap: 10px; margin-bottom: 16px; }
-.footer-logo-icon { width: 40px; height: 40px; background: rgba(255,255,255,.15); border-radius: var(--radius-sm); display: flex; align-items: center; justify-content: center; font-size: 1.1rem; color: white; }
-.footer-logo-text strong { display: block; font-size: .88rem; font-weight: 800; letter-spacing: .03em; color: white; text-transform: uppercase; }
-.footer-logo-text span { font-size: .7rem; opacity: .6; letter-spacing: .06em; }
-.footer-about { font-size: .83rem; line-height: 1.75; opacity: .75; margin-bottom: 20px; }
-.footer-contact-item { display: flex; align-items: center; gap: 10px; font-size: .82rem; margin-bottom: 10px; opacity: .8; }
-.footer-contact-item i { width: 18px; text-align: center; opacity: .7; }
-.footer-col h4 { font-size: .85rem; font-weight: 800; letter-spacing: .1em; text-transform: uppercase; color: white; margin-bottom: 20px; padding-bottom: 10px; border-bottom: 2px solid rgba(255,255,255,.12); }
-.footer-form-group { margin-bottom: 12px; }
-.footer-form-group input { width: 100%; padding: 9px 14px; border: 1px solid rgba(255,255,255,.2); border-radius: var(--radius-sm); background: rgba(255,255,255,.08); font-family: 'Be Vietnam Pro', sans-serif; font-size: .82rem; color: white; transition: border-color var(--transition); }
-.footer-form-group input::placeholder { color: rgba(255,255,255,.45); }
-.footer-form-group input:focus { outline: none; border-color: rgba(255,255,255,.5); }
-.btn-footer-send { display: block; width: 100%; text-align: center; background: rgba(255,255,255,.15); color: white; font-size: .82rem; font-weight: 800; letter-spacing: .08em; padding: 11px; border-radius: var(--radius-sm); border: 1.5px solid rgba(255,255,255,.3); cursor: pointer; margin-top: 4px; transition: all var(--transition); }
-.btn-footer-send:hover { background: rgba(255,255,255,.25); }
-.footer-map { border-radius: var(--radius-sm); overflow: hidden; height: 180px; border: 1px solid rgba(255,255,255,.12); }
-.footer-map iframe { width: 100%; height: 100%; border: none; filter: saturate(.7) brightness(.85); }
-.footer-bottom { border-top: 1px solid rgba(255,255,255,.10); padding: 18px 0; display: flex; align-items: center; justify-content: space-between; flex-wrap: wrap; gap: 12px; }
-.footer-copy { font-size: .76rem; opacity: .55; letter-spacing: .04em; }
-.footer-socials { display: flex; gap: 10px; }
-.footer-social-link { width: 34px; height: 34px; border-radius: 50%; background: rgba(255,255,255,.10); display: flex; align-items: center; justify-content: center; font-size: .82rem; color: rgba(255,255,255,.75); transition: all var(--transition); border: 1px solid rgba(255,255,255,.12); }
-.footer-social-link:hover { background: rgba(255,255,255,.22); color: white; transform: translateY(-2px); }
-.footer-nav-link { font-size: .8rem; opacity: .7; transition: opacity .2s; }
-.footer-nav-link:hover { opacity: 1; }
+/* FOOTER V2 */
+footer { padding: 0; }
+.ftv2-grid { display: grid; grid-template-columns: 1.4fr 1fr 1fr 1.3fr 1.6fr; gap: 36px; padding: 60px 0 44px; align-items: start; }
+.ftv2-brand { display: flex; flex-direction: column; align-items: flex-start; gap: 14px; }
+.ftv2-brand-text strong { display: block; font-size: 1.1rem; font-weight: 900; letter-spacing: .12em; color: #1a2e2e; }
+.ftv2-brand-text span { font-size: .68rem; letter-spacing: .18em; color: #4a6260; font-weight: 600; }
+.ftv2-col { display: flex; flex-direction: column; gap: 0; }
+.ftv2-heading { font-size: .7rem; font-weight: 800; letter-spacing: .14em; text-transform: uppercase; color: #1a2e2e; margin-bottom: 14px; padding-bottom: 8px; border-bottom: 1.5px solid rgba(26,46,46,.15); }
+.ftv2-link { font-size: .83rem; color: #3d5e5b; text-decoration: none; padding: 5px 0; transition: color .2s; font-weight: 500; }
+.ftv2-link:hover { color: #265C59; }
+.ftv2-info { display: flex; align-items: flex-start; gap: 9px; font-size: .82rem; color: #3d5e5b; margin-bottom: 9px; line-height: 1.5; font-weight: 500; }
+.ftv2-info i { width: 14px; text-align: center; margin-top: 2px; color: #265C59; flex-shrink: 0; }
+.ftv2-input { width: 100%; padding: 9px 13px; border: 1.5px solid rgba(26,46,46,.2); border-radius: 8px; background: rgba(255,255,255,.65); font-family: 'Be Vietnam Pro', sans-serif; font-size: .82rem; color: #1a2e2e; transition: border-color .2s; margin-bottom: 10px; box-sizing: border-box; }
+.ftv2-input::placeholder { color: #94a3b8; }
+.ftv2-input:focus { outline: none; border-color: #265C59; background: rgba(255,255,255,.85); }
+.ftv2-input-flex { margin-bottom: 0; border-radius: 8px 0 0 8px; }
+.ftv2-email-row { display: flex; align-items: stretch; }
+.ftv2-send-btn { padding: 0 16px; background: #265C59; color: white; border: none; border-radius: 0 8px 8px 0; cursor: pointer; font-size: .9rem; transition: background .2s; flex-shrink: 0; }
+.ftv2-send-btn:hover { background: #1e4a47; }
+.ftv2-socials { display: flex; gap: 10px; margin-top: 4px; }
+.ftv2-social { width: 36px; height: 36px; border-radius: 50%; border: 1.5px solid rgba(26,46,46,.2); display: flex; align-items: center; justify-content: center; font-size: .82rem; color: #3d5e5b; text-decoration: none; transition: all .2s; background: rgba(255,255,255,.5); }
+.ftv2-social:hover { background: #265C59; color: white; border-color: #265C59; transform: translateY(-2px); }
+.ftv2-book-btn { display: inline-block; margin-top: 18px; padding: 10px 22px; background: #265C59; color: white; border-radius: 50px; font-size: .8rem; font-weight: 800; letter-spacing: .06em; text-decoration: none; text-align: center; transition: background .2s, transform .2s; }
+.ftv2-book-btn:hover { background: #1e4a47; transform: translateY(-2px); }
+.ftv2-bottom { border-top: 1.5px solid rgba(26,46,46,.12); padding: 16px 0; display: flex; align-items: center; justify-content: center; flex-wrap: wrap; gap: 6px 24px; }
+.ftv2-bottom span { font-size: .74rem; color: #4a6260; font-weight: 500; cursor: default; }
+.ftv2-bottom-copy { font-weight: 700; color: #265C59 !important; }
+.ftv2-bottom span:not(.ftv2-bottom-copy):hover { color: #265C59; }
 
 /* SCROLL ANIMATIONS */
 .fade-up { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
@@ -360,6 +362,7 @@ footer { background: var(--teal-dark); color: rgba(255,255,255,.85); padding: 60
   .carousel-track { grid-template-columns: 1fr; }
   .gallery-grid  { grid-template-columns: repeat(2, 1fr); }
   .footer-grid   { grid-template-columns: 1fr; gap: 28px; padding-bottom: 36px; }
+  .ftv2-grid     { grid-template-columns: 1fr 1fr; gap: 28px; padding: 40px 0 32px; }
 
   /* Sections */
   .why-us, .destinations, .team, .pricing, .gallery, .testimonials { padding: 56px 0; }
@@ -453,17 +456,10 @@ footer { background: var(--teal-dark); color: rgba(255,255,255,.85); padding: 60
   .nav-logo-text strong { font-size: .82rem; }
   .nav-logo-text span   { font-size: .67rem; }
 
-  /* Footer */
-  footer { padding: 36px 0 0; }
-  .footer-grid  { gap: 22px; padding-bottom: 28px; }
-  .footer-about { font-size: .8rem; margin-bottom: 12px; }
-  .footer-contact-item { font-size: .79rem; margin-bottom: 8px; }
-  .footer-col h4 { font-size: .82rem; margin-bottom: 12px; }
-  .btn-footer-send { font-size: .8rem; padding: 11px; min-height: 44px; }
-  .footer-form-group input { font-size: .82rem; padding: 9px 12px; }
-  .footer-bottom { flex-direction: column; align-items: center; text-align: center; gap: 10px; padding: 14px 0; }
-  .footer-copy   { font-size: .76rem; }
-  .footer-social-link { width: 36px; height: 36px; font-size: .82rem; }
+  /* Footer V2 mobile */
+  .ftv2-grid { grid-template-columns: 1fr; gap: 24px; padding: 36px 0 28px; }
+  .ftv2-bottom { gap: 6px 16px; }
+  footer { padding: 0; }
 
   /* Admin on mobile */
   .admin-layout  { flex-direction: column; }

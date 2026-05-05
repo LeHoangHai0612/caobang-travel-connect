@@ -1334,130 +1334,109 @@ export default function CaoBangEcoTour() {
       </main>
 
       {/* ==================== FOOTER ==================== */}
-      <footer id="footer" aria-label="Chân trang">
-        <div className="container">
-          <div className="footer-grid">
-            {/* Thông tin */}
-            <div className="footer-col">
-              <div className="footer-logo">
-                <div className="footer-logo-icon" aria-hidden="true"><i className="fa-solid fa-mountain-sun" /></div>
-                <div className="footer-logo-text">
-                  <strong>Cao Bằng Eco Tour</strong>
-                  <span>Hướng Dẫn Viên Địa Phương</span>
-                </div>
+      <footer id="footer" aria-label="Chân trang" style={{ position: "relative", overflow: "hidden", color: "#1a2e2e", padding: 0 }}>
+        {/* Background */}
+        <div style={{ position: "absolute", inset: 0, backgroundImage: "url(https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75)", backgroundSize: "cover", backgroundPosition: "center" }} />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(238,234,222,.91)" }} />
+
+        <div className="container" style={{ position: "relative", zIndex: 1 }}>
+          {/* TOP GRID */}
+          <div className="ftv2-grid">
+
+            {/* Brand */}
+            <div className="ftv2-brand">
+              <img src="/logo.png" alt="Cao Bằng Travel" style={{ width: 64, height: 64, objectFit: "contain" }} />
+              <div className="ftv2-brand-text">
+                <strong>CAO BẰNG</strong>
+                <span>TRAVEL CONNECT</span>
               </div>
-              <p className="footer-about">
-                Kết nối du khách với những hướng dẫn viên địa phương am hiểu và tận tâm nhất tại Cao Bằng. Chúng tôi cam kết mang lại hành trình trọn vẹn và trải nghiệm chân thực nhất.
-              </p>
-              <address style={{ fontStyle: "normal" }}>
-                <div className="footer-contact-item"><i className="fa-solid fa-phone" /><span>+84 365 128 823</span></div>
-                <div className="footer-contact-item"><i className="fa-solid fa-envelope" /><span>info@caobangecotour.com</span></div>
-                <div className="footer-contact-item"><i className="fa-solid fa-globe" /><span>www.caobangecotour.com</span></div>
-                <div className="footer-contact-item"><i className="fa-solid fa-location-dot" /><span>Tp. Cao Bằng, tỉnh Cao Bằng, Việt Nam</span></div>
-              </address>
             </div>
 
-            {/* Form liên hệ */}
-            <div className="footer-col">
-              <h4>Liên Hệ</h4>
+            {/* TOUR */}
+            <div className="ftv2-col">
+              <h5 className="ftv2-heading">TOUR</h5>
+              <a href="/hdv" className="ftv2-link">Tour Xe Máy</a>
+              <a href="/hdv" className="ftv2-link">Tour Jeep</a>
+              <a href="/hdv" className="ftv2-link">Tour Gói</a>
+              <a href="/dat-lich" className="ftv2-link">Đặt Lịch Tùy Chỉnh</a>
+            </div>
+
+            {/* KHÁM PHÁ */}
+            <div className="ftv2-col">
+              <h5 className="ftv2-heading">KHÁM PHÁ</h5>
+              <a href="#destinations" className="ftv2-link" onClick={(e) => scrollToSection(e, "destinations")}>Điểm Đến</a>
+              <a href="#gallery" className="ftv2-link" onClick={(e) => scrollToSection(e, "gallery")}>Thư Viện Ảnh</a>
+              <a href="#reviews" className="ftv2-link" onClick={(e) => scrollToSection(e, "reviews")}>Đánh Giá</a>
+              <a href="/tai-khoan" className="ftv2-link">Tài Khoản</a>
+            </div>
+
+            {/* LIÊN HỆ + HOTLINE */}
+            <div className="ftv2-col">
+              <h5 className="ftv2-heading">LIÊN HỆ</h5>
+              <div className="ftv2-info"><i className="fa-solid fa-location-dot" /> Tp. Cao Bằng, Việt Nam</div>
+              <div className="ftv2-info"><i className="fa-solid fa-envelope" /> info@caobangtravel.com</div>
+              <h5 className="ftv2-heading" style={{ marginTop: 20 }}>HOTLINE</h5>
+              <div className="ftv2-info"><i className="fa-solid fa-phone" /> +84 365 128 823</div>
+              <div className="ftv2-info"><i className="fa-solid fa-phone" /> +84 916 361 128</div>
+            </div>
+
+            {/* ĐĂNG KÝ + SOCIAL */}
+            <div className="ftv2-col">
+              <h5 className="ftv2-heading">ĐĂNG KÝ NHẬN TIN</h5>
               <form onSubmit={handleContactSubmit}>
-                <div className="footer-form-group">
-                  <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)} placeholder="Họ và tên" autoComplete="name" required />
+                <input
+                  type="text" value={contactName}
+                  onChange={(e) => setContactName(e.target.value)}
+                  placeholder="Họ và tên" className="ftv2-input" required
+                />
+                <div className="ftv2-email-row">
+                  <input
+                    type="email" value={contactEmail}
+                    onChange={(e) => setContactEmail(e.target.value)}
+                    placeholder="Địa chỉ Email" className="ftv2-input ftv2-input-flex"
+                    required
+                  />
+                  <button type="submit" className="ftv2-send-btn" disabled={contactLoading}>
+                    {contactLoading
+                      ? <i className="fa-solid fa-spinner fa-spin" />
+                      : <i className="fa-solid fa-arrow-right" />}
+                  </button>
                 </div>
-                <div className="footer-form-group">
-                  <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)} placeholder="Địa chỉ Email" autoComplete="email" required />
-                </div>
-                <div className="footer-form-group">
-                  <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)} placeholder="Số điện thoại" autoComplete="tel" />
-                </div>
-                <div className="footer-form-group">
-                  <input type="text" value={contactMessage} onChange={(e) => setContactMessage(e.target.value)} placeholder="Nội dung tin nhắn..." required />
-                </div>
-                {!userSession && (
-                  <p style={{ color: "rgba(255,255,255,.5)", fontSize: ".74rem", fontStyle: "italic", marginBottom: 8, lineHeight: 1.5 }}>
-                    <i className="fa-solid fa-circle-info" style={{ marginRight: 5 }} />
-                    Khi chưa đăng nhập, bạn không thể xem phản hồi từ trang web. Chúng tôi sẽ liên hệ đến bạn qua điện thoại sớm nhất có thể.
+                <input type="hidden" value={contactMessage || "Đăng ký nhận tin tức"}
+                  onChange={(e) => setContactMessage(e.target.value)} />
+                {contactSuccess && (
+                  <p style={{ fontSize: ".74rem", color: "#265C59", marginTop: 6, fontWeight: 700 }}>
+                    <i className="fa-solid fa-circle-check" style={{ marginRight: 4 }} /> Đăng ký thành công!
                   </p>
                 )}
-                {contactSuccess && (
-                  <div style={{ background: "rgba(255,255,255,.08)", borderRadius: 10, padding: "12px 14px", marginBottom: 10 }}>
-                    <p style={{ color: "#a8e6d0", fontSize: ".82rem", marginBottom: userSession ? 8 : 0 }}>
-                      <i className="fa-solid fa-circle-check" style={{ marginRight: 6 }} />
-                      Gửi thành công! Chúng tôi sẽ phản hồi sớm nhất có thể.
-                    </p>
-                    {userSession && (
-                      <a href="/tai-khoan"
-                        style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#5eead4", fontSize: ".78rem", fontWeight: 700, textDecoration: "none", marginTop: 4 }}>
-                        <i className="fa-solid fa-envelope-open-text" style={{ fontSize: ".7rem" }} />
-                        Xem phản hồi từ chúng tôi tại đây
-                      </a>
-                    )}
-                  </div>
-                )}
                 {contactError && (
-                  <p style={{ color: "#f87171", fontSize: ".82rem", marginBottom: 8 }}>{contactError}</p>
+                  <p style={{ fontSize: ".74rem", color: "#dc2626", marginTop: 6 }}>{contactError}</p>
                 )}
-                <button type="submit" className="btn-footer-send" disabled={contactLoading}>
-                  {contactLoading
-                    ? "Đang gửi..."
-                    : <><i className="fa-solid fa-paper-plane" aria-hidden="true" /> GỬI TIN NHẮN</>
-                  }
-                </button>
               </form>
-            </div>
 
-            {/* Bản đồ + điều hướng */}
-            <div className="footer-col">
-              <h4>Map</h4>
-              <div className="footer-map" aria-label="Bản đồ vị trí Cao Bằng">
-                <iframe
-                  src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d59886.6!2d106.257!3d22.666!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x36cd16a1c9ef9d73%3A0x9c7f8b0ba2a3e4f0!2zVGjDoG5oIHBo4buRIENhbyBC4bqxbmcsIFZp4buHdCBOYW0!5e0!3m2!1svi!2svn!4v1700000000000!5m2!1svi!2svn"
-                  title="Bản đồ thành phố Cao Bằng"
-                  loading="lazy"
-                  allowFullScreen
-                />
+              <h5 className="ftv2-heading" style={{ marginTop: 20 }}>THEO DÕI CHÚNG TÔI</h5>
+              <div className="ftv2-socials">
+                {[
+                  { icon: "fa-brands fa-facebook-f", href: "#" },
+                  { icon: "fa-brands fa-instagram",  href: "#" },
+                  { icon: "fa-brands fa-tiktok",     href: "#" },
+                ].map(({ icon, href }) => (
+                  <a key={icon} href={href} className="ftv2-social" aria-label={icon}>
+                    <i className={icon} />
+                  </a>
+                ))}
               </div>
 
-              <div style={{ marginTop: "24px" }}>
-                <h4 style={{ marginBottom: "14px" }}>Điều Hướng</h4>
-                <nav aria-label="Điều hướng footer">
-                  <ul style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: "8px 16px" }}>
-                    {[
-                      { id: "hero",         label: "Trang Chủ" },
-                      { id: "why-us",       label: "Giới Thiệu" },
-                      { id: "team",         label: "Dịch Vụ HDV" },
-                      { id: "destinations", label: "Điểm Đến" },
-                      { id: "gallery",      label: "Thư Viện Ảnh" },
-                      { id: "pricing",      label: "Bảng Giá" },
-                    ].map(({ id, label }) => (
-                      <li key={id}>
-                        <a href={`#${id}`} className="footer-nav-link" onClick={(e) => scrollToSection(e, id)}>{label}</a>
-                      </li>
-                    ))}
-                  </ul>
-                </nav>
-              </div>
+              <a href="/dat-lich" className="ftv2-book-btn">Đặt Lịch Ngay</a>
             </div>
           </div>
 
-          <div className="footer-bottom">
-            <p className="footer-copy">
-              © 2024 Cao Bằng Eco Tour. Bảo lưu mọi quyền. | Thiết kế với{" "}
-              <i className="fa-solid fa-heart" style={{ color: "#e87c7c", fontSize: ".7em" }} /> cho du lịch Cao Bằng
-            </p>
-            <nav className="footer-socials">
-              {[
-                { icon: "fa-brands fa-facebook-f",  href: "#" },
-                { icon: "fa-brands fa-instagram",   href: "#" },
-                { icon: "fa-brands fa-youtube",     href: "#" },
-                { icon: "fa-brands fa-tiktok",      href: "#" },
-                { icon: "fa-solid fa-comment-dots", href: "#" },
-              ].map(({ icon, href }) => (
-                <a key={icon} href={href} className="footer-social-link" aria-label={icon}>
-                  <i className={icon} />
-                </a>
-              ))}
-            </nav>
+          {/* BOTTOM BAR */}
+          <div className="ftv2-bottom">
+            <span>Chính sách Cookies</span>
+            <span className="ftv2-bottom-copy">© 2025 Cao Bằng Travel Connect. Bảo lưu mọi quyền.</span>
+            <span>Quyền Riêng Tư</span>
+            <span>Điều Khoản Sử Dụng</span>
           </div>
         </div>
       </footer>
