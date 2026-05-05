@@ -1337,7 +1337,16 @@ export default function CaoBangEcoTour() {
       <footer id="footer" aria-label="Chân trang" style={{ position: "relative", overflow: "hidden", color: "#1a2e2e", padding: 0 }}>
         {/* Background */}
         <div style={{ position: "absolute", inset: 0, backgroundImage: "url(https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75)", backgroundSize: "cover", backgroundPosition: "center" }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(238,234,222,.91)" }} />
+        <div style={{ position: "absolute", inset: 0, background: "rgba(238,234,222,.88)" }} />
+
+        {/* Watermark chữ CAO BẰNG */}
+        <div className="ftv2-watermark">CAO BẰNG</div>
+
+        {/* Hiệu ứng đám mây */}
+        <div className="ftv2-cloud ftv2-cloud-1" />
+        <div className="ftv2-cloud ftv2-cloud-2" />
+        <div className="ftv2-cloud ftv2-cloud-3" />
+        <div className="ftv2-cloud ftv2-cloud-4" />
 
         <div className="container" style={{ position: "relative", zIndex: 1 }}>
           {/* TOP GRID */}

@@ -319,6 +319,58 @@ footer { padding: 0; }
 .ftv2-bottom-copy { font-weight: 700; color: #265C59 !important; }
 .ftv2-bottom span:not(.ftv2-bottom-copy):hover { color: #265C59; }
 
+/* Watermark + clouds */
+.ftv2-watermark {
+  position: absolute;
+  bottom: 12%;
+  left: 50%;
+  transform: translateX(-50%);
+  font-size: clamp(64px, 11vw, 160px);
+  font-weight: 900;
+  letter-spacing: .18em;
+  color: rgba(26,46,46,.055);
+  white-space: nowrap;
+  pointer-events: none;
+  user-select: none;
+  z-index: 0;
+  line-height: 1;
+  font-family: 'Be Vietnam Pro', sans-serif;
+}
+.ftv2-cloud {
+  position: absolute;
+  pointer-events: none;
+  z-index: 0;
+  border-radius: 50%;
+}
+.ftv2-cloud-1 {
+  width: 700px; height: 320px;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,.52) 0%, transparent 68%);
+  top: -60px; left: -120px;
+  animation: cloudDrift 18s ease-in-out infinite alternate;
+}
+.ftv2-cloud-2 {
+  width: 500px; height: 260px;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,.42) 0%, transparent 65%);
+  top: 20%; right: -80px;
+  animation: cloudDrift 24s ease-in-out infinite alternate-reverse;
+}
+.ftv2-cloud-3 {
+  width: 600px; height: 200px;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,.38) 0%, transparent 60%);
+  bottom: 18%; left: 20%;
+  animation: cloudDrift 20s ease-in-out infinite alternate;
+}
+.ftv2-cloud-4 {
+  width: 400px; height: 180px;
+  background: radial-gradient(ellipse at center, rgba(255,255,255,.35) 0%, transparent 60%);
+  bottom: 5%; right: 10%;
+  animation: cloudDrift 15s ease-in-out infinite alternate-reverse;
+}
+@keyframes cloudDrift {
+  from { transform: translateX(0) translateY(0); }
+  to   { transform: translateX(30px) translateY(-15px); }
+}
+
 /* SCROLL ANIMATIONS */
 .fade-up { opacity: 0; transform: translateY(30px); transition: opacity .6s ease, transform .6s ease; }
 .fade-up.visible { opacity: 1; transform: none; }
