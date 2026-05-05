@@ -429,6 +429,31 @@ export default function CaoBangEcoTour() {
     }
   };
 
+  const handleFooterSignup = async (e: React.SyntheticEvent) => {
+    e.preventDefault();
+    if (contactLoading) return;
+    setContactLoading(true);
+    setContactError("");
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ name: contactName || "Khách hàng", email: contactEmail, phone: "", message: "Đăng ký nhận tin tức", user_id: userSession?.user.id }),
+      });
+      if (res.ok) {
+        setContactSuccess(true);
+        setContactName(""); setContactEmail("");
+      } else {
+        const data = await res.json();
+        setContactError(data.error || "Đã có lỗi. Vui lòng thử lại.");
+      }
+    } catch {
+      setContactError("Không thể kết nối.");
+    } finally {
+      setContactLoading(false);
+    }
+  };
+
   const handlePageChange = (newPage: number) => {
     setCurrentPage(Math.max(0, Math.min(newPage, totalPages - 1)));
   };
@@ -1427,11 +1452,11 @@ export default function CaoBangEcoTour() {
             {/* ĐĂNG KÝ + SOCIAL */}
             <div className="ftv2-col">
               <h5 className="ftv2-heading">ĐĂNG KÝ NHẬN TIN</h5>
-              <form onSubmit={handleContactSubmit}>
+              <form onSubmit={handleFooterSignup}>
                 <input
                   type="text" value={contactName}
                   onChange={(e) => setContactName(e.target.value)}
-                  placeholder="Họ và tên" className="ftv2-input" required
+                  placeholder="Họ và tên" className="ftv2-input"
                 />
                 <div className="ftv2-email-row">
                   <input
@@ -1446,8 +1471,6 @@ export default function CaoBangEcoTour() {
                       : <i className="fa-solid fa-arrow-right" />}
                   </button>
                 </div>
-                <input type="hidden" value={contactMessage || "Đăng ký nhận tin tức"}
-                  onChange={(e) => setContactMessage(e.target.value)} />
                 {contactSuccess && (
                   <p style={{ fontSize: ".74rem", color: "#265C59", marginTop: 6, fontWeight: 700 }}>
                     <i className="fa-solid fa-circle-check" style={{ marginRight: 4 }} /> Đăng ký thành công!
