@@ -842,9 +842,9 @@ export default function CaoBangEcoTour() {
             <div className="hero-badge">
               <i className="fa-solid fa-leaf" /> Hướng Dẫn Viên Địa Phương · Cao Bằng, Việt Nam
             </div>
-            <h1>Khám Phá Cao Bằng<br />Cùng Hướng Dẫn Viên Địa Phương</h1>
-            <p className="hero-tagline">Chuyên Nghiệp · Am Hiểu · Tận Tâm</p>
-            <p className="hero-sub">Hành trình trọn vẹn, trải nghiệm chân thực</p>
+            <h1>Khám Phá<br />Cao Bằng</h1>
+            <p className="hero-tagline">Cùng Hướng Dẫn Viên Địa Phương</p>
+            <p className="hero-sub">Chuyên Nghiệp · Am Hiểu · Tận Tâm · Hành trình trọn vẹn</p>
             <div className="hero-actions">
               <a href="#team" className="btn-hero-primary" onClick={(e) => scrollToSection(e, "team")}>
                 <i className="fa-solid fa-compass" aria-hidden="true" /> XEM CÁC HDV &amp; TOUR
