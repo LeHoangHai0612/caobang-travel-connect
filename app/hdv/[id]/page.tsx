@@ -323,7 +323,7 @@ export default function GuideProfilePage() {
                     <i className="fa-brands fa-comment-dots" /> Chat Zalo
                   </a>
                 )}
-                <a href="/#pricing" className="hdv-btn-book">
+                <a href={`/dat-lich?guide=${guide.id}`} className="hdv-btn-book">
                   <i className="fa-solid fa-calendar-check" /> Đặt Lịch Ngay
                 </a>
               </div>
@@ -362,7 +362,7 @@ export default function GuideProfilePage() {
                 Xem ngày HDV còn trống để chọn thời gian phù hợp khi đặt lịch.
               </p>
               <GuideCalendar guideId={guide.id} />
-              <a href="/#pricing" style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, marginTop: 16, padding: "10px", borderRadius: 10, background: "#265C59", color: "white", textDecoration: "none", fontWeight: 700, fontSize: ".82rem", fontFamily: "inherit" }}>
+              <a href={`/dat-lich?guide=${guide.id}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, marginTop: 16, padding: "10px", borderRadius: 10, background: "#265C59", color: "white", textDecoration: "none", fontWeight: 700, fontSize: ".82rem", fontFamily: "inherit" }}>
                 <i className="fa-solid fa-calendar-check" /> Đặt Lịch Ngay
               </a>
             </div>
@@ -371,7 +371,7 @@ export default function GuideProfilePage() {
             <div className="hdv-cta">
               <h3><i className="fa-solid fa-calendar-check" style={{ marginRight: 8 }} />Đặt Lịch Với {guide.name.split(" ").pop()}</h3>
               <p>Liên hệ trực tiếp qua Zalo hoặc điền form đặt lịch. Chúng tôi sẽ xác nhận trong vòng 24 giờ.</p>
-              <a href="/#pricing" className="hdv-cta-btn">
+              <a href={`/dat-lich?guide=${guide.id}`} className="hdv-cta-btn">
                 <i className="fa-solid fa-arrow-right" /> Xem Gói Tour & Đặt Lịch
               </a>
             </div>
