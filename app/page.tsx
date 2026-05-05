@@ -5,6 +5,17 @@ import { supabase } from "@/lib/supabase";
 import type { Session } from "@supabase/supabase-js";
 import MusicPlayer from "@/app/components/MusicPlayer";
 import type { Guide, Destination, Review, GalleryImage, UserProfile } from "@/lib/database.types";
+
+interface Tour {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  price_from: number;
+  duration: string;
+  group_size: string;
+  zalo_number: string;
+}
 import { getTier, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BONUS_PCT } from "@/lib/loyalty";
 
 // ── Fallback data (hiển thị ngay khi chờ Supabase) ──────────────────────────
@@ -80,6 +91,7 @@ export default function CaoBangEcoTour() {
   const [destinations, setDestinations] = useState<Destination[]>(FALLBACK_DESTINATIONS);
   const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(FALLBACK_GALLERY);
+  const [tours, setTours] = useState<Tour[]>([]);
 
   // Site settings
   const [heroBg, setHeroBg]       = useState("");
@@ -147,17 +159,19 @@ export default function CaoBangEcoTour() {
   useEffect(() => {
     // Tải dữ liệu từ Supabase
     async function loadData() {
-      const [{ data: g }, { data: d }, { data: r }, { data: gal }, { data: settings }] = await Promise.all([
+      const [{ data: g }, { data: d }, { data: r }, { data: gal }, { data: settings }, { data: t }] = await Promise.all([
         supabase.from("guides").select("*").eq("is_active", true).order("rating", { ascending: false }).limit(8),
         supabase.from("destinations").select("*").order("sort_order").limit(6),
         supabase.from("reviews").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(6),
         supabase.from("gallery_images").select("*").order("sort_order").limit(12),
         supabase.from("site_settings").select("key,value"),
+        supabase.from("tours").select("id,title,description,image_url,price_from,duration,group_size,zalo_number").eq("is_active", true).order("sort_order").limit(6),
       ]);
       if (g && g.length > 0) setGuides(g);
       if (d && d.length > 0) setDestinations(d);
       if (r && r.length > 0) setReviews(r);
       if (gal && gal.length > 0) setGalleryImages(gal);
+      if (t && t.length > 0) setTours(t);
       if (settings) {
         const find = (k: string) => settings.find((s: { key: string; value: string }) => s.key === k)?.value;
         if (find("hero_bg"))         setHeroBg(find("hero_bg")!);
@@ -951,17 +965,19 @@ export default function CaoBangEcoTour() {
             </div>
 
             {/* Nút xem tất cả / thu gọn */}
-            {allFiltered.length > GUIDE_LIMIT && !guideSearch && !guideFilterLang && !guideFilterRating && (
-              <div style={{ textAlign: "center", marginTop: 28 }}>
-                <button
-                  onClick={() => setShowAllGuides((v) => !v)}
-                  style={{ padding: "12px 32px", borderRadius: 12, border: "2px solid rgba(255,255,255,.35)", background: "rgba(255,255,255,.1)", backdropFilter: "blur(6px)", color: "white", fontWeight: 700, fontSize: ".88rem", cursor: "pointer", transition: "all .2s" }}>
-                  {showAllGuides
-                    ? <><i className="fa-solid fa-chevron-up" style={{ marginRight: 8 }} />Thu gọn</>
-                    : <><i className="fa-solid fa-users" style={{ marginRight: 8 }} />Xem tất cả {allFiltered.length} hướng dẫn viên</>}
+            {/* Xem tất cả → trang /hdv riêng */}
+            <div style={{ textAlign: "center", marginTop: 28, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
+              {(guideSearch || guideFilterLang || guideFilterRating) && allFiltered.length > GUIDE_LIMIT && (
+                <button onClick={() => setShowAllGuides((v) => !v)}
+                  style={{ padding: "12px 24px", borderRadius: 12, border: "2px solid rgba(255,255,255,.35)", background: "rgba(255,255,255,.1)", backdropFilter: "blur(6px)", color: "white", fontWeight: 700, fontSize: ".86rem", cursor: "pointer" }}>
+                  {showAllGuides ? <><i className="fa-solid fa-chevron-up" style={{ marginRight: 7 }} />Thu gọn</> : <><i className="fa-solid fa-list" style={{ marginRight: 7 }} />Hiện thêm</>}
                 </button>
-              </div>
-            )}
+              )}
+              <a href="/hdv"
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 28px", borderRadius: 12, border: "2px solid rgba(255,255,255,.5)", background: "rgba(255,255,255,.15)", backdropFilter: "blur(6px)", color: "white", fontWeight: 700, fontSize: ".88rem", textDecoration: "none" }}>
+                <i className="fa-solid fa-users" />Xem tất cả hướng dẫn viên
+              </a>
+            </div>
           </div>
         </section>
 
@@ -996,6 +1012,65 @@ export default function CaoBangEcoTour() {
                     <p>{dest.description}</p>
                   </div>
                 </article>
+              ))}
+            </div>
+          </div>
+        </section>
+
+        {/* ==================== TOURS ==================== */}
+        <section id="tours" style={{ background: "#f8f9f8", padding: "72px 0" }}>
+          <div className="container">
+            <div className="section-header">
+              <span className="section-tag">Khám Phá Ngay</span>
+              <h2 className="section-title">Các Gói Tour Nổi Bật</h2>
+              <p className="section-subtitle">Lựa chọn hành trình phù hợp — từ tour 1 ngày đến khám phá dài ngày trọn vẹn</p>
+            </div>
+            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 20, marginBottom: 28 }}>
+              {tours.map((t) => (
+                <a key={t.id} href={`/tour/${t.id}`} style={{ textDecoration: "none", display: "block" }}>
+                  <div style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 14px rgba(0,0,0,.07)", transition: "transform .2s,box-shadow .2s", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}
+                    onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-4px)"; el.style.boxShadow = "0 10px 30px rgba(0,0,0,.13)"; }}
+                    onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.transform = ""; el.style.boxShadow = "0 2px 14px rgba(0,0,0,.07)"; }}>
+                    {/* Image */}
+                    <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden", background: "#e2e8f0", flexShrink: 0 }}>
+                      {t.image_url
+                        ? <img src={t.image_url} alt={t.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .3s" }} />
+                        : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="fa-solid fa-map" style={{ fontSize: 40, color: "#94a3b8" }} /></div>}
+                      {t.price_from > 0 && (
+                        <div style={{ position: "absolute", top: 10, right: 10, background: "#265C59", color: "white", borderRadius: 8, padding: "4px 10px", fontSize: ".72rem", fontWeight: 800 }}>
+                          Từ {t.price_from.toLocaleString("vi-VN")}đ
+                        </div>
+                      )}
+                    </div>
+                    {/* Body */}
+                    <div style={{ padding: "18px 20px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
+                      <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
+                        <span style={{ background: "#f0faf9", color: "#265C59", borderRadius: 6, padding: "3px 9px", fontSize: ".7rem", fontWeight: 700 }}>
+                          <i className="fa-solid fa-clock" style={{ marginRight: 4 }} />{t.duration}
+                        </span>
+                        <span style={{ background: "#f0faf9", color: "#265C59", borderRadius: 6, padding: "3px 9px", fontSize: ".7rem", fontWeight: 700 }}>
+                          <i className="fa-solid fa-users" style={{ marginRight: 4 }} />{t.group_size}
+                        </span>
+                      </div>
+                      <h3 style={{ fontWeight: 800, color: "#0f172a", fontSize: ".95rem", margin: "0 0 8px", lineHeight: 1.4 }}>{t.title}</h3>
+                      <p style={{ color: "#64748b", fontSize: ".82rem", lineHeight: 1.7, margin: "0 0 14px", flex: 1, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
+                        {t.description}
+                      </p>
+                      <div style={{ display: "flex", gap: 8 }}>
+                        {t.zalo_number && (
+                          <a href={`https://zalo.me/${t.zalo_number}`} target="_blank" rel="noopener noreferrer"
+                            onClick={(e) => e.stopPropagation()}
+                            style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, background: "#265C59", color: "white", fontWeight: 700, fontSize: ".75rem", textDecoration: "none" }}>
+                            <i className="fa-brands fa-comment-dots" />Zalo: {t.zalo_number}
+                          </a>
+                        )}
+                        <span style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", color: "#475569", fontSize: ".75rem", fontWeight: 600 }}>
+                          Xem chi tiết <i className="fa-solid fa-arrow-right" />
+                        </span>
+                      </div>
+                    </div>
+                  </div>
+                </a>
               ))}
             </div>
           </div>

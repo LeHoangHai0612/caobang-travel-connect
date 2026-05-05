@@ -8,6 +8,7 @@ import { supabase } from "@/lib/supabase";
 const NAV = [
   { href: "/admin",               icon: "fa-chart-pie",          label: "Tổng Quan"       },
   { href: "/admin/bookings",      icon: "fa-calendar-check",     label: "Đặt Lịch"        },
+  { href: "/admin/tours",         icon: "fa-map",                 label: "Tours"            },
   { href: "/admin/contacts",      icon: "fa-envelope",            label: "Liên Hệ"         },
   { href: "/admin/guides",        icon: "fa-person-hiking",       label: "Hướng Dẫn Viên" },
   { href: "/admin/destinations",  icon: "fa-map-location-dot",    label: "Điểm Đến"        },
