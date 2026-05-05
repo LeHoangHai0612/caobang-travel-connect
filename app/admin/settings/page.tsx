@@ -22,6 +22,7 @@ const ICONS: Record<string, string> = {
   gallery_bg:       "fa-images",
   testimonials_bg:  "fa-comments",
   sos_bg:           "fa-triangle-exclamation",
+  cam_nang_bg:      "fa-book-open",
   background_music: "fa-music",
 };
 
