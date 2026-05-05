@@ -863,37 +863,39 @@ export default function CaoBangEcoTour() {
           />
           <div className="hero-overlay" aria-hidden="true" />
           <div ref={heroMistRef} className="hero-mist" aria-hidden="true" />
-          <div className="hero-content">
-            <div className="hero-badge">
-              <i className="fa-solid fa-leaf" /> Hướng Dẫn Viên Địa Phương · Cao Bằng, Việt Nam
+          {/* Body — flex-1, centered */}
+          <div className="hero-body">
+            <div className="hero-content">
+              <div className="hero-badge">
+                <i className="fa-solid fa-leaf" /> Hướng Dẫn Viên Địa Phương · Cao Bằng, Việt Nam
+              </div>
+              <h1>Khám Phá<br />Cao Bằng</h1>
+              <p className="hero-tagline">Cùng Hướng Dẫn Viên Địa Phương</p>
+              <p className="hero-sub">Chuyên Nghiệp · Am Hiểu · Tận Tâm · Hành trình trọn vẹn</p>
+              <div className="hero-actions">
+                <a href="#team" className="btn-hero-primary" onClick={(e) => scrollToSection(e, "team")}>
+                  <i className="fa-solid fa-compass" aria-hidden="true" /> XEM CÁC HDV &amp; TOUR
+                </a>
+                <a href="#destinations" className="btn-hero-outline" onClick={(e) => scrollToSection(e, "destinations")}>
+                  <i className="fa-solid fa-map-location-dot" aria-hidden="true" /> KHÁM PHÁ ĐIỂM ĐẾN
+                </a>
+              </div>
             </div>
-            <h1>Khám Phá<br />Cao Bằng</h1>
-            <p className="hero-tagline">Cùng Hướng Dẫn Viên Địa Phương</p>
-            <p className="hero-sub">Chuyên Nghiệp · Am Hiểu · Tận Tâm · Hành trình trọn vẹn</p>
-            <div className="hero-actions">
-              <a href="#team" className="btn-hero-primary" onClick={(e) => scrollToSection(e, "team")}>
-                <i className="fa-solid fa-compass" aria-hidden="true" /> XEM CÁC HDV &amp; TOUR
-              </a>
-              <a href="#destinations" className="btn-hero-outline" onClick={(e) => scrollToSection(e, "destinations")}>
-                <i className="fa-solid fa-map-location-dot" aria-hidden="true" /> KHÁM PHÁ ĐIỂM ĐẾN
-              </a>
-            </div>
-
           </div>
 
-          {/* Stats — absolute ở đáy hero */}
-          <div className="hero-stats" aria-label="Thống kê dịch vụ">
-            <div className="hero-stat"><strong>50+</strong><span>Hướng Dẫn Viên</span></div>
-            <div className="hero-stat"><strong>2000+</strong><span>Du Khách Hài Lòng</span></div>
-            <div className="hero-stat"><strong>30+</strong><span>Điểm Tham Quan</span></div>
-            <div className="hero-stat"><strong>5★</strong><span>Đánh Giá TB</span></div>
+          {/* Bottom — scroll + stats */}
+          <div className="hero-bottom">
+            <a href="#why-us" className="hero-scroll" onClick={(e) => scrollToSection(e, "why-us")} aria-label="Cuộn xuống">
+              <span>Khám Phá</span>
+              <i className="fa-solid fa-chevron-down" />
+            </a>
+            <div className="hero-stats" aria-label="Thống kê dịch vụ">
+              <div className="hero-stat"><strong>50+</strong><span>Hướng Dẫn Viên</span></div>
+              <div className="hero-stat"><strong>2000+</strong><span>Du Khách Hài Lòng</span></div>
+              <div className="hero-stat"><strong>30+</strong><span>Điểm Tham Quan</span></div>
+              <div className="hero-stat"><strong>5★</strong><span>Đánh Giá TB</span></div>
+            </div>
           </div>
-
-          {/* Scroll indicator */}
-          <a href="#why-us" className="hero-scroll" onClick={(e) => scrollToSection(e, "why-us")} aria-label="Cuộn xuống">
-            <span>Khám Phá</span>
-            <i className="fa-solid fa-chevron-down" />
-          </a>
 
           {/* Weather widget — ngoài hero-content, không đè lên stats */}
           {weather && (() => {
