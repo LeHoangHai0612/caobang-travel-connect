@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState, useCallback } from "react";
-import { useSearchParams } from "next/navigation";
 import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import { getTier, POINTS_PER_BOOKING, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BONUS_PCT } from "@/lib/loyalty";
@@ -16,19 +15,15 @@ const PACKAGES = [
 ];
 
 export default function DatLichPage() {
-  const params = useSearchParams();
-
   const [bg, setBg]               = useState("https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75");
   const [guides, setGuides]       = useState<Guide[]>([]);
   const [session, setSession]     = useState<Session | null>(null);
   const [profile, setProfile]     = useState<UserProfile | null>(null);
   const [guideSearch, setGuideSearch] = useState("");
 
-  // Form state
-  const initPkg = params.get("package") ?? params.get("tour") ?? "";
-  const initGuide = params.get("guide") ?? "";
-  const [pkg, setPkg]             = useState(initPkg);
-  const [guideId, setGuideId]     = useState(initGuide);
+  // Form state — khởi tạo từ URL sau khi mount (tránh lỗi Suspense với useSearchParams)
+  const [pkg, setPkg]             = useState("");
+  const [guideId, setGuideId]     = useState("");
   const [name, setName]           = useState("");
   const [phone, setPhone]         = useState("");
   const [email, setEmail]         = useState("");
@@ -40,8 +35,14 @@ export default function DatLichPage() {
   const [pointsInfo, setPointsInfo] = useState<{ earned: number; newTotal: number; newTier: string } | null>(null);
   const [guideBookingCount, setGuideBookingCount] = useState(0);
 
-  // Load data
+  // Load data + đọc query params từ URL
   useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    const initPkg   = p.get("package") ?? p.get("tour") ?? "";
+    const initGuide = p.get("guide") ?? "";
+    if (initPkg)   setPkg(initPkg);
+    if (initGuide) setGuideId(initGuide);
+
     supabase.from("site_settings").select("value").eq("key", "booking_bg").single()
       .then(({ data }) => { if (data?.value) setBg(data.value); });
     supabase.from("guides").select("*").eq("is_active", true).order("rating", { ascending: false })
