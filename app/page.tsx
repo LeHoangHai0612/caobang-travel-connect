@@ -864,6 +864,12 @@ export default function CaoBangEcoTour() {
             <div className="hero-stat"><strong>5★</strong><span>Đánh Giá TB</span></div>
           </div>
 
+          {/* Scroll indicator */}
+          <a href="#why-us" className="hero-scroll" onClick={(e) => scrollToSection(e, "why-us")} aria-label="Cuộn xuống">
+            <span>Khám Phá</span>
+            <i className="fa-solid fa-chevron-down" />
+          </a>
+
           {/* Weather widget — ngoài hero-content, không đè lên stats */}
           {weather && (() => {
             const w = weatherIcon(weather.code);
