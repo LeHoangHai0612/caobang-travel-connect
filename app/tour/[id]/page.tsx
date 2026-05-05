@@ -64,8 +64,8 @@ export default function TourDetailPage() {
   }
 
   const handleBook = () => {
-    const params = new URLSearchParams({ tour: tour?.title ?? "", guides: selGuides.join(",") });
-    window.location.href = `/?booking=1&${params}#pricing`;
+    const params = new URLSearchParams({ package: tour?.title ?? "", guide: selGuides[0] ?? "" });
+    window.location.href = `/dat-lich?${params}`;
   };
 
   if (loading) return (

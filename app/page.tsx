@@ -236,19 +236,6 @@ export default function CaoBangEcoTour() {
     return () => fadeObserver.disconnect();
   }, [guides, destinations, reviews]);
 
-  // Đọc query params từ trang tour (booking=1&tour=...&guides=...)
-  useEffect(() => {
-    const p = new URLSearchParams(window.location.search);
-    if (p.get("booking") === "1") {
-      const tourName  = p.get("tour") ?? "";
-      const guideIds  = (p.get("guides") ?? "").split(",").filter(Boolean);
-      openBooking(tourName || "Tour Tùy Chỉnh");
-      if (guideIds.length > 0) setBookingGuideId(guideIds[0]);
-      // Xóa query params khỏi URL
-      window.history.replaceState({}, "", window.location.pathname + window.location.hash);
-    }
-  // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
 
   // Auth state listener
   useEffect(() => {
@@ -340,18 +327,7 @@ export default function CaoBangEcoTour() {
   };
 
   const openBooking = (pkg: string) => {
-    setBookingPackage(pkg);
-    setBookingSuccess(false);
-    setBookingError("");
-    setBookingGuideId("");
-    setBookingGuideSearch("");
-    setBookingPointsInfo(null);
-    setBookingName(userProfile?.full_name || "");
-    setBookingPhone(userProfile?.phone || "");
-    setBookingEmail(userSession?.user.email || "");
-    setBookingDate("");
-    setBookingNote("");
-    setIsBookingOpen(true);
+    window.location.href = `/dat-lich?package=${encodeURIComponent(pkg)}`;
   };
 
   const handleBookingSubmit = async (e: React.SyntheticEvent) => {
