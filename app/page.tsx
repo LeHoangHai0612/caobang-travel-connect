@@ -144,6 +144,9 @@ export default function CaoBangEcoTour() {
 
   const totalPages = Math.ceil(reviews.length / cardsPerPage);
 
+  // Destination detail modal
+  const [selectedDest, setSelectedDest] = useState<Destination | null>(null);
+
   // Review form state
   const [reviewOpen, setReviewOpen]       = useState(false);
   const [reviewStars, setReviewStars]     = useState(5);
@@ -232,6 +235,20 @@ export default function CaoBangEcoTour() {
     fadeEls.forEach((el) => fadeObserver.observe(el));
     return () => fadeObserver.disconnect();
   }, [guides, destinations, reviews]);
+
+  // Đọc query params từ trang tour (booking=1&tour=...&guides=...)
+  useEffect(() => {
+    const p = new URLSearchParams(window.location.search);
+    if (p.get("booking") === "1") {
+      const tourName  = p.get("tour") ?? "";
+      const guideIds  = (p.get("guides") ?? "").split(",").filter(Boolean);
+      openBooking(tourName || "Tour Tùy Chỉnh");
+      if (guideIds.length > 0) setBookingGuideId(guideIds[0]);
+      // Xóa query params khỏi URL
+      window.history.replaceState({}, "", window.location.pathname + window.location.hash);
+    }
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // Auth state listener
   useEffect(() => {
@@ -894,32 +911,32 @@ export default function CaoBangEcoTour() {
               <h2 className="section-title" id="team-heading">Đội Ngũ Hướng Dẫn Viên Biểu Tượng</h2>
               <p className="section-subtitle">Những hướng dẫn viên giàu kinh nghiệm, tận tâm và am hiểu sâu về vùng đất Cao Bằng</p>
             </div>
-            {/* Search & filter */}
+            {/* Search & filter — nền trắng nên dùng màu tối */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 28, justifyContent: "center" }}>
-              <div style={{ position: "relative", flex: "1 1 220px", maxWidth: 300 }}>
+              <div style={{ position: "relative", flex: "1 1 220px", maxWidth: 320 }}>
                 <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", fontSize: 13 }} />
                 <input
                   type="text" value={guideSearch} onChange={(e) => { setGuideSearch(e.target.value); setCurrentPage(0); }}
                   placeholder="Tìm theo tên, chuyên môn..."
-                  style={{ width: "100%", padding: "10px 14px 10px 36px", border: "1.5px solid rgba(255,255,255,.2)", borderRadius: 10, background: "rgba(255,255,255,.12)", color: "white", fontSize: ".84rem", outline: "none", backdropFilter: "blur(4px)" }}
+                  style={{ width: "100%", padding: "10px 14px 10px 36px", border: "1.5px solid #e2e8f0", borderRadius: 10, background: "white", color: "#1a2e2e", fontSize: ".84rem", outline: "none", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}
                 />
               </div>
               <select value={guideFilterLang} onChange={(e) => { setGuideFilterLang(e.target.value); setCurrentPage(0); }}
-                style={{ padding: "10px 14px", border: "1.5px solid rgba(255,255,255,.2)", borderRadius: 10, background: "rgba(255,255,255,.12)", color: "white", fontSize: ".84rem", outline: "none", backdropFilter: "blur(4px)", cursor: "pointer" }}>
-                <option value="" style={{ color: "#1a2e2e" }}>Ngôn ngữ</option>
-                <option value="English" style={{ color: "#1a2e2e" }}>English</option>
-                <option value="Tiếng Việt" style={{ color: "#1a2e2e" }}>Tiếng Việt</option>
+                style={{ padding: "10px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, background: "white", color: "#1a2e2e", fontSize: ".84rem", outline: "none", cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
+                <option value="">🌐 Ngôn ngữ</option>
+                <option value="English">English</option>
+                <option value="Tiếng Việt">Tiếng Việt</option>
               </select>
               <select value={guideFilterRating} onChange={(e) => { setGuideFilterRating(e.target.value); setCurrentPage(0); }}
-                style={{ padding: "10px 14px", border: "1.5px solid rgba(255,255,255,.2)", borderRadius: 10, background: "rgba(255,255,255,.12)", color: "white", fontSize: ".84rem", outline: "none", backdropFilter: "blur(4px)", cursor: "pointer" }}>
-                <option value="" style={{ color: "#1a2e2e" }}>Đánh giá</option>
-                <option value="5" style={{ color: "#1a2e2e" }}>5 sao</option>
-                <option value="4.5" style={{ color: "#1a2e2e" }}>4.5+ sao</option>
-                <option value="4" style={{ color: "#1a2e2e" }}>4+ sao</option>
+                style={{ padding: "10px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, background: "white", color: "#1a2e2e", fontSize: ".84rem", outline: "none", cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
+                <option value="">⭐ Đánh giá</option>
+                <option value="5">5 sao</option>
+                <option value="4.5">4.5+ sao</option>
+                <option value="4">4+ sao</option>
               </select>
               {(guideSearch || guideFilterLang || guideFilterRating) && (
                 <button onClick={() => { setGuideSearch(""); setGuideFilterLang(""); setGuideFilterRating(""); }}
-                  style={{ padding: "10px 14px", border: "1.5px solid rgba(255,255,255,.25)", borderRadius: 10, background: "transparent", color: "rgba(255,255,255,.7)", fontSize: ".82rem", cursor: "pointer" }}>
+                  style={{ padding: "10px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, background: "white", color: "#64748b", fontSize: ".82rem", cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
                   <i className="fa-solid fa-xmark" style={{ marginRight: 5 }} />Xóa lọc
                 </button>
               )}
@@ -927,9 +944,9 @@ export default function CaoBangEcoTour() {
 
             <div className="team-grid">
               {filteredGuides.length === 0 ? (
-                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px 0", color: "rgba(255,255,255,.55)" }}>
+                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px 0", color: "#94a3b8" }}>
                   <i className="fa-solid fa-person-hiking" style={{ fontSize: 36, marginBottom: 12, display: "block" }} />
-                  <p style={{ fontWeight: 700 }}>Không tìm thấy HDV phù hợp</p>
+                  <p style={{ fontWeight: 700, color: "#475569" }}>Không tìm thấy HDV phù hợp</p>
                   <p style={{ fontSize: ".82rem", marginTop: 4 }}>Thử điều chỉnh bộ lọc của bạn</p>
                 </div>
               ) : filteredGuides.map((member) => (
@@ -966,15 +983,9 @@ export default function CaoBangEcoTour() {
 
             {/* Nút xem tất cả / thu gọn */}
             {/* Xem tất cả → trang /hdv riêng */}
-            <div style={{ textAlign: "center", marginTop: 28, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              {(guideSearch || guideFilterLang || guideFilterRating) && allFiltered.length > GUIDE_LIMIT && (
-                <button onClick={() => setShowAllGuides((v) => !v)}
-                  style={{ padding: "12px 24px", borderRadius: 12, border: "2px solid rgba(255,255,255,.35)", background: "rgba(255,255,255,.1)", backdropFilter: "blur(6px)", color: "white", fontWeight: 700, fontSize: ".86rem", cursor: "pointer" }}>
-                  {showAllGuides ? <><i className="fa-solid fa-chevron-up" style={{ marginRight: 7 }} />Thu gọn</> : <><i className="fa-solid fa-list" style={{ marginRight: 7 }} />Hiện thêm</>}
-                </button>
-              )}
+            <div style={{ textAlign: "center", marginTop: 32, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
               <a href="/hdv"
-                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 28px", borderRadius: 12, border: "2px solid rgba(255,255,255,.5)", background: "rgba(255,255,255,.15)", backdropFilter: "blur(6px)", color: "white", fontWeight: 700, fontSize: ".88rem", textDecoration: "none" }}>
+                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 32px", borderRadius: 12, border: "2px solid #265C59", background: "#265C59", color: "white", fontWeight: 700, fontSize: ".9rem", textDecoration: "none", boxShadow: "0 4px 16px rgba(38,92,89,.25)" }}>
                 <i className="fa-solid fa-users" />Xem tất cả hướng dẫn viên
               </a>
             </div>
@@ -1003,9 +1014,18 @@ export default function CaoBangEcoTour() {
 
             <div className="dest-grid">
               {destinations.map((dest) => (
-                <article key={dest.id} className="dest-card fade-up">
-                  <div className="dest-card-img-wrap">
+                <article key={dest.id} className="dest-card fade-up" onClick={() => setSelectedDest(dest)}
+                  style={{ cursor: "pointer" }}>
+                  <div className="dest-card-img-wrap" style={{ position: "relative" }}>
                     <img className="dest-card-img" src={dest.image_url} alt={dest.title} loading="lazy" />
+                    <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0)", transition: "background .2s", display: "flex", alignItems: "center", justifyContent: "center" }}
+                      onMouseEnter={(e) => (e.currentTarget as HTMLDivElement).style.background = "rgba(0,0,0,.3)"}
+                      onMouseLeave={(e) => (e.currentTarget as HTMLDivElement).style.background = "rgba(0,0,0,0)"}>
+                      <span style={{ background: "rgba(38,92,89,.9)", color: "white", padding: "7px 16px", borderRadius: 20, fontSize: ".75rem", fontWeight: 700, opacity: 0, transition: "opacity .2s" }}
+                        className="dest-hover-label">
+                        <i className="fa-solid fa-circle-info" style={{ marginRight: 5 }} />Xem chi tiết
+                      </span>
+                    </div>
                   </div>
                   <div className="dest-card-body">
                     <h3>{dest.title}</h3>
@@ -1014,6 +1034,38 @@ export default function CaoBangEcoTour() {
                 </article>
               ))}
             </div>
+
+            {/* Destination detail modal */}
+            {selectedDest && (
+              <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,.65)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+                onClick={() => setSelectedDest(null)}>
+                <div style={{ background: "white", borderRadius: 20, width: "100%", maxWidth: 580, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,.3)" }}
+                  onClick={(e) => e.stopPropagation()}>
+                  <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden" }}>
+                    <img src={selectedDest.image_url} alt={selectedDest.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%)" }} />
+                    <button onClick={() => setSelectedDest(null)}
+                      style={{ position: "absolute", top: 12, right: 12, width: 36, height: 36, borderRadius: "50%", border: "none", background: "rgba(0,0,0,.45)", color: "white", cursor: "pointer", fontSize: ".9rem" }}>
+                      <i className="fa-solid fa-xmark" />
+                    </button>
+                    <h2 style={{ position: "absolute", bottom: 16, left: 20, color: "white", fontWeight: 900, fontSize: "1.3rem", margin: 0, textShadow: "0 2px 8px rgba(0,0,0,.4)" }}>{selectedDest.title}</h2>
+                  </div>
+                  <div style={{ padding: "24px 28px" }}>
+                    <p style={{ color: "#334155", fontSize: ".92rem", lineHeight: 1.8, marginBottom: 24 }}>{selectedDest.description}</p>
+                    <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                      <button onClick={() => { setSelectedDest(null); openBooking(`Tham quan ${selectedDest.title}`); }}
+                        style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: "none", background: "#265C59", color: "white", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
+                        <i className="fa-solid fa-calendar-check" style={{ marginRight: 7 }} />Đặt tour tham quan
+                      </button>
+                      <button onClick={() => setSelectedDest(null)}
+                        style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "white", color: "#475569", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
+                        Đóng
+                      </button>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            )}
           </div>
         </section>
 

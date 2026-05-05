@@ -31,7 +31,7 @@ export default function TourDetailPage() {
   const [guides, setGuides]   = useState<Guide[]>([]);
   const [loading, setLoading] = useState(true);
   const [notFound, setNotFound] = useState(false);
-  const [selGuide, setSelGuide] = useState("");
+  const [selGuides, setSelGuides] = useState<string[]>([]); // multi-select
   const [guideSearch, setGuideSearch] = useState("");
 
   useEffect(() => {
@@ -52,8 +52,19 @@ export default function TourDetailPage() {
     return !q || g.name.toLowerCase().includes(q) || g.specialty.toLowerCase().includes(q);
   });
 
+  const maxGuides = tour?.guide_count ?? 1;
+  const isMulti   = maxGuides > 1;
+
+  function toggleGuide(id: string) {
+    setSelGuides((prev) => {
+      if (prev.includes(id)) return prev.filter((g) => g !== id);
+      if (prev.length >= maxGuides) return [...prev.slice(1), id]; // replace oldest
+      return [...prev, id];
+    });
+  }
+
   const handleBook = () => {
-    const params = new URLSearchParams({ tour: tour?.title ?? "", guide: selGuide });
+    const params = new URLSearchParams({ tour: tour?.title ?? "", guides: selGuides.join(",") });
     window.location.href = `/?booking=1&${params}#pricing`;
   };
 
@@ -165,32 +176,66 @@ export default function TourDetailPage() {
             <h2 style={{ fontWeight: 800, color: "#1a2e2e", fontSize: "1rem", marginBottom: 6 }}>
               <i className="fa-solid fa-person-hiking" style={{ marginRight: 8, color: "#265C59" }} />Chọn hướng dẫn viên
             </h2>
-            <p style={{ color: "#94a3b8", fontSize: ".78rem", marginBottom: 14 }}>Tour này cần {tour.guide_count} HDV. Bạn có thể chọn hoặc để chúng tôi sắp xếp phù hợp nhất.</p>
+            <p style={{ color: "#94a3b8", fontSize: ".78rem", marginBottom: 10 }}>
+              {isMulti
+                ? `Tour cần ${maxGuides} HDV. Đã chọn ${selGuides.length}/${maxGuides}. ${selGuides.length < maxGuides ? `Chọn thêm ${maxGuides - selGuides.length} HDV.` : "Đủ rồi!"}`
+                : "Chọn HDV hoặc để chúng tôi sắp xếp phù hợp nhất."}
+            </p>
+            {isMulti && selGuides.length > 0 && (
+              <div style={{ display: "flex", gap: 6, flexWrap: "wrap", marginBottom: 10 }}>
+                {selGuides.map((gid) => {
+                  const g = guides.find((x) => x.id === gid);
+                  return g ? (
+                    <span key={gid} style={{ display: "flex", alignItems: "center", gap: 5, background: "#f0faf9", border: "1.5px solid #265C59", borderRadius: 20, padding: "3px 10px 3px 6px", fontSize: ".75rem", fontWeight: 700, color: "#265C59" }}>
+                      <img src={g.image_url} alt={g.name} style={{ width: 20, height: 20, borderRadius: "50%", objectFit: "cover" }} />
+                      {g.name}
+                      <button onClick={() => toggleGuide(gid)} style={{ background: "none", border: "none", color: "#265C59", cursor: "pointer", padding: 0, lineHeight: 1, marginLeft: 2 }}>×</button>
+                    </span>
+                  ) : null;
+                })}
+              </div>
+            )}
             {/* Search */}
             <div style={{ position: "relative", marginBottom: 10 }}>
               <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", fontSize: 12 }} />
               <input type="text" placeholder="Tìm HDV..." value={guideSearch} onChange={(e) => setGuideSearch(e.target.value)}
                 style={{ width: "100%", padding: "8px 10px 8px 30px", border: "1.5px solid #e2e8f0", borderRadius: 8, fontSize: ".83rem", outline: "none", boxSizing: "border-box" }} />
             </div>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 260, overflowY: "auto" }}>
-              <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, border: `2px solid ${selGuide === "" ? "#265C59" : "#e2e8f0"}`, background: selGuide === "" ? "#f0faf9" : "white", cursor: "pointer" }}>
-                <input type="radio" name="guide" value="" checked={selGuide === ""} onChange={() => setSelGuide("")} style={{ accentColor: "#265C59" }} />
-                <div>
-                  <p style={{ fontWeight: 700, fontSize: ".85rem", color: "#1a2e2e", margin: 0 }}>Để chúng tôi sắp xếp</p>
-                  <p style={{ fontSize: ".72rem", color: "#94a3b8", margin: "2px 0 0" }}>HDV phù hợp nhất sẽ liên hệ bạn</p>
-                </div>
-              </label>
-              {filteredGuides.map((g) => (
-                <label key={g.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, border: `2px solid ${selGuide === g.id ? "#265C59" : "#e2e8f0"}`, background: selGuide === g.id ? "#f0faf9" : "white", cursor: "pointer" }}>
-                  <input type="radio" name="guide" value={g.id} checked={selGuide === g.id} onChange={() => setSelGuide(g.id)} style={{ accentColor: "#265C59" }} />
-                  <img src={g.image_url} alt={g.name} style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
-                  <div style={{ flex: 1, minWidth: 0 }}>
-                    <p style={{ fontWeight: 700, fontSize: ".85rem", color: "#1a2e2e", margin: 0 }}>{g.name}</p>
-                    <p style={{ fontSize: ".72rem", color: "#64748b", margin: "2px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.specialty}</p>
+            <div style={{ display: "flex", flexDirection: "column", gap: 8, maxHeight: 280, overflowY: "auto" }}>
+              {/* "Để chúng tôi sắp xếp" — chỉ radio khi 1 HDV */}
+              {!isMulti && (
+                <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, border: `2px solid ${selGuides.length === 0 ? "#265C59" : "#e2e8f0"}`, background: selGuides.length === 0 ? "#f0faf9" : "white", cursor: "pointer" }}>
+                  <input type="radio" name="guide" value="" checked={selGuides.length === 0} onChange={() => setSelGuides([])} style={{ accentColor: "#265C59" }} />
+                  <div>
+                    <p style={{ fontWeight: 700, fontSize: ".85rem", color: "#1a2e2e", margin: 0 }}>Để chúng tôi sắp xếp</p>
+                    <p style={{ fontSize: ".72rem", color: "#94a3b8", margin: "2px 0 0" }}>HDV phù hợp nhất sẽ liên hệ bạn</p>
                   </div>
-                  <span style={{ color: "#E5A919", fontSize: ".75rem", fontWeight: 700, flexShrink: 0 }}>{g.rating}★</span>
                 </label>
-              ))}
+              )}
+              {filteredGuides.map((g) => {
+                const checked = selGuides.includes(g.id);
+                const disabled = isMulti && !checked && selGuides.length >= maxGuides;
+                return (
+                  <label key={g.id}
+                    style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 12px", borderRadius: 10, border: `2px solid ${checked ? "#265C59" : "#e2e8f0"}`, background: checked ? "#f0faf9" : disabled ? "#f8fafc" : "white", cursor: disabled ? "not-allowed" : "pointer", opacity: disabled ? .5 : 1 }}>
+                    <input
+                      type={isMulti ? "checkbox" : "radio"}
+                      name="guide"
+                      value={g.id}
+                      checked={checked}
+                      disabled={disabled}
+                      onChange={() => isMulti ? toggleGuide(g.id) : setSelGuides([g.id])}
+                      style={{ accentColor: "#265C59" }}
+                    />
+                    <img src={g.image_url} alt={g.name} style={{ width: 38, height: 38, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
+                    <div style={{ flex: 1, minWidth: 0 }}>
+                      <p style={{ fontWeight: 700, fontSize: ".85rem", color: "#1a2e2e", margin: 0 }}>{g.name}</p>
+                      <p style={{ fontSize: ".72rem", color: "#64748b", margin: "2px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.specialty}</p>
+                    </div>
+                    <span style={{ color: "#E5A919", fontSize: ".75rem", fontWeight: 700, flexShrink: 0 }}>{g.rating}★</span>
+                  </label>
+                );
+              })}
             </div>
           </div>
         </div>
@@ -219,6 +264,15 @@ export default function TourDetailPage() {
               </div>
             ))}
 
+            {selGuides.length > 0 && (
+              <div style={{ marginBottom: 14, padding: "10px 12px", background: "#f0faf9", borderRadius: 10, border: "1.5px solid #b2dfdb" }}>
+                <p style={{ fontSize: ".7rem", fontWeight: 700, color: "#265C59", margin: "0 0 6px", textTransform: "uppercase" }}>HDV đã chọn ({selGuides.length}/{maxGuides})</p>
+                {selGuides.map((gid) => {
+                  const g = guides.find((x) => x.id === gid);
+                  return g ? <p key={gid} style={{ fontSize: ".82rem", color: "#334155", margin: "2px 0", fontWeight: 600 }}>{g.name} · {g.specialty}</p> : null;
+                })}
+              </div>
+            )}
             <button onClick={handleBook}
               style={{ width: "100%", marginTop: 20, padding: "13px 0", borderRadius: 12, border: "none", background: "linear-gradient(135deg,#265C59,#3a9490)", color: "white", fontWeight: 800, fontSize: ".92rem", cursor: "pointer", letterSpacing: ".04em" }}>
               <i className="fa-solid fa-calendar-check" style={{ marginRight: 8 }} />Đặt Tour Này
