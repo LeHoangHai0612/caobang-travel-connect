@@ -1454,33 +1454,38 @@ export default function CaoBangEcoTour() {
             {/* ĐĂNG KÝ + SOCIAL */}
             <div className="ftv2-col">
               <h5 className="ftv2-heading">Liên Hệ Chúng Tôi</h5>
-              <form onSubmit={handleFooterSignup}>
-                <input
-                  type="text" value={contactName}
-                  onChange={(e) => setContactName(e.target.value)}
-                  placeholder="Họ và tên" className="ftv2-input"
-                />
-                <input
-                  type="email" value={contactEmail}
-                  onChange={(e) => setContactEmail(e.target.value)}
-                  placeholder="Địa chỉ Email" className="ftv2-input"
-                  required
-                />
-                <textarea
-                  value={contactMessage}
-                  onChange={(e) => setContactMessage(e.target.value)}
-                  placeholder="Tin nhắn của bạn..." className="ftv2-input ftv2-textarea"
-                  rows={3}
-                />
+              <form onSubmit={handleContactSubmit}>
+                <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)}
+                  placeholder="Họ và tên" className="ftv2-input" autoComplete="name" required />
+                <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)}
+                  placeholder="Địa chỉ Email" className="ftv2-input" autoComplete="email" required />
+                <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)}
+                  placeholder="Số điện thoại" className="ftv2-input" autoComplete="tel" />
+                <textarea value={contactMessage} onChange={(e) => setContactMessage(e.target.value)}
+                  placeholder="Nội dung tin nhắn..." className="ftv2-input ftv2-textarea"
+                  rows={3} required />
+                {!userSession && (
+                  <p style={{ fontSize: ".72rem", color: "#4a6260", fontStyle: "italic", marginBottom: 8, lineHeight: 1.5 }}>
+                    <i className="fa-solid fa-circle-info" style={{ marginRight: 4 }} />
+                    Đăng nhập để xem phản hồi từ chúng tôi trong tài khoản.
+                  </p>
+                )}
                 <button type="submit" className="ftv2-send-btn ftv2-send-full" disabled={contactLoading}>
                   {contactLoading
                     ? <><i className="fa-solid fa-spinner fa-spin" /> Đang gửi...</>
                     : <><i className="fa-solid fa-paper-plane" /> Gửi Tin Nhắn</>}
                 </button>
                 {contactSuccess && (
-                  <p style={{ fontSize: ".74rem", color: "#265C59", marginTop: 6, fontWeight: 700 }}>
-                    <i className="fa-solid fa-circle-check" style={{ marginRight: 4 }} /> Đăng ký thành công!
-                  </p>
+                  <div style={{ marginTop: 8 }}>
+                    <p style={{ fontSize: ".74rem", color: "#265C59", fontWeight: 700 }}>
+                      <i className="fa-solid fa-circle-check" style={{ marginRight: 4 }} /> Gửi thành công!
+                    </p>
+                    {userSession && (
+                      <a href="/tai-khoan" style={{ fontSize: ".72rem", color: "#265C59", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 5, marginTop: 4 }}>
+                        <i className="fa-solid fa-envelope-open-text" style={{ fontSize: ".7rem" }} /> Xem phản hồi tại đây
+                      </a>
+                    )}
+                  </div>
                 )}
                 {contactError && (
                   <p style={{ fontSize: ".74rem", color: "#dc2626", marginTop: 6 }}>{contactError}</p>
