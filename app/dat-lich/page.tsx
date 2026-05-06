@@ -8,11 +8,13 @@ import type { Guide, UserProfile } from "@/lib/database.types";
 import type { Session } from "@supabase/supabase-js";
 
 const PACKAGES = [
-  { label: "HDV Cá Nhân",  price: "500.000đ / Ngày",  icon: "fa-person-hiking",  desc: "1 HDV chuyên trách, tour cá nhân hoặc cặp đôi" },
-  { label: "HDV Đoàn",     price: "650.000đ / Ngày",  icon: "fa-users",           desc: "Phù hợp nhóm 5-20 người, HDV kinh nghiệm dẫn đoàn" },
-  { label: "HDV Xe Máy",   price: "550.000đ / Ngày",  icon: "fa-motorcycle",      desc: "Phượt xe máy, cung đường hiểm trở và ngoạn mục" },
-  { label: "Tour Tùy Chỉnh", price: "Liên hệ",         icon: "fa-sliders",         desc: "Tư vấn và thiết kế lộ trình theo yêu cầu riêng" },
+  { label: "HDV Cá Nhân",    price: "500.000đ / Ngày",  basePrice: 500000, icon: "fa-person-hiking", desc: "1 HDV chuyên trách, tour cá nhân hoặc cặp đôi" },
+  { label: "HDV Đoàn",       price: "650.000đ / Ngày",  basePrice: 650000, icon: "fa-users",          desc: "Phù hợp nhóm 5-20 người, HDV kinh nghiệm dẫn đoàn" },
+  { label: "HDV Xe Máy",     price: "550.000đ / Ngày",  basePrice: 550000, icon: "fa-motorcycle",     desc: "Phượt xe máy, cung đường hiểm trở và ngoạn mục" },
+  { label: "Tour Tùy Chỉnh", price: "Liên hệ",           basePrice: 0,      icon: "fa-sliders",        desc: "Tư vấn và thiết kế lộ trình theo yêu cầu riêng" },
 ];
+
+const fmt = (n: number) => n.toLocaleString("vi-VN") + "đ";
 
 export default function DatLichPage() {
   const [bg, setBg]               = useState("https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75");
@@ -29,6 +31,8 @@ export default function DatLichPage() {
   const [email, setEmail]         = useState("");
   const [date, setDate]           = useState("");
   const [note, setNote]           = useState("");
+  const [days, setDays]           = useState(1);
+  const [depositPct, setDepositPct] = useState(30);
   const [loading, setLoading]     = useState(false);
   const [success, setSuccess]     = useState(false);
   const [error, setError]         = useState("");
@@ -43,8 +47,13 @@ export default function DatLichPage() {
     if (initPkg)   setPkg(initPkg);
     if (initGuide) setGuideId(initGuide);
 
-    supabase.from("site_settings").select("value").eq("key", "booking_bg").single()
-      .then(({ data }) => { if (data?.value) setBg(data.value); });
+    supabase.from("site_settings").select("key,value").in("key", ["booking_bg","deposit_pct"])
+      .then(({ data }) => {
+        data?.forEach((s: { key: string; value: string }) => {
+          if (s.key === "booking_bg")  setBg(s.value);
+          if (s.key === "deposit_pct") setDepositPct(parseInt(s.value) || 30);
+        });
+      });
     supabase.from("guides").select("*").eq("is_active", true).order("rating", { ascending: false })
       .then(({ data }) => setGuides(data ?? []));
     supabase.auth.getSession().then(({ data: { session: s } }) => {
@@ -77,6 +86,16 @@ export default function DatLichPage() {
 
   const selectedGuide = guides.find((g) => g.id === guideId);
   const today = new Date().toISOString().split("T")[0];
+
+  // Tính tiền cọc
+  const selectedPkg   = PACKAGES.find((p) => pkg.startsWith(p.label));
+  const basePrice     = selectedPkg?.basePrice ?? 0;
+  const subtotal      = basePrice * days;
+  const discountAmt   = Math.round(subtotal * totalDiscount / 100);
+  const totalPrice    = subtotal - discountAmt;
+  const depositAmt    = Math.round(totalPrice * depositPct / 100);
+  const remainingAmt  = totalPrice - depositAmt;
+  const hasPricing    = basePrice > 0;
 
   const filteredGuides = guides.filter((g) => {
     const q = guideSearch.toLowerCase();
@@ -221,7 +240,17 @@ export default function DatLichPage() {
                   <Field label="Số điện thoại *" id="b-phone" type="tel" value={phone} onChange={setPhone} placeholder="0912 345 678" required />
                 </div>
                 <Field label="Email" id="b-email" type="email" value={email} onChange={setEmail} placeholder="email@example.com" />
-                <Field label="Ngày dự kiến" id="b-date" type="date" value={date} onChange={setDate} min={today} />
+                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                  <Field label="Ngày dự kiến" id="b-date" type="date" value={date} onChange={setDate} min={today} />
+                  <div>
+                    <label htmlFor="b-days" style={{ display: "block", fontSize: ".72rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>Số ngày</label>
+                    <input id="b-days" type="number" value={days} min={1} max={30}
+                      onChange={(e) => setDays(Math.max(1, parseInt(e.target.value) || 1))}
+                      style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: ".88rem", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                      onFocus={(e) => (e.target.style.borderColor = "#265C59")}
+                      onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")} />
+                  </div>
+                </div>
 
                 {/* Guide selector */}
                 <div>
@@ -343,6 +372,7 @@ export default function DatLichPage() {
                   { label: "Gói dịch vụ", val: pkg || "Chưa chọn" },
                   { label: "HDV", val: selectedGuide?.name ?? "Hệ thống sắp xếp" },
                   { label: "Ngày", val: date ? new Date(date).toLocaleDateString("vi-VN") : "Chưa chọn" },
+                  { label: "Số ngày", val: `${days} ngày` },
                   { label: "Ưu đãi", val: totalDiscount > 0 ? `-${totalDiscount}%` : "Không có" },
                   { label: "Điểm thưởng", val: session ? `+${POINTS_PER_BOOKING} điểm` : "Đăng nhập để tích điểm" },
                 ].map((r) => (
@@ -352,6 +382,57 @@ export default function DatLichPage() {
                   </div>
                 ))}
               </div>
+
+              {/* Deposit calculation */}
+              {hasPricing && (
+                <div style={{ background: "rgba(255,255,255,.97)", borderRadius: 18, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,.2)" }}>
+                  <div style={{ background: "linear-gradient(135deg,#1a3c3a,#265C59)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 8 }}>
+                    <i className="fa-solid fa-calculator" style={{ color: "rgba(255,255,255,.8)", fontSize: 14 }} />
+                    <p style={{ color: "white", fontWeight: 800, fontSize: ".82rem", margin: 0, letterSpacing: ".04em" }}>Bảng Tính Tiền Cọc</p>
+                  </div>
+                  <div style={{ padding: "16px 20px" }}>
+                    {/* Rows */}
+                    {[
+                      { label: `Đơn giá (${selectedPkg?.label})`, val: fmt(basePrice) + "/ngày", dim: true },
+                      { label: `× ${days} ngày`, val: fmt(subtotal), dim: true },
+                      ...(discountAmt > 0 ? [{ label: `Giảm giá (-${totalDiscount}%)`, val: `- ${fmt(discountAmt)}`, green: true }] : []),
+                    ].map((r, i) => (
+                      <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f1f5f9" }}>
+                        <span style={{ fontSize: ".78rem", color: "#64748b" }}>{r.label}</span>
+                        <span style={{ fontSize: ".78rem", fontWeight: 700, color: (r as {green?: boolean}).green ? "#16a34a" : "#1a2e2e" }}>{r.val}</span>
+                      </div>
+                    ))}
+
+                    {/* Total */}
+                    <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0 8px", borderBottom: "2px solid #e2e8f0", marginTop: 4 }}>
+                      <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#1a2e2e" }}>Tổng tiền</span>
+                      <span style={{ fontSize: ".95rem", fontWeight: 900, color: "#265C59" }}>{fmt(totalPrice)}</span>
+                    </div>
+
+                    {/* Deposit highlight */}
+                    <div style={{ background: "#fefce8", border: "1.5px solid #fde047", borderRadius: 12, padding: "12px 14px", margin: "12px 0 8px" }}>
+                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
+                        <div>
+                          <p style={{ fontSize: ".72rem", fontWeight: 700, color: "#854d0e", textTransform: "uppercase", letterSpacing: ".06em", margin: 0 }}>
+                            <i className="fa-solid fa-coins" style={{ marginRight: 5 }} />Tiền Cọc ({depositPct}%)
+                          </p>
+                          <p style={{ fontSize: ".7rem", color: "#a16207", margin: "2px 0 0" }}>Thanh toán khi xác nhận lịch</p>
+                        </div>
+                        <span style={{ fontSize: "1.1rem", fontWeight: 900, color: "#b45309" }}>{fmt(depositAmt)}</span>
+                      </div>
+                    </div>
+
+                    <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0" }}>
+                      <span style={{ fontSize: ".8rem", color: "#64748b" }}>Còn lại (thanh toán sau)</span>
+                      <span style={{ fontSize: ".82rem", fontWeight: 700, color: "#475569" }}>{fmt(remainingAmt)}</span>
+                    </div>
+
+                    <p style={{ fontSize: ".7rem", color: "#94a3b8", marginTop: 10, lineHeight: 1.5, fontStyle: "italic" }}>
+                      * Giá chỉ mang tính tham khảo. Giá chính thức sẽ được xác nhận qua Zalo/điện thoại.
+                    </p>
+                  </div>
+                </div>
+              )}
 
               {/* Trust badges */}
               <div style={{ background: "rgba(255,255,255,.1)", backdropFilter: "blur(6px)", borderRadius: 14, padding: "14px 18px", border: "1px solid rgba(255,255,255,.2)" }}>

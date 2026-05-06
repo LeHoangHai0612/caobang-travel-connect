@@ -9,7 +9,8 @@ interface Setting {
   value: string;
 }
 
-const AUDIO_KEYS = ["background_music"];
+const AUDIO_KEYS   = ["background_music"];
+const NUMBER_KEYS  = ["deposit_pct"];
 const ICONS: Record<string, string> = {
   hero_bg:          "fa-mountain-sun",
   login_bg:         "fa-right-to-bracket",
@@ -163,6 +164,48 @@ function SettingSlot({ setting, onSaved }: { setting: Setting; onSaved: (key: st
   );
 }
 
+function NumberSlot({ setting, onSaved }: { setting: Setting; onSaved: (key: string, value: string) => void }) {
+  const [val, setVal] = useState(setting.value);
+  const [saving, setSaving] = useState(false);
+  const [saved, setSaved]   = useState(false);
+
+  const handleSave = async () => {
+    setSaving(true);
+    await supabase.from("site_settings").update({ value: val }).eq("key", setting.key);
+    setSaving(false);
+    setSaved(true);
+    onSaved(setting.key, val);
+    setTimeout(() => setSaved(false), 2500);
+  };
+
+  const icon = setting.key === "deposit_pct" ? "fa-percent" : "fa-gear";
+  const suffix = setting.key === "deposit_pct" ? "%" : "";
+
+  return (
+    <div className="admin-card" style={{ display: "flex", alignItems: "center", gap: 18, padding: "18px 22px" }}>
+      <div style={{ width: 44, height: 44, borderRadius: 12, background: "#f0faf9", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+        <i className={`fa-solid ${icon}`} style={{ color: "#265C59", fontSize: 18 }} />
+      </div>
+      <div style={{ flex: 1 }}>
+        <p style={{ fontWeight: 800, fontSize: ".9rem", color: "#0f172a", margin: "0 0 2px" }}>{setting.label}</p>
+        <code style={{ fontSize: ".7rem", color: "#94a3b8" }}>{setting.key}</code>
+      </div>
+      <div style={{ display: "flex", alignItems: "center", gap: 10 }}>
+        <div style={{ position: "relative" }}>
+          <input type="number" value={val} onChange={e => setVal(e.target.value)} min={0} max={100}
+            style={{ width: 90, padding: "8px 28px 8px 12px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: ".9rem", fontWeight: 700, outline: "none", textAlign: "center" }}
+            onFocus={e => (e.target.style.borderColor = "#265C59")}
+            onBlur={e => (e.target.style.borderColor = "#e2e8f0")} />
+          {suffix && <span style={{ position: "absolute", right: 10, top: "50%", transform: "translateY(-50%)", color: "#265C59", fontWeight: 700, fontSize: ".85rem" }}>{suffix}</span>}
+        </div>
+        <button className="admin-btn admin-btn-primary" onClick={handleSave} disabled={saving} style={{ whiteSpace: "nowrap" }}>
+          {saving ? <i className="fa-solid fa-spinner fa-spin" /> : saved ? <><i className="fa-solid fa-check" /> Đã lưu</> : <><i className="fa-solid fa-floppy-disk" /> Lưu</>}
+        </button>
+      </div>
+    </div>
+  );
+}
+
 export default function SettingsPage() {
   const [settings, setSettings] = useState<Setting[]>([]);
   const [loading, setLoading]   = useState(true);
@@ -175,9 +218,10 @@ export default function SettingsPage() {
   const handleSaved = (key: string, value: string) =>
     setSettings((prev) => prev.map((s) => s.key === key ? { ...s, value } : s));
 
-  // Nhóm: images vs audio
-  const images = settings.filter((s) => !AUDIO_KEYS.includes(s.key));
-  const audio  = settings.filter((s) => AUDIO_KEYS.includes(s.key));
+  // Nhóm settings
+  const images  = settings.filter((s) => !AUDIO_KEYS.includes(s.key) && !NUMBER_KEYS.includes(s.key));
+  const audio   = settings.filter((s) => AUDIO_KEYS.includes(s.key));
+  const numbers = settings.filter((s) => NUMBER_KEYS.includes(s.key));
 
   return (
     <div className="admin-content">
@@ -210,6 +254,18 @@ export default function SettingsPage() {
               </h2>
               <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(380px, 1fr))", gap: 20, marginBottom: 32 }}>
                 {images.map((s) => <SettingSlot key={s.key} setting={s} onSaved={handleSaved} />)}
+              </div>
+            </>
+          )}
+
+          {/* Số liệu cài đặt */}
+          {numbers.length > 0 && (
+            <>
+              <h2 style={{ fontSize: ".75rem", fontWeight: 800, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 16 }}>
+                <i className="fa-solid fa-sliders" style={{ marginRight: 8 }} />Cài Đặt Chung
+              </h2>
+              <div style={{ display: "flex", flexDirection: "column", gap: 16, marginBottom: 32 }}>
+                {numbers.map((s) => <NumberSlot key={s.key} setting={s} onSaved={handleSaved} />)}
               </div>
             </>
           )}
