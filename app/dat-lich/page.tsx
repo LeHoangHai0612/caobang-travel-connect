@@ -7,12 +7,18 @@ import { getTier, POINTS_PER_BOOKING, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BON
 import type { Guide, UserProfile } from "@/lib/database.types";
 import type { Session } from "@supabase/supabase-js";
 
-const PACKAGES = [
-  { label: "HDV Cá Nhân",    price: "500.000đ / Ngày",  basePrice: 500000, icon: "fa-person-hiking", desc: "1 HDV chuyên trách, tour cá nhân hoặc cặp đôi" },
-  { label: "HDV Đoàn",       price: "650.000đ / Ngày",  basePrice: 650000, icon: "fa-users",          desc: "Phù hợp nhóm 5-20 người, HDV kinh nghiệm dẫn đoàn" },
-  { label: "HDV Xe Máy",     price: "550.000đ / Ngày",  basePrice: 550000, icon: "fa-motorcycle",     desc: "Phượt xe máy, cung đường hiểm trở và ngoạn mục" },
-  { label: "Tour Tùy Chỉnh", price: "Liên hệ",           basePrice: 0,      icon: "fa-sliders",        desc: "Tư vấn và thiết kế lộ trình theo yêu cầu riêng" },
-];
+// Giá mặc định — sẽ được ghi đè bởi DB
+const DEFAULT_PRICES = { hdv_ca_nhan: 500000, hdv_doan: 650000, hdv_xe_may: 550000 };
+
+function buildPackages(p: typeof DEFAULT_PRICES) {
+  const f = (n: number) => n.toLocaleString("vi-VN") + "đ";
+  return [
+    { label: "HDV Cá Nhân",    price: f(p.hdv_ca_nhan) + " / Ngày", basePrice: p.hdv_ca_nhan, icon: "fa-person-hiking", desc: "1 HDV chuyên trách, tour cá nhân hoặc cặp đôi" },
+    { label: "HDV Đoàn",       price: f(p.hdv_doan)    + " / Ngày", basePrice: p.hdv_doan,    icon: "fa-users",          desc: "Phù hợp nhóm 5-20 người, HDV kinh nghiệm dẫn đoàn" },
+    { label: "HDV Xe Máy",     price: f(p.hdv_xe_may)  + " / Ngày", basePrice: p.hdv_xe_may,  icon: "fa-motorcycle",     desc: "Phượt xe máy, cung đường hiểm trở và ngoạn mục" },
+    { label: "Tour Tùy Chỉnh", price: "Liên hệ",                     basePrice: 0,              icon: "fa-sliders",        desc: "Tư vấn và thiết kế lộ trình theo yêu cầu riêng" },
+  ];
+}
 
 const fmt = (n: number) => n.toLocaleString("vi-VN") + "đ";
 
@@ -33,6 +39,8 @@ export default function DatLichPage() {
   const [note, setNote]           = useState("");
   const [days, setDays]           = useState(1);
   const [depositPct, setDepositPct] = useState(30);
+  const [prices, setPrices]       = useState(DEFAULT_PRICES);
+  const PACKAGES = buildPackages(prices);
   const [selectedTour, setSelectedTour] = useState<{ id: string; title: string; price_from: number; duration: string } | null>(null);
   const [loading, setLoading]     = useState(false);
   const [success, setSuccess]     = useState(false);
@@ -60,12 +68,16 @@ export default function DatLichPage() {
         });
     }
 
-    supabase.from("site_settings").select("key,value").in("key", ["booking_bg","deposit_pct"])
+    supabase.from("site_settings").select("key,value")
+      .in("key", ["booking_bg","deposit_pct","price_hdv_ca_nhan","price_hdv_doan","price_hdv_xe_may"])
       .then(({ data }) => {
+        const find = (k: string) => parseInt(data?.find((s: {key:string;value:string}) => s.key === k)?.value ?? "0") || 0;
         data?.forEach((s: { key: string; value: string }) => {
           if (s.key === "booking_bg")  setBg(s.value);
           if (s.key === "deposit_pct") setDepositPct(parseInt(s.value) || 30);
         });
+        const p = { hdv_ca_nhan: find("price_hdv_ca_nhan") || 500000, hdv_doan: find("price_hdv_doan") || 650000, hdv_xe_may: find("price_hdv_xe_may") || 550000 };
+        setPrices(p);
       });
     supabase.from("guides").select("*").eq("is_active", true).order("rating", { ascending: false })
       .then(({ data }) => setGuides(data ?? []));
