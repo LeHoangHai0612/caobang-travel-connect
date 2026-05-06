@@ -13,6 +13,7 @@ const NAV = [
   { href: "/admin/guides",        icon: "fa-person-hiking",       label: "Hướng Dẫn Viên" },
   { href: "/admin/destinations",  icon: "fa-map-location-dot",    label: "Điểm Đến"        },
   { href: "/admin/gallery",       icon: "fa-images",              label: "Thư Viện Ảnh"    },
+  { href: "/admin/cam-nang",      icon: "fa-book-open",           label: "Cẩm Nang"        },
   { href: "/admin/reviews",       icon: "fa-star",                label: "Đánh Giá"        },
   { href: "/admin/users",         icon: "fa-users-gear",          label: "Tài Khoản"       },
   { href: "/admin/settings",      icon: "fa-sliders",             label: "Cài Đặt Website" },

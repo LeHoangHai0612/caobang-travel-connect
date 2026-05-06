@@ -93,6 +93,9 @@ export default function CaoBangEcoTour() {
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(FALLBACK_GALLERY);
   const [tours, setTours] = useState<Tour[]>([]);
 
+  interface CamNangTip { id: string; icon: string; tag: string; color: string; title: string; description: string; sort_order: number; }
+  const [camNangTips, setCamNangTips] = useState<CamNangTip[]>([]);
+
   // Site settings
   const [heroBg, setHeroBg]             = useState("");
   const [destBg, setDestBg]             = useState("https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1600&q=75");
@@ -172,16 +175,18 @@ export default function CaoBangEcoTour() {
   useEffect(() => {
     // Tải dữ liệu từ Supabase
     async function loadData() {
-      const [{ data: g }, { data: d }, { data: r }, { data: gal }, { data: settings }, { data: t }] = await Promise.all([
+      const [{ data: g }, { data: d }, { data: r }, { data: gal }, { data: settings }, { data: t }, { data: cn }] = await Promise.all([
         supabase.from("guides").select("*").eq("is_active", true).order("rating", { ascending: false }).limit(8),
         supabase.from("destinations").select("*").order("sort_order").limit(6),
         supabase.from("reviews").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(6),
         supabase.from("gallery_images").select("*").order("sort_order").limit(12),
         supabase.from("site_settings").select("key,value"),
         supabase.from("tours").select("id,title,description,image_url,price_from,duration,group_size,zalo_number").eq("is_active", true).order("sort_order").limit(6),
+        supabase.from("cam_nang_tips").select("*").eq("is_active", true).order("sort_order").limit(6),
       ]);
       if (g && g.length > 0) setGuides(g);
       if (d && d.length > 0) setDestinations(d);
+      if (cn && cn.length > 0) setCamNangTips(cn);
       if (r && r.length > 0) setReviews(r);
       if (gal && gal.length > 0) setGalleryImages(gal);
       if (t && t.length > 0) setTours(t);
@@ -887,12 +892,8 @@ export default function CaoBangEcoTour() {
             </div>
           </div>
 
-          {/* Bottom — scroll + stats */}
+          {/* Bottom — stats */}
           <div className="hero-bottom">
-            <a href="#why-us" className="hero-scroll" onClick={(e) => scrollToSection(e, "why-us")} aria-label="Cuộn xuống">
-              <span>Khám Phá</span>
-              <i className="fa-solid fa-chevron-down" />
-            </a>
             <div className="hero-stats" aria-label="Thống kê dịch vụ">
               <div className="hero-stat"><strong>50+</strong><span>Hướng Dẫn Viên</span></div>
               <div className="hero-stat"><strong>2000+</strong><span>Du Khách Hài Lòng</span></div>
@@ -1200,15 +1201,15 @@ export default function CaoBangEcoTour() {
               <p className="section-subtitle" style={{ color: "rgba(255,255,255,.72)" }}>Những điều bạn cần biết để có chuyến đi trọn vẹn và an toàn</p>
             </div>
             <div className="cam-nang-grid">
-              {[
-                { icon: "fa-calendar-sun",      tag: "Thời Điểm",  color: "#f59e0b", title: "Mùa Đẹp Nhất",            desc: "Tháng 9–11: lúa chín vàng, thác đầy nước, thời tiết mát mẻ. Tháng 3–4: hoa tam giác mạch nở rộ trên các sườn núi." },
-                { icon: "fa-bowl-food",         tag: "Ẩm Thực",   color: "#ef4444", title: "Đặc Sản Không Thể Bỏ Qua", desc: "Bánh coóng phù, phở chua, lợn quay lá mắc mật, hạt dẻ Trùng Khánh — hương vị đặc trưng chỉ có ở Cao Bằng." },
-                { icon: "fa-motorcycle",        tag: "Di Chuyển",  color: "#8b5cf6", title: "Phương Tiện Phù Hợp",      desc: "Xe máy là lựa chọn tốt nhất. Đường đèo quanh co nhưng cảnh đẹp hùng vĩ — thuê xe tại thị xã hoặc đi cùng HDV." },
-                { icon: "fa-camera-retro",      tag: "Nhiếp Ảnh", color: "#06b6d4", title: "Góc Chụp Ảnh Đẹp Nhất",   desc: "Cầu treo Bản Giốc, thuyền trên sông Quây Sơn, ruộng bậc thang Phia Oắc — ánh sáng buổi sáng sớm là lý tưởng nhất." },
-                { icon: "fa-hand-holding-heart",tag: "Văn Hóa",   color: "#10b981", title: "Tôn Trọng Phong Tục",      desc: "Dân tộc Tày, Nùng chiếm đa số. Hỏi phép trước khi chụp ảnh, tìm hiểu phong tục trước khi đến thăm bản làng." },
-                { icon: "fa-shield-halved",     tag: "An Toàn",   color: "#f97316", title: "Lưu Ý Quan Trọng",         desc: "Mang theo thuốc chống muỗi, kem chống nắng và giày trekking chắc chắn. Đặt HDV địa phương để đảm bảo an toàn tối đa." },
-              ].map(({ icon, tag, color, title, desc }) => (
-                <article key={title} className="cam-nang-card fade-up">
+              {(camNangTips.length > 0 ? camNangTips : [
+                { id:"1", icon:"fa-calendar-sun",       tag:"Thời Điểm", color:"#f59e0b", title:"Mùa Đẹp Nhất",            description:"Tháng 9–11: lúa chín vàng, thác đầy nước, thời tiết mát mẻ. Tháng 3–4: hoa tam giác mạch nở rộ trên các sườn núi.", sort_order:1 },
+                { id:"2", icon:"fa-bowl-food",          tag:"Ẩm Thực",   color:"#ef4444", title:"Đặc Sản Không Thể Bỏ Qua",description:"Bánh coóng phù, phở chua, lợn quay lá mắc mật, hạt dẻ Trùng Khánh — hương vị đặc trưng chỉ có ở Cao Bằng.",        sort_order:2 },
+                { id:"3", icon:"fa-motorcycle",         tag:"Di Chuyển", color:"#8b5cf6", title:"Phương Tiện Phù Hợp",      description:"Xe máy là lựa chọn tốt nhất. Đường đèo quanh co nhưng cảnh đẹp hùng vĩ — thuê xe tại thị xã hoặc đi cùng HDV.",   sort_order:3 },
+                { id:"4", icon:"fa-camera-retro",       tag:"Nhiếp Ảnh", color:"#06b6d4", title:"Góc Chụp Ảnh Đẹp Nhất",   description:"Cầu treo Bản Giốc, thuyền trên sông Quây Sơn, ruộng bậc thang Phia Oắc — ánh sáng buổi sáng sớm là lý tưởng nhất.", sort_order:4 },
+                { id:"5", icon:"fa-hand-holding-heart", tag:"Văn Hóa",   color:"#10b981", title:"Tôn Trọng Phong Tục",      description:"Dân tộc Tày, Nùng chiếm đa số. Hỏi phép trước khi chụp ảnh, tìm hiểu phong tục trước khi đến thăm bản làng.",      sort_order:5 },
+                { id:"6", icon:"fa-shield-halved",      tag:"An Toàn",   color:"#f97316", title:"Lưu Ý Quan Trọng",         description:"Mang theo thuốc chống muỗi, kem chống nắng và giày trekking chắc chắn. Đặt HDV địa phương để đảm bảo an toàn tối đa.", sort_order:6 },
+              ]).map(({ id, icon, tag, color, title, description }) => (
+                <article key={id} className="cam-nang-card fade-up">
                   <div className="cam-nang-card-top">
                     <span className="cam-nang-tag" style={{ background: color + "22", color }}>{tag}</span>
                     <div className="cam-nang-icon" style={{ background: color + "18" }}>
@@ -1216,7 +1217,7 @@ export default function CaoBangEcoTour() {
                     </div>
                   </div>
                   <h3>{title}</h3>
-                  <p>{desc}</p>
+                  <p>{description}</p>
                 </article>
               ))}
             </div>
