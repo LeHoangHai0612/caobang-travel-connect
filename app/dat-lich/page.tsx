@@ -33,6 +33,7 @@ export default function DatLichPage() {
   const [note, setNote]           = useState("");
   const [days, setDays]           = useState(1);
   const [depositPct, setDepositPct] = useState(30);
+  const [selectedTour, setSelectedTour] = useState<{ id: string; title: string; price_from: number; duration: string } | null>(null);
   const [loading, setLoading]     = useState(false);
   const [success, setSuccess]     = useState(false);
   const [error, setError]         = useState("");
@@ -42,10 +43,22 @@ export default function DatLichPage() {
   // Load data + đọc query params từ URL
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
-    const initPkg   = p.get("package") ?? p.get("tour") ?? "";
-    const initGuide = p.get("guide") ?? "";
+    const initPkg    = p.get("package") ?? "";
+    const tourId     = p.get("tour") ?? "";
+    const initGuide  = p.get("guide") ?? "";
     if (initPkg)   setPkg(initPkg);
     if (initGuide) setGuideId(initGuide);
+
+    // Nếu có tour ID → load từ DB
+    if (tourId) {
+      supabase.from("tours").select("id,title,price_from,duration").eq("id", tourId).single()
+        .then(({ data }) => {
+          if (data) {
+            setSelectedTour(data);
+            setPkg(data.title);
+          }
+        });
+    }
 
     supabase.from("site_settings").select("key,value").in("key", ["booking_bg","deposit_pct"])
       .then(({ data }) => {
@@ -87,10 +100,14 @@ export default function DatLichPage() {
   const selectedGuide = guides.find((g) => g.id === guideId);
   const today = new Date().toISOString().split("T")[0];
 
-  // Tính tiền cọc
+  // Tính tiền cọc — ưu tiên tour price nếu đặt từ trang tour
   const selectedPkg   = PACKAGES.find((p) => pkg.startsWith(p.label));
-  const basePrice     = selectedPkg?.basePrice ?? 0;
-  const subtotal      = basePrice * days;
+  const basePrice     = selectedTour ? selectedTour.price_from : (selectedPkg?.basePrice ?? 0);
+  const priceLabel    = selectedTour
+    ? `${selectedTour.title}`
+    : (selectedPkg?.label ?? "Gói dịch vụ");
+  // Tour có price_from là giá trọn gói (không nhân days), package là giá/ngày
+  const subtotal      = selectedTour ? basePrice : basePrice * days;
   const discountAmt   = Math.round(subtotal * totalDiscount / 100);
   const totalPrice    = subtotal - discountAmt;
   const depositAmt    = Math.round(totalPrice * depositPct / 100);
@@ -240,16 +257,18 @@ export default function DatLichPage() {
                   <Field label="Số điện thoại *" id="b-phone" type="tel" value={phone} onChange={setPhone} placeholder="0912 345 678" required />
                 </div>
                 <Field label="Email" id="b-email" type="email" value={email} onChange={setEmail} placeholder="email@example.com" />
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div style={{ display: "grid", gridTemplateColumns: selectedTour ? "1fr" : "1fr 1fr", gap: 14 }}>
                   <Field label="Ngày dự kiến" id="b-date" type="date" value={date} onChange={setDate} min={today} />
-                  <div>
-                    <label htmlFor="b-days" style={{ display: "block", fontSize: ".72rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>Số ngày</label>
-                    <input id="b-days" type="number" value={days} min={1} max={30}
-                      onChange={(e) => setDays(Math.max(1, parseInt(e.target.value) || 1))}
-                      style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: ".88rem", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
-                      onFocus={(e) => (e.target.style.borderColor = "#265C59")}
-                      onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")} />
-                  </div>
+                  {!selectedTour && (
+                    <div>
+                      <label htmlFor="b-days" style={{ display: "block", fontSize: ".72rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>Số ngày</label>
+                      <input id="b-days" type="number" value={days} min={1} max={30}
+                        onChange={(e) => setDays(Math.max(1, parseInt(e.target.value) || 1))}
+                        style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: ".88rem", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
+                        onFocus={(e) => (e.target.style.borderColor = "#265C59")}
+                        onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")} />
+                    </div>
+                  )}
                 </div>
 
                 {/* Guide selector */}
@@ -391,10 +410,25 @@ export default function DatLichPage() {
                     <p style={{ color: "white", fontWeight: 800, fontSize: ".82rem", margin: 0, letterSpacing: ".04em" }}>Bảng Tính Tiền Cọc</p>
                   </div>
                   <div style={{ padding: "16px 20px" }}>
+                    {/* Tour info banner */}
+                    {selectedTour && (
+                      <div style={{ background: "#f0faf9", border: "1.5px solid #b2dfdb", borderRadius: 10, padding: "10px 13px", marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
+                        <i className="fa-solid fa-map" style={{ color: "#265C59", fontSize: 14 }} />
+                        <div>
+                          <p style={{ fontWeight: 800, fontSize: ".82rem", color: "#265C59", margin: 0 }}>{selectedTour.title}</p>
+                          <p style={{ fontSize: ".72rem", color: "#4a6260", margin: "2px 0 0" }}>
+                            <i className="fa-solid fa-clock" style={{ marginRight: 4 }} />{selectedTour.duration} · Giá trọn gói
+                          </p>
+                        </div>
+                      </div>
+                    )}
+
                     {/* Rows */}
                     {[
-                      { label: `Đơn giá (${selectedPkg?.label})`, val: fmt(basePrice) + "/ngày", dim: true },
-                      { label: `× ${days} ngày`, val: fmt(subtotal), dim: true },
+                      selectedTour
+                        ? { label: `Giá tour (${selectedTour.title})`, val: fmt(basePrice), dim: true }
+                        : { label: `Đơn giá (${selectedPkg?.label ?? "Gói"})`, val: fmt(basePrice) + "/ngày", dim: true },
+                      ...(!selectedTour ? [{ label: `× ${days} ngày`, val: fmt(subtotal), dim: true }] : []),
                       ...(discountAmt > 0 ? [{ label: `Giảm giá (-${totalDiscount}%)`, val: `- ${fmt(discountAmt)}`, green: true }] : []),
                     ].map((r, i) => (
                       <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f1f5f9" }}>
