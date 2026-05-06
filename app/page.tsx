@@ -17,6 +17,7 @@ interface Tour {
   zalo_number: string;
 }
 import { getTier, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BONUS_PCT } from "@/lib/loyalty";
+import { t, type Lang } from "@/lib/translations";
 
 // ── Fallback data (hiển thị ngay khi chờ Supabase) ──────────────────────────
 const FALLBACK_GUIDES: Guide[] = [
@@ -82,6 +83,8 @@ export default function CaoBangEcoTour() {
   // UI state
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
   const [isScrolled, setIsScrolled] = useState(false);
+  const [lang, setLang] = useState<Lang>("vi");
+  const T = (k: Parameters<typeof t>[0]) => t(k, lang);
   const [activeSection, setActiveSection] = useState("hero");
   const [currentPage, setCurrentPage] = useState(0);
   const [cardsPerPage, setCardsPerPage] = useState(3);
@@ -788,13 +791,13 @@ export default function CaoBangEcoTour() {
 
             <ul className="nav-links" role="list">
               {[
-                { id: "hero",         label: "Trang Chủ" },
-                { id: "why-us",       label: "Giới Thiệu" },
-                { id: "team",         label: "HDV & Tour" },
-                { id: "destinations", label: "Điểm Đến" },
-                { id: "gallery",      label: "Hình Ảnh" },
-                { id: "cam-nang",     label: "Cẩm Nang" },
-                { id: "footer",       label: "Liên Hệ" },
+                { id: "hero",         label: T("nav_home") },
+                { id: "why-us",       label: T("nav_about") },
+                { id: "team",         label: T("nav_hdv") },
+                { id: "destinations", label: T("nav_destinations") },
+                { id: "gallery",      label: T("nav_gallery") },
+                { id: "cam-nang",     label: T("nav_guide") },
+                { id: "footer",       label: T("nav_contact") },
               ].map(({ id, label }) => (
                 <li key={id}>
                   <a href={`#${id}`} className={activeSection === id ? "active" : ""} onClick={(e) => scrollToSection(e, id)}>
@@ -805,14 +808,22 @@ export default function CaoBangEcoTour() {
             </ul>
 
             <a href="#pricing" className="btn-cta" onClick={(e) => scrollToSection(e, "pricing")}>
-              <i className="fa-solid fa-calendar-check" aria-hidden="true" /> ĐẶT HDV NGAY
+              <i className="fa-solid fa-calendar-check" aria-hidden="true" /> {T("nav_book")}
             </a>
+
+            {/* Language toggle */}
+            <button onClick={() => setLang(l => l === "vi" ? "en" : "vi")}
+              style={{ display: "flex", alignItems: "center", gap: 5, padding: "6px 12px", borderRadius: 20, border: `1.5px solid ${isScrolled ? "rgba(38,92,89,.25)" : "rgba(255,255,255,.45)"}`, background: "transparent", cursor: "pointer", fontSize: ".78rem", fontWeight: 700, color: isScrolled ? "#265C59" : "white", transition: "all .2s", whiteSpace: "nowrap" }}
+              title={lang === "vi" ? "Switch to English" : "Chuyển sang Tiếng Việt"}>
+              <span style={{ fontSize: ".9rem" }}>{lang === "vi" ? "🇻🇳" : "🇬🇧"}</span>
+              {lang === "vi" ? "EN" : "VI"}
+            </button>
 
             {userSession ? (
               <a href="/tai-khoan" className="nav-user-btn" style={{ position: "relative" }}>
                 <i className={`fa-solid ${userProfile ? getTier(userProfile.points).icon : "fa-award"}`}
                    style={{ color: userProfile ? getTier(userProfile.points).color : "#cd7f32" }} />
-                <span>Tài Khoản</span>
+                <span>{T("nav_account")}</span>
                 {unreadReplies > 0 && (
                   <span style={{
                     position: "absolute", top: -4, right: -4,
@@ -827,7 +838,7 @@ export default function CaoBangEcoTour() {
             ) : (
               <a href="/dang-nhap" className="nav-user-btn">
                 <i className="fa-solid fa-user" />
-                <span>Đăng Nhập</span>
+                <span>{T("nav_login")}</span>
               </a>
             )}
 
@@ -876,17 +887,17 @@ export default function CaoBangEcoTour() {
           <div className="hero-body">
             <div className="hero-content">
               <div className="hero-badge">
-                <i className="fa-solid fa-leaf" /> Hướng Dẫn Viên Địa Phương · Cao Bằng, Việt Nam
+                <i className="fa-solid fa-leaf" /> {T("hero_badge")}
               </div>
-              <h1>Khám Phá<br />Cao Bằng</h1>
-              <p className="hero-tagline">Cùng Hướng Dẫn Viên Địa Phương</p>
-              <p className="hero-sub">Chuyên Nghiệp · Am Hiểu · Tận Tâm · Hành trình trọn vẹn</p>
+              <h1>{T("hero_h1_1")}<br />{T("hero_h1_2")}</h1>
+              <p className="hero-tagline">{T("hero_tagline")}</p>
+              <p className="hero-sub">{T("hero_sub")}</p>
               <div className="hero-actions">
                 <a href="#team" className="btn-hero-primary" onClick={(e) => scrollToSection(e, "team")}>
-                  <i className="fa-solid fa-compass" aria-hidden="true" /> XEM CÁC HDV &amp; TOUR
+                  <i className="fa-solid fa-compass" aria-hidden="true" /> {T("hero_btn1")}
                 </a>
                 <a href="#destinations" className="btn-hero-outline" onClick={(e) => scrollToSection(e, "destinations")}>
-                  <i className="fa-solid fa-map-location-dot" aria-hidden="true" /> KHÁM PHÁ ĐIỂM ĐẾN
+                  <i className="fa-solid fa-map-location-dot" aria-hidden="true" /> {T("hero_btn2")}
                 </a>
               </div>
             </div>
@@ -895,10 +906,10 @@ export default function CaoBangEcoTour() {
           {/* Bottom — stats */}
           <div className="hero-bottom">
             <div className="hero-stats" aria-label="Thống kê dịch vụ">
-              <div className="hero-stat"><strong>50+</strong><span>Hướng Dẫn Viên</span></div>
-              <div className="hero-stat"><strong>2000+</strong><span>Du Khách Hài Lòng</span></div>
-              <div className="hero-stat"><strong>30+</strong><span>Điểm Tham Quan</span></div>
-              <div className="hero-stat"><strong>5★</strong><span>Đánh Giá TB</span></div>
+              <div className="hero-stat"><strong>50+</strong><span>{T("stat_guides")}</span></div>
+              <div className="hero-stat"><strong>2000+</strong><span>{T("stat_guests")}</span></div>
+              <div className="hero-stat"><strong>30+</strong><span>{T("stat_spots")}</span></div>
+              <div className="hero-stat"><strong>5★</strong><span>{T("stat_rating")}</span></div>
             </div>
           </div>
 
@@ -923,20 +934,20 @@ export default function CaoBangEcoTour() {
           style={{ background: `linear-gradient(rgba(237,231,218,.90),rgba(237,231,218,.90)),url('${whyusBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
-              <span className="section-tag">Vì Sao Chọn Chúng Tôi</span>
-              <h2 className="section-title" id="why-heading">Tại Sao Chọn Chúng Tôi?</h2>
-              <p className="section-subtitle">Chúng tôi cung cấp những trải nghiệm du lịch sinh thái độc đáo và chân thực nhất tại Cao Bằng</p>
+              <span className="section-tag">{T("why_tag")}</span>
+              <h2 className="section-title" id="why-heading">{T("why_title")}</h2>
+              <p className="section-subtitle">{T("why_sub")}</p>
             </div>
             <div className="features-grid">
               {[
-                { icon: "fa-map-pin",  title: "Kiến Thức Bản Địa Điểm", desc: "Hướng dẫn viên sinh ra và lớn lên tại Cao Bằng, am hiểu sâu về văn hóa, lịch sử và địa hình từng điểm đến bản địa." },
-                { icon: "fa-route",    title: "Lộ Trình Thiết Kế Riêng", desc: "Mỗi chuyến đi được cá nhân hóa theo sở thích và nhu cầu của từng đoàn khách, đảm bảo trải nghiệm tốt nhất." },
-                { icon: "fa-headset",  title: "Hỗ Trợ 24/7",             desc: "Đội ngũ hỗ trợ luôn sẵn sàng giải đáp mọi thắc mắc và đảm bảo an toàn cho du khách trên toàn bộ hành trình." },
-              ].map(({ icon, title, desc }) => (
-                <article key={title} className="feature-card fade-up">
+                { icon: "fa-map-pin",  tk: "why_f1" },
+                { icon: "fa-route",    tk: "why_f2" },
+                { icon: "fa-headset",  tk: "why_f3" },
+              ].map(({ icon, tk }) => (
+                <article key={tk} className="feature-card fade-up">
                   <div className="feature-icon" aria-hidden="true"><i className={`fa-solid ${icon}`} /></div>
-                  <h3>{title}</h3>
-                  <p>{desc}</p>
+                  <h3>{T(`${tk}_title` as Parameters<typeof T>[0])}</h3>
+                  <p>{T(`${tk}_desc` as Parameters<typeof T>[0])}</p>
                 </article>
               ))}
             </div>
@@ -948,9 +959,9 @@ export default function CaoBangEcoTour() {
           style={{ background: `linear-gradient(rgba(255,255,255,.91),rgba(255,255,255,.91)),url('${teamBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
-              <span className="section-tag">Đội Ngũ Chuyên Nghiệp</span>
-              <h2 className="section-title" id="team-heading">Đội Ngũ Hướng Dẫn Viên Biểu Tượng</h2>
-              <p className="section-subtitle">Những hướng dẫn viên giàu kinh nghiệm, tận tâm và am hiểu sâu về vùng đất Cao Bằng</p>
+              <span className="section-tag">{T("team_tag")}</span>
+              <h2 className="section-title" id="team-heading">{T("team_title")}</h2>
+              <p className="section-subtitle">{T("team_sub")}</p>
             </div>
             {/* Search & filter — nền trắng nên dùng màu tối */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 28, justifyContent: "center" }}>
@@ -1038,9 +1049,9 @@ export default function CaoBangEcoTour() {
           style={{ background: `linear-gradient(to bottom,rgba(20,52,52,.55),rgba(20,52,52,.62)),url('${destBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
-              <span className="section-tag" style={{ background: "rgba(38,92,89,.12)", color: "var(--teal-dark)" }}>Khám Phá Ngay</span>
-              <h2 className="section-title" id="dest-heading">Điểm Đến Không Thể Bỏ Lỡ</h2>
-              <p className="section-subtitle">Những địa danh hùng vĩ và đặc sắc nhất tại vùng đất Cao Bằng đang chờ bạn khám phá</p>
+              <span className="section-tag" style={{ background: "rgba(38,92,89,.12)", color: "var(--teal-dark)" }}>{T("dest_tag")}</span>
+              <h2 className="section-title" id="dest-heading">{T("dest_title")}</h2>
+              <p className="section-subtitle">{T("dest_sub")}</p>
             </div>
 
             <div className="dest-map-wrapper" aria-label="Bản đồ du lịch Cao Bằng">
@@ -1109,7 +1120,7 @@ export default function CaoBangEcoTour() {
             )}
             <div style={{ textAlign: "center", marginTop: 36 }}>
               <a href="/diem-den" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
-                <i className="fa-solid fa-map-location-dot" /> Xem Tất Cả Điểm Đến <i className="fa-solid fa-arrow-right" />
+                <i className="fa-solid fa-map-location-dot" /> {T("dest_all")} <i className="fa-solid fa-arrow-right" />
               </a>
             </div>
           </div>
@@ -1119,9 +1130,9 @@ export default function CaoBangEcoTour() {
         <section id="tours" style={{ padding: "72px 0", background: `linear-gradient(rgba(248,249,248,.91),rgba(248,249,248,.91)),url('${toursBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
-              <span className="section-tag">Khám Phá Ngay</span>
-              <h2 className="section-title">Các Gói Tour Nổi Bật</h2>
-              <p className="section-subtitle">Lựa chọn hành trình phù hợp — từ tour 1 ngày đến khám phá dài ngày trọn vẹn</p>
+              <span className="section-tag">{T("tours_tag")}</span>
+              <h2 className="section-title">{T("tours_title")}</h2>
+              <p className="section-subtitle">{T("tours_sub")}</p>
             </div>
             <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 20, marginBottom: 28 }}>
               {tours.map((t) => (
@@ -1173,7 +1184,7 @@ export default function CaoBangEcoTour() {
             </div>
             <div style={{ textAlign: "center", marginTop: 36 }}>
               <a href="/tour" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid #265C59", color: "#265C59", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", background: "white", letterSpacing: ".04em" }}>
-                <i className="fa-solid fa-map" /> Xem Tất Cả Gói Tour <i className="fa-solid fa-arrow-right" />
+                <i className="fa-solid fa-map" /> {T("tours_all")} <i className="fa-solid fa-arrow-right" />
               </a>
             </div>
           </div>
@@ -1184,9 +1195,9 @@ export default function CaoBangEcoTour() {
           style={{ background: `linear-gradient(rgba(255,255,255,.89),rgba(255,255,255,.89)),url('${galleryBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
-              <span className="section-tag" style={{ background: "rgba(229,169,25,.12)", color: "#c48d10" }}>Góc Nhìn Chân Thực</span>
-              <h2 className="section-title" id="gallery-heading">Thư Viện Hình Ảnh</h2>
-              <p className="section-subtitle">Những khoảnh khắc tuyệt đẹp được ghi lại trong các chuyến đi của chúng tôi</p>
+              <span className="section-tag" style={{ background: "rgba(229,169,25,.12)", color: "#c48d10" }}>{T("gallery_tag")}</span>
+              <h2 className="section-title" id="gallery-heading">{T("gallery_title")}</h2>
+              <p className="section-subtitle">{T("gallery_sub")}</p>
             </div>
             <div className="gallery-grid">
               {galleryImages.map((img, i) => (
@@ -1206,9 +1217,9 @@ export default function CaoBangEcoTour() {
           style={{ background: `linear-gradient(rgba(14,42,40,.82),rgba(14,42,40,.78)),url('${camNangBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
-              <span className="section-tag" style={{ background: "rgba(255,255,255,.12)", color: "rgba(255,255,255,.9)", border: "1px solid rgba(255,255,255,.22)" }}>Cẩm Nang Du Lịch</span>
-              <h2 className="section-title" id="cam-nang-heading" style={{ color: "white" }}>Bí Quyết Khám Phá Cao Bằng</h2>
-              <p className="section-subtitle" style={{ color: "rgba(255,255,255,.72)" }}>Những điều bạn cần biết để có chuyến đi trọn vẹn và an toàn</p>
+              <span className="section-tag" style={{ background: "rgba(255,255,255,.12)", color: "rgba(255,255,255,.9)", border: "1px solid rgba(255,255,255,.22)" }}>{T("cn_tag")}</span>
+              <h2 className="section-title" id="cam-nang-heading" style={{ color: "white" }}>{T("cn_title")}</h2>
+              <p className="section-subtitle" style={{ color: "rgba(255,255,255,.72)" }}>{T("cn_sub")}</p>
             </div>
             <div className="cam-nang-grid">
               {(camNangTips.length > 0 ? camNangTips : [
@@ -1236,7 +1247,7 @@ export default function CaoBangEcoTour() {
             </div>
             <div style={{ textAlign: "center", marginTop: 36 }}>
               <a href="/cam-nang" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
-                <i className="fa-solid fa-book-open" /> Xem Tất Cả Cẩm Nang <i className="fa-solid fa-arrow-right" />
+                <i className="fa-solid fa-book-open" /> {T("cn_all")} <i className="fa-solid fa-arrow-right" />
               </a>
             </div>
           </div>
@@ -1247,9 +1258,9 @@ export default function CaoBangEcoTour() {
           style={{ background: `linear-gradient(135deg,rgba(10,35,35,.90),rgba(26,60,55,.86),rgba(15,45,40,.90)),url('${pricingBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
-              <span className="section-tag">Bảng Giá Minh Bạch</span>
-              <h2 className="section-title" id="pricing-heading">Bảng Giá Dịch Vụ HDV</h2>
-              <p className="section-subtitle">Lựa chọn gói dịch vụ phù hợp với nhu cầu và ngân sách của bạn</p>
+              <span className="section-tag">{T("pricing_tag")}</span>
+              <h2 className="section-title" id="pricing-heading">{T("pricing_title")}</h2>
+              <p className="section-subtitle">{T("pricing_sub")}</p>
             </div>
 
             <div className="pricing-grid">
@@ -1346,9 +1357,9 @@ export default function CaoBangEcoTour() {
           style={{ background: `linear-gradient(150deg,rgba(13,40,38,.88),rgba(26,60,58,.85),rgba(17,46,44,.88)),url('${testimonialsBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
-              <span className="section-tag">Khách Hàng Nói Gì</span>
-              <h2 className="section-title" id="testi-heading">Ý Kiến Khách Hàng</h2>
-              <p className="section-subtitle">Những chia sẻ chân thực từ du khách đã trải nghiệm dịch vụ của chúng tôi</p>
+              <span className="section-tag">{T("reviews_tag")}</span>
+              <h2 className="section-title" id="testi-heading">{T("reviews_title")}</h2>
+              <p className="section-subtitle">{T("reviews_sub")}</p>
               <button
                 onClick={openReview}
                 style={{
