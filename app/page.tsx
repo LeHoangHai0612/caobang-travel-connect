@@ -1209,7 +1209,7 @@ export default function CaoBangEcoTour() {
                 { id:"5", icon:"fa-hand-holding-heart", tag:"Văn Hóa",   color:"#10b981", title:"Tôn Trọng Phong Tục",      description:"Dân tộc Tày, Nùng chiếm đa số. Hỏi phép trước khi chụp ảnh, tìm hiểu phong tục trước khi đến thăm bản làng.",      sort_order:5 },
                 { id:"6", icon:"fa-shield-halved",      tag:"An Toàn",   color:"#f97316", title:"Lưu Ý Quan Trọng",         description:"Mang theo thuốc chống muỗi, kem chống nắng và giày trekking chắc chắn. Đặt HDV địa phương để đảm bảo an toàn tối đa.", sort_order:6 },
               ]).map(({ id, icon, tag, color, title, description }) => (
-                <article key={id} className="cam-nang-card fade-up">
+                <a key={id} href={`/cam-nang/${id}`} className="cam-nang-card fade-up" style={{ textDecoration: "none", display: "block" }}>
                   <div className="cam-nang-card-top">
                     <span className="cam-nang-tag" style={{ background: color + "22", color }}>{tag}</span>
                     <div className="cam-nang-icon" style={{ background: color + "18" }}>
@@ -1218,7 +1218,10 @@ export default function CaoBangEcoTour() {
                   </div>
                   <h3>{title}</h3>
                   <p>{description}</p>
-                </article>
+                  <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, color, fontSize: ".78rem", fontWeight: 700 }}>
+                    Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
+                  </div>
+                </a>
               ))}
             </div>
           </div>

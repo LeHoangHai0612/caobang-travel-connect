@@ -9,6 +9,8 @@ interface Tip {
   color: string;
   title: string;
   description: string;
+  content: string;
+  image_url: string;
   sort_order: number;
   is_active: boolean;
 }
@@ -16,6 +18,7 @@ interface Tip {
 const EMPTY: Omit<Tip, "id"> = {
   icon: "fa-lightbulb", tag: "Mẹo Hay", color: "#265C59",
   title: "", description: "", sort_order: 0, is_active: true,
+  image_url: "", content: "",
 };
 
 const COLOR_PRESETS = ["#f59e0b","#ef4444","#8b5cf6","#06b6d4","#10b981","#f97316","#265C59","#3b82f6","#ec4899"];
@@ -163,9 +166,24 @@ export default function CamNangAdmin() {
               </div>
 
               <div>
-                <label className="admin-form-label">Nội dung *</label>
+                <label className="admin-form-label">Mô tả ngắn * (hiển thị trên thẻ)</label>
                 <textarea className="admin-form-input" value={form.description} onChange={e => set("description", e.target.value)}
-                  rows={4} placeholder="Mô tả chi tiết..." style={{ resize: "vertical" }} />
+                  rows={2} placeholder="Tóm tắt ngắn gọn..." style={{ resize: "vertical" }} />
+              </div>
+
+              <div>
+                <label className="admin-form-label">Ảnh bìa bài viết (URL)</label>
+                <input className="admin-form-input" value={form.image_url} onChange={e => set("image_url", e.target.value)} placeholder="https://images.unsplash.com/..." />
+                {form.image_url && (
+                  <img src={form.image_url} alt="preview" onError={e => (e.currentTarget.style.display = "none")}
+                    style={{ marginTop: 8, width: "100%", height: 120, objectFit: "cover", borderRadius: 8, border: "1px solid #e2e8f0" }} />
+                )}
+              </div>
+
+              <div>
+                <label className="admin-form-label">Nội dung đầy đủ (xuống dòng = đoạn mới)</label>
+                <textarea className="admin-form-input" value={form.content} onChange={e => set("content", e.target.value)}
+                  rows={6} placeholder="Viết nội dung chi tiết cho bài cẩm nang. Xuống dòng để tạo đoạn mới..." style={{ resize: "vertical" }} />
               </div>
 
               <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 12 }}>
