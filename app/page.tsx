@@ -1107,6 +1107,11 @@ export default function CaoBangEcoTour() {
                 </div>
               </div>
             )}
+            <div style={{ textAlign: "center", marginTop: 36 }}>
+              <a href="/diem-den" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
+                <i className="fa-solid fa-map-location-dot" /> Xem Tất Cả Điểm Đến <i className="fa-solid fa-arrow-right" />
+              </a>
+            </div>
           </div>
         </section>
 
@@ -1166,6 +1171,11 @@ export default function CaoBangEcoTour() {
                 </a>
               ))}
             </div>
+            <div style={{ textAlign: "center", marginTop: 36 }}>
+              <a href="/tour" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid #265C59", color: "#265C59", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", background: "white", letterSpacing: ".04em" }}>
+                <i className="fa-solid fa-map" /> Xem Tất Cả Gói Tour <i className="fa-solid fa-arrow-right" />
+              </a>
+            </div>
           </div>
         </section>
 
@@ -1223,6 +1233,11 @@ export default function CaoBangEcoTour() {
                   </div>
                 </a>
               ))}
+            </div>
+            <div style={{ textAlign: "center", marginTop: 36 }}>
+              <a href="/cam-nang" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
+                <i className="fa-solid fa-book-open" /> Xem Tất Cả Cẩm Nang <i className="fa-solid fa-arrow-right" />
+              </a>
             </div>
           </div>
         </section>
