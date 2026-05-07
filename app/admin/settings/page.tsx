@@ -10,8 +10,10 @@ interface Setting {
 }
 
 const AUDIO_KEYS   = ["background_music"];
+const VIDEO_KEYS   = ["hero_video"];
 const NUMBER_KEYS  = ["deposit_pct"];
 const ICONS: Record<string, string> = {
+  hero_video:       "fa-film",
   hero_bg:          "fa-mountain-sun",
   login_bg:         "fa-right-to-bracket",
   destinations_bg:  "fa-map-location-dot",
@@ -36,6 +38,7 @@ function SettingSlot({ setting, onSaved }: { setting: Setting; onSaved: (key: st
   const [uploading, setUploading] = useState(false);
 
   const isAudio = AUDIO_KEYS.includes(setting.key);
+  const isVideo = VIDEO_KEYS.includes(setting.key);
 
   async function handleFileUpload(file: File) {
     if (!file) return;
@@ -63,7 +66,6 @@ function SettingSlot({ setting, onSaved }: { setting: Setting; onSaved: (key: st
       {/* Preview area */}
       <div style={{ position: "relative", width: "100%", background: "#0f172a", overflow: "hidden", minHeight: isAudio ? 120 : 0, aspectRatio: isAudio ? undefined : "16/7" }}>
         {isAudio ? (
-          /* Audio preview */
           <div style={{ padding: "24px 20px", display: "flex", flexDirection: "column", alignItems: "center", gap: 14 }}>
             <div style={{ width: 52, height: 52, borderRadius: "50%", background: preview ? "rgba(58,148,144,.3)" : "rgba(255,255,255,.08)", display: "flex", alignItems: "center", justifyContent: "center" }}>
               <i className="fa-solid fa-music" style={{ color: preview ? "#5eead4" : "rgba(255,255,255,.3)", fontSize: 22 }} />
@@ -72,6 +74,14 @@ function SettingSlot({ setting, onSaved }: { setting: Setting; onSaved: (key: st
               ? <audio controls src={preview} style={{ width: "100%", maxWidth: 280, height: 36 }} />
               : <span style={{ fontSize: ".8rem", color: "rgba(255,255,255,.3)", fontWeight: 600 }}>Chưa có nhạc nền</span>}
           </div>
+        ) : isVideo ? (
+          /* Video preview */
+          preview
+            ? <video src={preview} autoPlay muted loop playsInline style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+            : <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 8, color: "rgba(255,255,255,.25)", padding: "32px 0" }}>
+                <i className="fa-solid fa-film" style={{ fontSize: 32 }} />
+                <span style={{ fontSize: ".78rem" }}>Chưa có video</span>
+              </div>
         ) : (
           /* Image preview */
           preview && !imgErr
@@ -96,7 +106,7 @@ function SettingSlot({ setting, onSaved }: { setting: Setting; onSaved: (key: st
       <div style={{ padding: "16px 18px", display: "flex", flexDirection: "column", gap: 10 }}>
         <div>
           <label style={{ display: "block", fontSize: ".68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>
-            {isAudio ? "URL file nhạc (mp3, ogg...)" : "URL ảnh mới"}
+            {isAudio ? "URL file nhạc (mp3, ogg...)" : isVideo ? "URL video (mp4)" : "URL ảnh mới"}
           </label>
           <input
             className="admin-form-input"

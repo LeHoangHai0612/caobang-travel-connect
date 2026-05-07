@@ -100,6 +100,7 @@ export default function CaoBangEcoTour() {
 
   // Site settings
   const [heroBg, setHeroBg]             = useState("");
+  const [heroVideo, setHeroVideo]       = useState("");
   const [destBg, setDestBg]             = useState("https://images.unsplash.com/photo-1528360983277-13d401cdc186?w=1600&q=75");
   const [pricingBg, setPricingBg]       = useState("https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75");
   const [whyusBg, setWhyusBg]           = useState("https://images.unsplash.com/photo-1448375240586-882707db888b?w=1600&q=75");
@@ -195,6 +196,7 @@ export default function CaoBangEcoTour() {
       if (settings) {
         const find = (k: string) => settings.find((s: { key: string; value: string }) => s.key === k)?.value;
         if (find("hero_bg"))          setHeroBg(find("hero_bg")!);
+        if (find("hero_video"))       setHeroVideo(find("hero_video")!);
         if (find("destinations_bg"))  setDestBg(find("destinations_bg")!);
         if (find("pricing_bg"))       setPricingBg(find("pricing_bg")!);
         if (find("whyus_bg"))         setWhyusBg(find("whyus_bg")!);
@@ -866,12 +868,23 @@ export default function CaoBangEcoTour() {
       <main>
         {/* ==================== HERO ==================== */}
         <section className="hero" id="hero" aria-label="Ảnh bìa - Khám phá Cao Bằng">
-          <div
-            className="hero-bg"
-            role="img"
-            aria-label="Thác Bản Giốc Cao Bằng"
-            style={heroBg ? { backgroundImage: `url('${heroBg}')` } : undefined}
-          />
+          {heroVideo ? (
+            <video
+              className="hero-bg"
+              autoPlay muted loop playsInline
+              poster={heroBg || undefined}
+              aria-hidden="true"
+            >
+              <source src={heroVideo} type="video/mp4" />
+            </video>
+          ) : (
+            <div
+              className="hero-bg"
+              role="img"
+              aria-label="Thác Bản Giốc Cao Bằng"
+              style={heroBg ? { backgroundImage: `url('${heroBg}')` } : undefined}
+            />
+          )}
           <div className="hero-overlay" aria-hidden="true" />
           <div ref={heroMistRef} className="hero-mist" aria-hidden="true" />
           {/* Body — flex-1, centered */}
