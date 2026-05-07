@@ -6,6 +6,7 @@ declare global {
   interface Window {
     YT: any;
     onYouTubeIframeAPIReady: () => void;
+    SC: any;
   }
 }
 
@@ -220,10 +221,86 @@ function PlayerShell({ playing, expanded, setExpanded, volume, setVolume, toggle
   );
 }
 
-/* ─── Main export — tự nhận diện mp3 hay YouTube ─── */
+/* ─── SoundCloud Player ─── */
+function SoundCloudPlayer({ trackUrl }: { trackUrl: string }) {
+  const iframeRef           = useRef<HTMLIFrameElement>(null);
+  const widgetRef           = useRef<any>(null);
+  const [playing, setPlaying]   = useState(false);
+  const [volume, setVolume]     = useState(100);
+  const [expanded, setExpanded] = useState(false);
+  const [status, setStatus]     = useState<"idle"|"loading"|"ready"|"error">("loading");
+
+  const embedUrl = `https://w.soundcloud.com/player/?url=${encodeURIComponent(trackUrl)}&auto_play=true&hide_related=true&show_comments=false&show_user=false&show_reposts=false&show_teaser=false&buying=false&sharing=false&download=false`;
+
+  useEffect(() => {
+    let cancelled = false;
+
+    const initWidget = () => {
+      if (cancelled || !iframeRef.current || !window.SC) return;
+      const SC = window.SC;
+      widgetRef.current = SC.Widget(iframeRef.current);
+      widgetRef.current.bind(SC.Widget.Events.READY, () => {
+        if (cancelled) return;
+        widgetRef.current.setVolume(100);
+        setStatus("ready");
+        try { widgetRef.current.play(); } catch { /* blocked */ }
+        const onInteract = () => {
+          try { widgetRef.current?.play(); } catch { /* ignore */ }
+        };
+        document.addEventListener("click",      onInteract, { once: true });
+        document.addEventListener("touchstart", onInteract, { once: true });
+      });
+      widgetRef.current.bind(SC.Widget.Events.PLAY,  () => { if (!cancelled) setPlaying(true);  });
+      widgetRef.current.bind(SC.Widget.Events.PAUSE, () => { if (!cancelled) setPlaying(false); });
+      widgetRef.current.bind(SC.Widget.Events.ERROR, () => { if (!cancelled) setStatus("error"); });
+    };
+
+    if (window.SC) {
+      initWidget();
+    } else if (!document.querySelector('script[src*="soundcloud.com/player/api"]')) {
+      const script = document.createElement("script");
+      script.src = "https://w.soundcloud.com/player/api.js";
+      script.onload = () => initWidget();
+      document.head.appendChild(script);
+    } else {
+      const check = setInterval(() => { if (window.SC) { clearInterval(check); initWidget(); } }, 150);
+      setTimeout(() => clearInterval(check), 6000);
+    }
+
+    return () => { cancelled = true; };
+  }, [trackUrl]);
+
+  useEffect(() => { try { widgetRef.current?.setVolume(volume); } catch { /* ignore */ } }, [volume]);
+
+  const toggle = () => {
+    if (!widgetRef.current) return;
+    try {
+      if (playing) widgetRef.current.pause();
+      else         widgetRef.current.play();
+    } catch { /* ignore */ }
+  };
+
+  return <PlayerShell playing={playing} expanded={expanded} setExpanded={setExpanded}
+    volume={volume / 100} setVolume={v => setVolume(Math.round(v * 100))}
+    toggle={toggle} status={status}>
+    <div style={{ position: "fixed", top: -9999, left: -9999, pointerEvents: "none" }}>
+      <iframe ref={iframeRef} width="100" height="100" scrolling="no" frameBorder="no"
+        allow="autoplay" src={embedUrl} />
+    </div>
+  </PlayerShell>;
+}
+
+/* ─── Helpers ─── */
+function getSoundCloudUrl(url: string): string | null {
+  return url.includes("soundcloud.com") ? url : null;
+}
+
+/* ─── Main export — tự nhận diện mp3 / YouTube / SoundCloud ─── */
 export default function MusicPlayer({ src }: { src: string }) {
   if (!src) return null;
   const ytId = getYouTubeId(src);
   if (ytId) return <YouTubePlayer videoId={ytId} />;
+  const scUrl = getSoundCloudUrl(src);
+  if (scUrl) return <SoundCloudPlayer trackUrl={scUrl} />;
   return <Mp3Player src={src} />;
 }
