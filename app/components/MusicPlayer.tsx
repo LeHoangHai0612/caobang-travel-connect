@@ -137,9 +137,9 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
   return <PlayerShell playing={playing} expanded={expanded} setExpanded={setExpanded}
     volume={volume / 100} setVolume={v => setVolume(Math.round(v * 100))}
     toggle={toggle} status={status}>
-    {/* YouTube player — đặt ngoài màn hình, cần tồn tại trong DOM */}
-    <div style={{ position: "fixed", top: -9999, left: -9999, pointerEvents: "none" }}>
-      <div id={playerDivId.current} />
+    {/* YouTube player — cần trong viewport để browser load */}
+    <div style={{ position: "fixed", bottom: 80, right: 22, opacity: 0, pointerEvents: "none", zIndex: -1 }}>
+      <div id={playerDivId.current} style={{ width: 120, height: 120 }} />
     </div>
   </PlayerShell>;
 }
@@ -283,8 +283,8 @@ function SoundCloudPlayer({ trackUrl }: { trackUrl: string }) {
   return <PlayerShell playing={playing} expanded={expanded} setExpanded={setExpanded}
     volume={volume / 100} setVolume={v => setVolume(Math.round(v * 100))}
     toggle={toggle} status={status}>
-    <div style={{ position: "fixed", top: -9999, left: -9999, pointerEvents: "none" }}>
-      <iframe ref={iframeRef} width="100" height="100" scrolling="no" frameBorder="no"
+    <div style={{ position: "fixed", bottom: 80, right: 22, opacity: 0, pointerEvents: "none", zIndex: -1 }}>
+      <iframe ref={iframeRef} width="300" height="166" scrolling="no" frameBorder="no"
         allow="autoplay" src={embedUrl} />
     </div>
   </PlayerShell>;
