@@ -1193,27 +1193,92 @@ export default function CaoBangEcoTour() {
           </div>
         </section>
 
-        {/* ==================== GALLERY ==================== */}
+        {/* ==================== GALLERY SCRAPBOOK ==================== */}
         <section className="gallery" id="gallery" aria-labelledby="gallery-heading"
-          style={{ background: `linear-gradient(rgba(255,255,255,.89),rgba(255,255,255,.89)),url('${galleryBg}') center/cover no-repeat` }}>
+          style={{ background: "#f5f2ec", padding: "88px 0 80px", overflow: "hidden" }}>
           <div className="container">
-            <div className="section-header">
-              <span className="section-tag" style={{ background: "rgba(229,169,25,.12)", color: "#c48d10" }}>Góc Nhìn Chân Thực</span>
-              <h2 className="section-title" id="gallery-heading">Thư Viện Hình Ảnh</h2>
-              <p className="section-subtitle">Những khoảnh khắc tuyệt đẹp được ghi lại trong các chuyến đi của chúng tôi</p>
+            {/* Header chữ tay */}
+            <div style={{ textAlign: "center", marginBottom: 56, position: "relative" }}>
+              <p style={{ fontSize: ".72rem", fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: "#a07840", marginBottom: 10 }}>
+                <i className="fa-solid fa-camera-retro" style={{ marginRight: 7 }} />Góc Nhìn Chân Thực
+              </p>
+              <h2 id="gallery-heading" style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "clamp(2.4rem, 5vw, 3.6rem)", fontWeight: 700, color: "#3a6b3a", lineHeight: 1.1, margin: "0 0 6px" }}>
+                Khoảnh Khắc Đáng Nhớ
+              </h2>
+              <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "1.15rem", color: "#7a9e5a", fontWeight: 600 }}>
+                những ký ức từ hành trình của bạn
+              </p>
+              {/* Butterfly sticker */}
+              <span style={{ position: "absolute", top: -8, right: "calc(50% - 180px)", fontSize: "1.6rem", transform: "rotate(-20deg)", pointerEvents: "none" }}>🦋</span>
             </div>
-            <div className="gallery-grid">
-              {galleryImages.map((img, i) => (
-                <div key={img.id} className="gallery-item fade-up">
-                  <img className="gallery-img" src={img.image_url} alt={`Ảnh du lịch Cao Bằng ${i + 1}`} loading="lazy" />
-                  <div className="gallery-overlay">
-                    <i className="fa-brands fa-instagram" />
-                  </div>
-                </div>
-              ))}
+
+            {/* Scrapbook scatter */}
+            <div style={{ position: "relative", display: "flex", flexWrap: "wrap", justifyContent: "center", gap: 0, padding: "20px 0 40px" }}>
+              {galleryImages.slice(0, 8).map((img, i) => {
+                const rotations = [-5, 3, -2, 6, -4, 2, -6, 4];
+                const rot = rotations[i % rotations.length];
+                const zIndex = [3, 2, 4, 1, 5, 2, 3, 4][i % 8];
+                const margins = [
+                  "0 -18px 0 0", "0 -14px 0 0", "0 -20px 0 0", "0 -16px 0 0",
+                  "0 -18px 0 0", "0 -14px 0 0", "0 -20px 0 0", "0 0 0 0"
+                ];
+                return (
+                  <a key={img.id} href="/thu-vien"
+                    style={{
+                      display: "block", flexShrink: 0,
+                      background: "white",
+                      padding: "10px 10px 36px",
+                      boxShadow: "0 6px 24px rgba(0,0,0,.13), 0 2px 6px rgba(0,0,0,.08)",
+                      transform: `rotate(${rot}deg)`,
+                      transition: "transform .3s ease, box-shadow .3s ease, z-index 0s",
+                      zIndex, position: "relative",
+                      margin: margins[i],
+                      textDecoration: "none",
+                      width: "clamp(140px, 16vw, 200px)",
+                    }}
+                    onMouseEnter={e => {
+                      const el = e.currentTarget as HTMLAnchorElement;
+                      el.style.transform = "rotate(0deg) scale(1.08)";
+                      el.style.zIndex = "20";
+                      el.style.boxShadow = "0 16px 40px rgba(0,0,0,.2)";
+                    }}
+                    onMouseLeave={e => {
+                      const el = e.currentTarget as HTMLAnchorElement;
+                      el.style.transform = `rotate(${rot}deg)`;
+                      el.style.zIndex = String(zIndex);
+                      el.style.boxShadow = "0 6px 24px rgba(0,0,0,.13), 0 2px 6px rgba(0,0,0,.08)";
+                    }}>
+                    <div style={{ width: "100%", aspectRatio: "1", overflow: "hidden", background: "#e8e4de" }}>
+                      <img src={img.image_url} alt={`Ảnh Cao Bằng ${i + 1}`} loading="lazy"
+                        style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                    </div>
+                    <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: ".95rem", color: "#7a6a50", textAlign: "center", marginTop: 8, fontWeight: 600 }}>
+                      #caobangtravel
+                    </p>
+                  </a>
+                );
+              })}
+
+              {/* Note sticker */}
+              <div style={{
+                position: "absolute", bottom: 10, right: "8%",
+                background: "#fffef0",
+                padding: "14px 16px",
+                boxShadow: "0 4px 16px rgba(0,0,0,.10)",
+                transform: "rotate(4deg)",
+                width: 140, zIndex: 10,
+                pointerEvents: "none",
+              }}>
+                <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "1rem", color: "#7a6a50", lineHeight: 1.5, fontWeight: 600 }}>
+                  The pearl amidst the misty place ✨
+                </p>
+                <p style={{ marginTop: 8, fontSize: "1.4rem" }}>🌸🌼</p>
+              </div>
             </div>
-            <div style={{ textAlign: "center", marginTop: 36 }}>
-              <a href="/thu-vien" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid #c48d10", color: "#c48d10", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", background: "rgba(229,169,25,.08)", letterSpacing: ".04em" }}>
+
+            {/* CTA */}
+            <div style={{ textAlign: "center", marginTop: 20 }}>
+              <a href="/thu-vien" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 32px", borderRadius: 50, background: "#3a6b3a", color: "white", fontWeight: 700, fontSize: ".86rem", textDecoration: "none", letterSpacing: ".04em", boxShadow: "0 4px 16px rgba(58,107,58,.3)" }}>
                 <i className="fa-solid fa-images" /> Xem Tất Cả Hình Ảnh <i className="fa-solid fa-arrow-right" />
               </a>
             </div>
