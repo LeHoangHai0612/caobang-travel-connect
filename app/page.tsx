@@ -796,7 +796,8 @@ export default function CaoBangEcoTour() {
               {[
                 { id: "hero",         label: "Trang Chủ" },
                 { id: "why-us",       label: "Giới Thiệu" },
-                { id: "team",         label: "HDV & Tour" },
+                { id: "team",         label: "HDV" },
+                { id: "tours",        label: "Tours" },
                 { id: "destinations", label: "Điểm Đến" },
                 { id: "gallery",      label: "Hình Ảnh" },
                 { id: "cam-nang",     label: "Cẩm Nang" },
@@ -852,7 +853,8 @@ export default function CaoBangEcoTour() {
           {[
             { id: "hero",         label: "Trang Chủ" },
             { id: "why-us",       label: "Giới Thiệu" },
-            { id: "team",         label: "HDV & Tour" },
+            { id: "team",         label: "HDV" },
+            { id: "tours",        label: "Tours" },
             { id: "destinations", label: "Điểm Đến" },
             { id: "gallery",      label: "Hình Ảnh" },
             { id: "cam-nang",     label: "Cẩm Nang" },
