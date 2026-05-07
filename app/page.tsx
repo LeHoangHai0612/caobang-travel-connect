@@ -179,7 +179,7 @@ export default function CaoBangEcoTour() {
         supabase.from("guides").select("*").eq("is_active", true).order("rating", { ascending: false }).limit(8),
         supabase.from("destinations").select("*").order("sort_order").limit(6),
         supabase.from("reviews").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(6),
-        supabase.from("gallery_images").select("*").order("sort_order").limit(12),
+        supabase.from("gallery_images").select("*").order("sort_order").limit(8),
         supabase.from("site_settings").select("key,value"),
         supabase.from("tours").select("id,title,description,image_url,price_from,duration,group_size,zalo_number").eq("is_active", true).order("sort_order").limit(6),
         supabase.from("cam_nang_tips").select("*").eq("is_active", true).order("sort_order").limit(6),
@@ -1071,6 +1071,10 @@ export default function CaoBangEcoTour() {
                   <div className="dest-card-body">
                     <h3>{dest.title}</h3>
                     <p>{dest.description}</p>
+                    <a href={`/diem-den/${dest.id}`} onClick={e => e.stopPropagation()}
+                      style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 5, color: "#265C59", fontSize: ".78rem", fontWeight: 700, textDecoration: "none" }}>
+                      Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
+                    </a>
                   </div>
                 </article>
               ))}
@@ -1098,6 +1102,10 @@ export default function CaoBangEcoTour() {
                         style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: "none", background: "#265C59", color: "white", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
                         <i className="fa-solid fa-calendar-check" style={{ marginRight: 7 }} />Đặt tour tham quan
                       </button>
+                      <a href={`/diem-den/${selectedDest.id}`}
+                        style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #265C59", background: "white", color: "#265C59", fontWeight: 700, fontSize: ".88rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                        <i className="fa-solid fa-arrow-up-right-from-square" />Xem chi tiết
+                      </a>
                       <button onClick={() => setSelectedDest(null)}
                         style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "white", color: "#475569", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
                         Đóng
@@ -1198,6 +1206,11 @@ export default function CaoBangEcoTour() {
                 </div>
               ))}
             </div>
+            <div style={{ textAlign: "center", marginTop: 36 }}>
+              <a href="/thu-vien" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid #c48d10", color: "#c48d10", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", background: "rgba(229,169,25,.08)", letterSpacing: ".04em" }}>
+                <i className="fa-solid fa-images" /> Xem Tất Cả Hình Ảnh <i className="fa-solid fa-arrow-right" />
+              </a>
+            </div>
           </div>
         </section>
 
@@ -1218,21 +1231,28 @@ export default function CaoBangEcoTour() {
                 { id:"4", icon:"fa-camera-retro",       tag:"Nhiếp Ảnh", color:"#06b6d4", title:"Góc Chụp Ảnh Đẹp Nhất",   description:"Cầu treo Bản Giốc, thuyền trên sông Quây Sơn, ruộng bậc thang Phia Oắc — ánh sáng buổi sáng sớm là lý tưởng nhất.", sort_order:4 },
                 { id:"5", icon:"fa-hand-holding-heart", tag:"Văn Hóa",   color:"#10b981", title:"Tôn Trọng Phong Tục",      description:"Dân tộc Tày, Nùng chiếm đa số. Hỏi phép trước khi chụp ảnh, tìm hiểu phong tục trước khi đến thăm bản làng.",      sort_order:5 },
                 { id:"6", icon:"fa-shield-halved",      tag:"An Toàn",   color:"#f97316", title:"Lưu Ý Quan Trọng",         description:"Mang theo thuốc chống muỗi, kem chống nắng và giày trekking chắc chắn. Đặt HDV địa phương để đảm bảo an toàn tối đa.", sort_order:6 },
-              ]).map(({ id, icon, tag, color, title, description }) => (
-                <a key={id} href={`/cam-nang/${id}`} className="cam-nang-card fade-up" style={{ textDecoration: "none", display: "block" }}>
-                  <div className="cam-nang-card-top">
-                    <span className="cam-nang-tag" style={{ background: color + "22", color }}>{tag}</span>
-                    <div className="cam-nang-icon" style={{ background: color + "18" }}>
-                      <i className={`fa-solid ${icon}`} style={{ color }} />
+              ]).map(({ id, icon, tag, color, title, description }) => {
+                const cardInner = (
+                  <>
+                    <div className="cam-nang-card-top">
+                      <span className="cam-nang-tag" style={{ background: color + "22", color }}>{tag}</span>
+                      <div className="cam-nang-icon" style={{ background: color + "18" }}>
+                        <i className={`fa-solid ${icon}`} style={{ color }} />
+                      </div>
                     </div>
-                  </div>
-                  <h3>{title}</h3>
-                  <p>{description}</p>
-                  <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, color, fontSize: ".78rem", fontWeight: 700 }}>
-                    Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
-                  </div>
-                </a>
-              ))}
+                    <h3>{title}</h3>
+                    <p>{description}</p>
+                    {camNangTips.length > 0 && (
+                      <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, color, fontSize: ".78rem", fontWeight: 700 }}>
+                        Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
+                      </div>
+                    )}
+                  </>
+                );
+                return camNangTips.length > 0
+                  ? <a key={id} href={`/cam-nang/${id}`} className="cam-nang-card fade-up" style={{ textDecoration: "none", display: "block" }}>{cardInner}</a>
+                  : <article key={id} className="cam-nang-card fade-up">{cardInner}</article>;
+              })}
             </div>
             <div style={{ textAlign: "center", marginTop: 36 }}>
               <a href="/cam-nang" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>

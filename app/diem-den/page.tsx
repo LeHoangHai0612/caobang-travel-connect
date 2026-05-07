@@ -66,10 +66,18 @@ export default function DiemDenList() {
                   </div>
                   <div style={{ padding: "18px 20px 20px" }}>
                     <h3 style={{ fontSize: "1rem", fontWeight: 800, color: "#265C59", margin: "0 0 8px", textTransform: "uppercase", letterSpacing: ".04em" }}>{d.title}</h3>
-                    <p style={{ fontSize: ".83rem", color: "#64748b", lineHeight: 1.65, margin: 0 }}>{d.description}</p>
-                    <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, background: "#265C59", color: "white", padding: "7px 16px", borderRadius: 50, fontSize: ".78rem", fontWeight: 700, cursor: "pointer" }}
-                      onClick={() => { window.location.href = `/dat-lich?destination=${encodeURIComponent(d.title)}`; }}>
-                      <i className="fa-solid fa-calendar-check" /> Đặt Tour Tham Quan
+                    <p style={{ fontSize: ".83rem", color: "#64748b", lineHeight: 1.65, margin: 0 }}>
+                      {d.description.length > 120 ? d.description.slice(0, 120) + "…" : d.description}
+                    </p>
+                    <div style={{ marginTop: 14, display: "flex", gap: 10, flexWrap: "wrap", alignItems: "center" }}>
+                      <a href={`/diem-den/${d.id}`}
+                        style={{ display: "inline-flex", alignItems: "center", gap: 6, color: "#265C59", border: "1.5px solid #265C59", padding: "7px 16px", borderRadius: 50, fontSize: ".78rem", fontWeight: 700, textDecoration: "none" }}>
+                        <i className="fa-solid fa-book-open" /> Đọc Thêm
+                      </a>
+                      <div style={{ display: "inline-flex", alignItems: "center", gap: 6, background: "#265C59", color: "white", padding: "7px 16px", borderRadius: 50, fontSize: ".78rem", fontWeight: 700, cursor: "pointer" }}
+                        onClick={() => { window.location.href = `/dat-lich?destination=${encodeURIComponent(d.title)}`; }}>
+                        <i className="fa-solid fa-calendar-check" /> Đặt Tour
+                      </div>
                     </div>
                   </div>
                 </article>

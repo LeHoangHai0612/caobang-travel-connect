@@ -78,7 +78,7 @@ export default function CamNangList() {
                         <span style={{ fontSize: ".68rem", fontWeight: 700, color: t.color, textTransform: "uppercase", letterSpacing: ".08em", background: t.color + "15", padding: "3px 10px", borderRadius: 20 }}>{t.tag}</span>
                       </div>
                       <h3 style={{ fontSize: ".95rem", fontWeight: 800, color: "#0f172a", margin: "0 0 8px", lineHeight: 1.4 }}>{t.title}</h3>
-                      <p style={{ fontSize: ".82rem", color: "#64748b", lineHeight: 1.65, margin: "0 0 14px" }}>{t.description}</p>
+                      <p style={{ fontSize: ".82rem", color: "#64748b", lineHeight: 1.65, margin: "0 0 14px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.description}</p>
                       <span style={{ fontSize: ".78rem", fontWeight: 700, color: t.color, display: "inline-flex", alignItems: "center", gap: 5 }}>
                         Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
                       </span>

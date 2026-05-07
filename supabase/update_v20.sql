@@ -21,5 +21,11 @@ INSERT INTO public.cam_nang_tips (icon, tag, color, title, description, sort_ord
 ON CONFLICT DO NOTHING;
 
 ALTER TABLE public.cam_nang_tips ENABLE ROW LEVEL SECURITY;
-CREATE POLICY IF NOT EXISTS "Public read cam_nang_tips" ON public.cam_nang_tips FOR SELECT USING (true);
-CREATE POLICY IF NOT EXISTS "Admin manage cam_nang_tips" ON public.cam_nang_tips FOR ALL USING (true);
+DO $$ BEGIN
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'cam_nang_tips' AND policyname = 'Public read cam_nang_tips') THEN
+    CREATE POLICY "Public read cam_nang_tips" ON public.cam_nang_tips FOR SELECT USING (true);
+  END IF;
+  IF NOT EXISTS (SELECT 1 FROM pg_policies WHERE tablename = 'cam_nang_tips' AND policyname = 'Admin manage cam_nang_tips') THEN
+    CREATE POLICY "Admin manage cam_nang_tips" ON public.cam_nang_tips FOR ALL USING (true);
+  END IF;
+END $$;

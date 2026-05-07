@@ -240,7 +240,7 @@ footer#footer {
 .dest-card-img-wrap::after { content: ''; position: absolute; bottom: 0; left: 0; right: 0; height: 50%; background: linear-gradient(transparent, rgba(20,50,50,.35)); }
 .dest-card-body { padding: 18px 20px 20px; }
 .dest-card-body h3 { font-size: .95rem; font-weight: 800; letter-spacing: .04em; text-transform: uppercase; color: var(--teal-dark); margin-bottom: 8px; }
-.dest-card-body p { font-size: .82rem; color: var(--text-mid); line-height: 1.65; }
+.dest-card-body p { font-size: .82rem; color: var(--text-mid); line-height: 1.65; display: -webkit-box; -webkit-line-clamp: 3; line-clamp: 3; -webkit-box-orient: vertical; overflow: hidden; }
 
 /* TEAM (HDV) */
 .team { padding: 88px 0; background: var(--white); }
