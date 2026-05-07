@@ -7,21 +7,46 @@ type Status = "idle" | "loading" | "ready" | "error";
 export default function MusicPlayer({ src }: { src: string }) {
   const audioRef            = useRef<HTMLAudioElement>(null);
   const [playing, setPlaying]   = useState(false);
-  const [volume, setVolume]     = useState(0.4);
+  const [volume, setVolume]     = useState(1);
   const [expanded, setExpanded] = useState(false);
   const [status, setStatus]     = useState<Status>("idle");
 
-  // Reset khi URL thay đổi
+  // Reset + autoplay khi URL thay đổi
   useEffect(() => {
     const audio = audioRef.current;
     if (!audio) return;
     if (!src) { setStatus("idle"); return; }
 
     setStatus("loading");
-    setPlaying(false);
-    audio.volume = volume;
+    audio.volume = 1;
     audio.loop   = true;
     audio.load();
+
+    // Thử phát ngay (có thể bị block nếu chưa tương tác)
+    const tryPlay = async () => {
+      try {
+        await audio.play();
+        setPlaying(true);
+        setStatus("ready");
+      } catch {
+        // Chờ tương tác đầu tiên của người dùng
+        const onInteract = async () => {
+          try {
+            await audio.play();
+            setPlaying(true);
+            setStatus("ready");
+          } catch { setStatus("ready"); }
+          document.removeEventListener("click",      onInteract);
+          document.removeEventListener("touchstart", onInteract);
+          document.removeEventListener("keydown",    onInteract);
+        };
+        document.addEventListener("click",      onInteract, { once: true });
+        document.addEventListener("touchstart", onInteract, { once: true });
+        document.addEventListener("keydown",    onInteract, { once: true });
+        setStatus("ready");
+      }
+    };
+    tryPlay();
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [src]);
 
