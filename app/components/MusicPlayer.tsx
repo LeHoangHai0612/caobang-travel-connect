@@ -66,49 +66,61 @@ function Mp3Player({ src }: { src: string }) {
 /* ─── YouTube Player ─── */
 function YouTubePlayer({ videoId }: { videoId: string }) {
   const ytRef               = useRef<any>(null);
-  const mountRef            = useRef<HTMLDivElement>(null);
+  const playerDivId         = useRef(`yt-bg-${videoId}`);
   const [playing, setPlaying]   = useState(false);
   const [volume, setVolume]     = useState(100);
   const [expanded, setExpanded] = useState(false);
   const [status, setStatus]     = useState<"idle"|"loading"|"ready"|"error">("loading");
 
   useEffect(() => {
-    const initPlayer = () => {
-      if (!mountRef.current) return;
-      ytRef.current = new window.YT.Player(mountRef.current, {
+    let cancelled = false;
+
+    const createPlayer = () => {
+      if (cancelled) return;
+      ytRef.current = new window.YT.Player(playerDivId.current, {
+        height: "120", width: "120",
         videoId,
         playerVars: { autoplay: 1, loop: 1, playlist: videoId, controls: 0, rel: 0, iv_load_policy: 3 },
         events: {
           onReady: (e: any) => {
+            if (cancelled) return;
             e.target.setVolume(100);
             setStatus("ready");
-            const tryPlay = async () => {
-              try { e.target.playVideo(); }
-              catch { /* wait for interaction */ }
+            try { e.target.playVideo(); } catch { /* blocked */ }
+            const onInteract = () => {
+              try { e.target.playVideo(); } catch { /* ignore */ }
             };
-            tryPlay();
-            const onInteract = () => { e.target.playVideo(); document.removeEventListener("click", onInteract); document.removeEventListener("touchstart", onInteract); };
             document.addEventListener("click",      onInteract, { once: true });
             document.addEventListener("touchstart", onInteract, { once: true });
           },
           onStateChange: (e: any) => {
-            setPlaying(e.data === window.YT.PlayerState.PLAYING);
+            if (!cancelled) setPlaying(e.data === window.YT?.PlayerState?.PLAYING);
           },
-          onError: () => setStatus("error"),
+          onError: () => { if (!cancelled) setStatus("error"); },
         },
       });
     };
 
-    if (window.YT?.Player) {
-      initPlayer();
+    if (window.YT && window.YT.Player) {
+      createPlayer();
     } else {
-      const tag = document.createElement("script");
-      tag.src = "https://www.youtube.com/iframe_api";
-      document.head.appendChild(tag);
-      window.onYouTubeIframeAPIReady = initPlayer;
+      // Giữ callback cũ nếu có (tránh ghi đè)
+      const prev = window.onYouTubeIframeAPIReady;
+      window.onYouTubeIframeAPIReady = () => {
+        if (typeof prev === "function") prev();
+        createPlayer();
+      };
+      if (!document.querySelector('script[src*="youtube.com/iframe_api"]')) {
+        const tag = document.createElement("script");
+        tag.src = "https://www.youtube.com/iframe_api";
+        document.head.appendChild(tag);
+      }
     }
 
-    return () => { try { ytRef.current?.destroy(); } catch { /* ignore */ } };
+    return () => {
+      cancelled = true;
+      try { ytRef.current?.destroy(); } catch { /* ignore */ }
+    };
   }, [videoId]);
 
   useEffect(() => { try { ytRef.current?.setVolume(volume); } catch { /* ignore */ } }, [volume]);
@@ -116,17 +128,17 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
   const toggle = () => {
     if (!ytRef.current) return;
     try {
-      if (playing) { ytRef.current.pauseVideo(); setPlaying(false); }
-      else         { ytRef.current.playVideo();  setPlaying(true);  }
+      if (playing) { ytRef.current.pauseVideo(); }
+      else         { ytRef.current.playVideo();  }
     } catch { /* ignore */ }
   };
 
   return <PlayerShell playing={playing} expanded={expanded} setExpanded={setExpanded}
     volume={volume / 100} setVolume={v => setVolume(Math.round(v * 100))}
     toggle={toggle} status={status}>
-    {/* Hidden YouTube iframe mount point — must exist for YT API */}
-    <div style={{ position: "absolute", width: 1, height: 1, overflow: "hidden", opacity: 0, pointerEvents: "none" }}>
-      <div ref={mountRef} />
+    {/* YouTube player — đặt ngoài màn hình, cần tồn tại trong DOM */}
+    <div style={{ position: "fixed", top: -9999, left: -9999, pointerEvents: "none" }}>
+      <div id={playerDivId.current} />
     </div>
   </PlayerShell>;
 }
