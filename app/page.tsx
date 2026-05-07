@@ -89,6 +89,7 @@ export default function CaoBangEcoTour() {
   // Data state – khởi tạo bằng fallback, cập nhật từ Supabase
   const [guides, setGuides] = useState<Guide[]>(FALLBACK_GUIDES);
   const [destinations, setDestinations] = useState<Destination[]>(FALLBACK_DESTINATIONS);
+  const [destsFromDB, setDestsFromDB]   = useState(false);
   const [reviews, setReviews] = useState<Review[]>(FALLBACK_REVIEWS);
   const [galleryImages, setGalleryImages] = useState<GalleryImage[]>(FALLBACK_GALLERY);
   const [tours, setTours] = useState<Tour[]>([]);
@@ -185,7 +186,7 @@ export default function CaoBangEcoTour() {
         supabase.from("cam_nang_tips").select("*").eq("is_active", true).order("sort_order").limit(6),
       ]);
       if (g && g.length > 0) setGuides(g);
-      if (d && d.length > 0) setDestinations(d);
+      if (d && d.length > 0) { setDestinations(d); setDestsFromDB(true); }
       if (cn && cn.length > 0) setCamNangTips(cn);
       if (r && r.length > 0) setReviews(r);
       if (gal && gal.length > 0) setGalleryImages(gal);
@@ -1071,10 +1072,12 @@ export default function CaoBangEcoTour() {
                   <div className="dest-card-body">
                     <h3>{dest.title}</h3>
                     <p>{dest.description}</p>
-                    <a href={`/diem-den/${dest.id}`} onClick={e => e.stopPropagation()}
-                      style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 5, color: "#265C59", fontSize: ".78rem", fontWeight: 700, textDecoration: "none" }}>
-                      Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
-                    </a>
+                    {destsFromDB && (
+                      <a href={`/diem-den/${dest.id}`} onClick={e => e.stopPropagation()}
+                        style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 5, color: "#265C59", fontSize: ".78rem", fontWeight: 700, textDecoration: "none" }}>
+                        Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
+                      </a>
+                    )}
                   </div>
                 </article>
               ))}
@@ -1102,10 +1105,12 @@ export default function CaoBangEcoTour() {
                         style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: "none", background: "#265C59", color: "white", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
                         <i className="fa-solid fa-calendar-check" style={{ marginRight: 7 }} />Đặt tour tham quan
                       </button>
-                      <a href={`/diem-den/${selectedDest.id}`}
-                        style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #265C59", background: "white", color: "#265C59", fontWeight: 700, fontSize: ".88rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
-                        <i className="fa-solid fa-arrow-up-right-from-square" />Xem chi tiết
-                      </a>
+                      {destsFromDB && (
+                        <a href={`/diem-den/${selectedDest.id}`}
+                          style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #265C59", background: "white", color: "#265C59", fontWeight: 700, fontSize: ".88rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                          <i className="fa-solid fa-arrow-up-right-from-square" />Xem chi tiết
+                        </a>
+                      )}
                       <button onClick={() => setSelectedDest(null)}
                         style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "white", color: "#475569", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
                         Đóng
