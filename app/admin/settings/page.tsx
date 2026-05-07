@@ -15,6 +15,7 @@ const NUMBER_KEYS  = ["deposit_pct"];
 const ICONS: Record<string, string> = {
   hero_video:       "fa-film",
   hero_bg:          "fa-mountain-sun",
+  about_image:      "fa-image-portrait",
   login_bg:         "fa-right-to-bracket",
   destinations_bg:  "fa-map-location-dot",
   pricing_bg:       "fa-tag",

@@ -150,6 +150,42 @@ video.hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-
 }
 
 /* ═══════════════════════════════════════════════════
+   ABOUT SECTION
+   ═══════════════════════════════════════════════════ */
+.about-grid {
+  display: grid;
+  grid-template-columns: 1fr minmax(280px, 420px);
+  gap: clamp(32px, 5vw, 80px);
+  align-items: center;
+  padding: 88px 24px 56px;
+}
+@media (max-width: 860px) {
+  .about-grid { grid-template-columns: 1fr; padding: 60px 24px 48px; }
+}
+.about-marquee-track {
+  display: flex;
+  width: max-content;
+  animation: about-marquee 22s linear infinite;
+  white-space: nowrap;
+  padding: 16px 0;
+}
+.about-marquee-text {
+  font-family: var(--font-lora), Georgia, serif;
+  font-size: clamp(2.8rem, 5.5vw, 4.5rem);
+  font-weight: 700;
+  font-style: italic;
+  -webkit-text-stroke: 2px rgba(45,90,39,.42);
+  color: transparent;
+  padding-right: 2rem;
+  flex-shrink: 0;
+  user-select: none;
+}
+@keyframes about-marquee {
+  from { transform: translateX(0); }
+  to   { transform: translateX(-50%); }
+}
+
+/* ═══════════════════════════════════════════════════
    LAYERED PARALLAX — Card Stack
    Mỗi section "trượt lên" section trước với rounded top
    ═══════════════════════════════════════════════════ */
