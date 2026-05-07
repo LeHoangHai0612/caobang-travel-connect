@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Be_Vietnam_Pro, Caveat } from "next/font/google";
+import { Be_Vietnam_Pro, Caveat, Lora } from "next/font/google";
 import "./globals.css";
 
 const beVietnam = Be_Vietnam_Pro({
@@ -14,6 +14,14 @@ const caveat = Caveat({
   subsets: ["latin"],
   weight: ["400", "600", "700"],
   variable: "--font-caveat",
+  display: "swap",
+});
+
+const lora = Lora({
+  subsets: ["vietnamese", "latin"],
+  weight: ["400", "500", "600", "700"],
+  style: ["normal", "italic"],
+  variable: "--font-lora",
   display: "swap",
 });
 
@@ -34,7 +42,7 @@ export default function RootLayout({
   children,
 }: Readonly<{ children: React.ReactNode }>) {
   return (
-    <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${caveat.variable}`}>
+    <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${caveat.variable} ${lora.variable}`}>
       <body className={`${beVietnam.className} min-h-full flex flex-col`}>
         {children}
       </body>
