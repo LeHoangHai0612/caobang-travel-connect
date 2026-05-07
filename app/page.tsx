@@ -96,6 +96,7 @@ export default function CaoBangEcoTour() {
 
   interface CamNangTip { id: string; icon: string; tag: string; color: string; title: string; description: string; sort_order: number; }
   const [camNangTips, setCamNangTips] = useState<CamNangTip[]>([]);
+  const [camNangFromDB, setCamNangFromDB] = useState(false);
 
   // Site settings
   const [heroBg, setHeroBg]             = useState("");
@@ -187,7 +188,7 @@ export default function CaoBangEcoTour() {
       ]);
       if (g && g.length > 0) setGuides(g);
       if (d && d.length > 0) { setDestinations(d); setDestsFromDB(true); }
-      if (cn && cn.length > 0) setCamNangTips(cn);
+      if (cn && cn.length > 0) { setCamNangTips(cn); setCamNangFromDB(true); }
       if (r && r.length > 0) setReviews(r);
       if (gal && gal.length > 0) setGalleryImages(gal);
       if (t && t.length > 0) setTours(t);
@@ -1229,7 +1230,7 @@ export default function CaoBangEcoTour() {
               <p className="section-subtitle" style={{ color: "rgba(255,255,255,.72)" }}>Những điều bạn cần biết để có chuyến đi trọn vẹn và an toàn</p>
             </div>
             <div className="cam-nang-grid">
-              {(camNangTips.length > 0 ? camNangTips : [
+              {(camNangFromDB ? camNangTips : [
                 { id:"1", icon:"fa-calendar-sun",       tag:"Thời Điểm", color:"#f59e0b", title:"Mùa Đẹp Nhất",            description:"Tháng 9–11: lúa chín vàng, thác đầy nước, thời tiết mát mẻ. Tháng 3–4: hoa tam giác mạch nở rộ trên các sườn núi.", sort_order:1 },
                 { id:"2", icon:"fa-bowl-food",          tag:"Ẩm Thực",   color:"#ef4444", title:"Đặc Sản Không Thể Bỏ Qua",description:"Bánh coóng phù, phở chua, lợn quay lá mắc mật, hạt dẻ Trùng Khánh — hương vị đặc trưng chỉ có ở Cao Bằng.",        sort_order:2 },
                 { id:"3", icon:"fa-motorcycle",         tag:"Di Chuyển", color:"#8b5cf6", title:"Phương Tiện Phù Hợp",      description:"Xe máy là lựa chọn tốt nhất. Đường đèo quanh co nhưng cảnh đẹp hùng vĩ — thuê xe tại thị xã hoặc đi cùng HDV.",   sort_order:3 },
@@ -1247,14 +1248,14 @@ export default function CaoBangEcoTour() {
                     </div>
                     <h3>{title}</h3>
                     <p>{description}</p>
-                    {camNangTips.length > 0 && (
+                    {camNangFromDB && (
                       <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, color, fontSize: ".78rem", fontWeight: 700 }}>
                         Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
                       </div>
                     )}
                   </>
                 );
-                return camNangTips.length > 0
+                return camNangFromDB
                   ? <a key={id} href={`/cam-nang/${id}`} className="cam-nang-card fade-up" style={{ textDecoration: "none", display: "block" }}>{cardInner}</a>
                   : <article key={id} className="cam-nang-card fade-up">{cardInner}</article>;
               })}
