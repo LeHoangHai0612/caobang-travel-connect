@@ -27,7 +27,7 @@ export default function AllGuidesPage() {
   const [filterSpec, setFilterSpec]   = useState("");
 
   useEffect(() => {
-    supabase.from("guides").select("*").eq("is_active", true)
+    supabase.from("guides").select("*").or("is_active.is.null,is_active.eq.true")
       .order("rating", { ascending: false })
       .then(({ data }) => {
         const list = (data ?? []).sort((a, b) => ((b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0)));

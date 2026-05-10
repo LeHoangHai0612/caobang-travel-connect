@@ -180,7 +180,7 @@ export default function CaoBangEcoTour() {
     // Tải dữ liệu từ Supabase
     async function loadData() {
       const [{ data: g }, { data: d }, { data: r }, { data: gal }, { data: settings }, { data: t }, { data: cn }] = await Promise.all([
-        supabase.from("guides").select("*").eq("is_active", true).order("rating", { ascending: false }).limit(8),
+        supabase.from("guides").select("*").or("is_active.is.null,is_active.eq.true").order("rating", { ascending: false }).limit(8),
         supabase.from("destinations").select("*").order("sort_order").limit(6),
         supabase.from("reviews").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(6),
         supabase.from("gallery_images").select("*").order("sort_order").limit(8),
