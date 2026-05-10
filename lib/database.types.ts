@@ -10,6 +10,7 @@ export interface Guide {
   years_experience: number;
   languages: string;
   is_active: boolean;
+  is_featured: boolean;
   created_at: string;
 }
 

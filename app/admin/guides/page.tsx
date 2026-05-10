@@ -7,7 +7,7 @@ import type { Guide } from "@/lib/database.types";
 const EMPTY_FORM = {
   name: "", specialty: "", role: "Chuyên gia HDV Sinh Thái",
   rating: 5, image_url: "", zalo_number: "", bio: "",
-  years_experience: 1, languages: "Tiếng Việt", is_active: true,
+  years_experience: 1, languages: "Tiếng Việt", is_active: true, is_featured: false,
 };
 type FormData = typeof EMPTY_FORM;
 
@@ -388,7 +388,7 @@ export default function GuidesAdmin() {
     setForm({ name: guide.name, specialty: guide.specialty, role: guide.role, rating: guide.rating,
       image_url: guide.image_url, zalo_number: guide.zalo_number ?? "", bio: guide.bio ?? "",
       years_experience: guide.years_experience ?? 1, languages: guide.languages ?? "Tiếng Việt",
-      is_active: guide.is_active });
+      is_active: guide.is_active, is_featured: guide.is_featured ?? false });
     setError(""); setModalOpen(true);
   }
   function closeModal() { setModalOpen(false); setEditingId(null); }
@@ -415,6 +415,11 @@ export default function GuidesAdmin() {
 
   async function toggleActive(guide: Guide) {
     await supabase.from("guides").update({ is_active: !guide.is_active }).eq("id", guide.id);
+    fetchGuides();
+  }
+
+  async function toggleFeatured(guide: Guide) {
+    await supabase.from("guides").update({ is_featured: !guide.is_featured }).eq("id", guide.id);
     fetchGuides();
   }
 
@@ -447,6 +452,7 @@ export default function GuidesAdmin() {
                   <th>Chuyên môn</th>
                   <th>Zalo</th>
                   <th>Đánh giá</th>
+                  <th>Nổi Bật</th>
                   <th>Trạng thái</th>
                   <th>Thao tác</th>
                 </tr>
@@ -461,6 +467,16 @@ export default function GuidesAdmin() {
                     <td style={{ color: "#6b8888" }}>{g.specialty}</td>
                     <td>{g.zalo_number || <span style={{ color: "#bbb" }}>—</span>}</td>
                     <td><span style={{ color: "#E5A919", fontWeight: 700 }}>{g.rating}★</span></td>
+                    <td style={{ textAlign: "center" }}>
+                      <button
+                        onClick={() => toggleFeatured(g)}
+                        title={g.is_featured ? "Bỏ nổi bật" : "Đánh dấu nổi bật"}
+                        style={{ background: "none", border: "none", cursor: "pointer", fontSize: "1.3rem", lineHeight: 1, padding: 4, transition: "transform .2s" }}
+                        onMouseEnter={e => (e.currentTarget.style.transform = "scale(1.2)")}
+                        onMouseLeave={e => (e.currentTarget.style.transform = "")}>
+                        {g.is_featured ? "⭐" : "☆"}
+                      </button>
+                    </td>
                     <td>
                       <button onClick={() => toggleActive(g)}
                         className={`admin-badge ${g.is_active ? "admin-badge-success" : "admin-badge-danger"}`}
@@ -536,10 +552,14 @@ export default function GuidesAdmin() {
                   <label className="admin-form-label">Số Zalo</label>
                   <input className="admin-form-input" value={form.zalo_number} onChange={(e) => setForm({ ...form, zalo_number: e.target.value })} placeholder="0912345678" />
                 </div>
-                <div className="admin-form-group" style={{ display: "flex", alignItems: "flex-end" }}>
-                  <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer", paddingBottom: 10 }}>
+                <div className="admin-form-group" style={{ display: "flex", flexDirection: "column", gap: 10, alignItems: "flex-start", justifyContent: "flex-end", paddingBottom: 10 }}>
+                  <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
                     <input type="checkbox" checked={form.is_active} onChange={(e) => setForm({ ...form, is_active: e.target.checked })} style={{ width: 18, height: 18, accentColor: "#265C59" }} />
                     <span className="admin-form-label" style={{ marginBottom: 0 }}>Hiển thị trên trang chủ</span>
+                  </label>
+                  <label style={{ display: "flex", alignItems: "center", gap: 10, cursor: "pointer" }}>
+                    <input type="checkbox" checked={form.is_featured} onChange={(e) => setForm({ ...form, is_featured: e.target.checked })} style={{ width: 18, height: 18, accentColor: "#E5A919" }} />
+                    <span className="admin-form-label" style={{ marginBottom: 0 }}>⭐ HDV Nổi Bật</span>
                   </label>
                 </div>
               </div>
