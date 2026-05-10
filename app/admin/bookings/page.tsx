@@ -95,7 +95,12 @@ export default function AdminBookings() {
   async function updateStatus(id: string, status: "confirmed") {
     setUpdating(id);
     const { adminId, adminName } = await getAdminInfo();
-    await supabase.from("bookings").update({ status }).eq("id", id);
+    const { error } = await supabase.from("bookings").update({ status }).eq("id", id);
+    if (error) {
+      showToast(`Lỗi: ${error.message}`, false);
+      setUpdating(null);
+      return;
+    }
 
     const booking = bookings.find((b) => b.id === id) ?? detail;
     if (booking?.guide_id && booking?.preferred_date) {
@@ -125,12 +130,17 @@ export default function AdminBookings() {
     const { adminId, adminName } = await getAdminInfo();
     const cancelledAt = new Date().toISOString();
 
-    await supabase.from("bookings").update({
+    const { error } = await supabase.from("bookings").update({
       status: "cancelled",
       cancelled_by_name: adminName,
       cancelled_note:    note.trim(),
       cancelled_at:      cancelledAt,
     }).eq("id", booking.id);
+    if (error) {
+      showToast(`Lỗi: ${error.message}`, false);
+      setUpdating(null);
+      return;
+    }
 
     if (booking.guide_id && booking.preferred_date) {
       const date = booking.preferred_date.slice(0, 10);
