@@ -133,7 +133,7 @@ export default function AllGuidesPage() {
           <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 20 }}>
             {filtered.map((g) => (
               <a key={g.id} href={`/hdv/${g.id}`} style={{ textDecoration: "none", display: "block" }}>
-                <div style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.06)", transition: "transform .2s,box-shadow .2s", cursor: "pointer" }}
+                <div style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: g.is_featured ? "0 4px 24px rgba(229,169,25,.25)" : "0 2px 12px rgba(0,0,0,.06)", border: g.is_featured ? "2px solid #E5A919" : "none", transition: "transform .2s,box-shadow .2s", cursor: "pointer" }}
                   onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 28px rgba(0,0,0,.12)"; }}
                   onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.transform = ""; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 12px rgba(0,0,0,.06)"; }}>
                   {/* Image */}
@@ -142,8 +142,16 @@ export default function AllGuidesPage() {
                     <div style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,0,0,.6)", color: "#E5A919", borderRadius: 8, padding: "4px 10px", fontSize: ".78rem", fontWeight: 800 }}>
                       {g.rating}★
                     </div>
-                    {g.languages?.includes("English") && (
+                    {g.is_featured && (
+                      <div style={{ position: "absolute", top: 10, left: 10, background: "#E5A919", color: "white", borderRadius: 6, padding: "3px 10px", fontSize: ".65rem", fontWeight: 800, display: "flex", alignItems: "center", gap: 3 }}>
+                        ⭐ Nổi Bật
+                      </div>
+                    )}
+                    {!g.is_featured && g.languages?.includes("English") && (
                       <div style={{ position: "absolute", top: 10, left: 10, background: "#265C59", color: "white", borderRadius: 6, padding: "3px 8px", fontSize: ".65rem", fontWeight: 700 }}>EN</div>
+                    )}
+                    {g.is_featured && g.languages?.includes("English") && (
+                      <div style={{ position: "absolute", top: 36, left: 10, background: "#265C59", color: "white", borderRadius: 6, padding: "3px 8px", fontSize: ".65rem", fontWeight: 700 }}>EN</div>
                     )}
                   </div>
                   {/* Info */}
