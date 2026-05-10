@@ -29,7 +29,11 @@ export default function AllGuidesPage() {
   useEffect(() => {
     supabase.from("guides").select("*").eq("is_active", true)
       .order("rating", { ascending: false })
-      .then(({ data }) => { setGuides(data ?? []); setLoading(false); });
+      .then(({ data }) => {
+        const list = (data ?? []).sort((a, b) => ((b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0)));
+        setGuides(list);
+        setLoading(false);
+      });
   }, []);
 
   const filtered = guides.filter((g) => {

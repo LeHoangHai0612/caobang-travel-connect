@@ -180,7 +180,7 @@ export default function CaoBangEcoTour() {
     // Tải dữ liệu từ Supabase
     async function loadData() {
       const [{ data: g }, { data: d }, { data: r }, { data: gal }, { data: settings }, { data: t }, { data: cn }] = await Promise.all([
-        supabase.from("guides").select("*").eq("is_active", true).order("is_featured", { ascending: false }).order("rating", { ascending: false }).limit(8),
+        supabase.from("guides").select("*").eq("is_active", true).order("rating", { ascending: false }).limit(8),
         supabase.from("destinations").select("*").order("sort_order").limit(6),
         supabase.from("reviews").select("*").eq("is_approved", true).order("created_at", { ascending: false }).limit(6),
         supabase.from("gallery_images").select("*").order("sort_order").limit(8),
@@ -188,7 +188,10 @@ export default function CaoBangEcoTour() {
         supabase.from("tours").select("id,title,description,image_url,price_from,duration,group_size,zalo_number").eq("is_active", true).order("sort_order").limit(6),
         supabase.from("cam_nang_tips").select("*").eq("is_active", true).order("sort_order").limit(6),
       ]);
-      if (g && g.length > 0) setGuides(g);
+      if (g && g.length > 0) {
+        const sorted = [...g].sort((a, b) => ((b.is_featured ? 1 : 0) - (a.is_featured ? 1 : 0)));
+        setGuides(sorted);
+      }
       if (d && d.length > 0) { setDestinations(d); setDestsFromDB(true); }
       if (cn && cn.length > 0) { setCamNangTips(cn); setCamNangFromDB(true); }
       if (r && r.length > 0) setReviews(r);
