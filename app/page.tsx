@@ -254,25 +254,28 @@ export default function CaoBangEcoTour() {
     };
   }, []);
 
-  // Observer fade-up chạy lại mỗi khi data thay đổi (fix card vô hình sau khi Supabase load)
+  // Observer fade-up chạy lại mỗi khi data hoặc filter thay đổi
   useEffect(() => {
-    const fadeEls = document.querySelectorAll(".fade-up:not(.visible)");
-    if (!fadeEls.length) return;
+    const timer = setTimeout(() => {
+      const fadeEls = document.querySelectorAll(".fade-up:not(.visible)");
+      if (!fadeEls.length) return;
 
-    const fadeObserver = new IntersectionObserver(
-      (entries) => {
-        entries.forEach((entry) => {
-          if (entry.isIntersecting) {
-            entry.target.classList.add("visible");
-            fadeObserver.unobserve(entry.target);
-          }
-        });
-      },
-      { threshold: 0.12, rootMargin: "0px 0px -40px 0px" }
-    );
-    fadeEls.forEach((el) => fadeObserver.observe(el));
-    return () => fadeObserver.disconnect();
-  }, [guides, destinations, reviews]);
+      const fadeObserver = new IntersectionObserver(
+        (entries) => {
+          entries.forEach((entry) => {
+            if (entry.isIntersecting) {
+              entry.target.classList.add("visible");
+              fadeObserver.unobserve(entry.target);
+            }
+          });
+        },
+        { threshold: 0.05, rootMargin: "0px 0px 0px 0px" }
+      );
+      fadeEls.forEach((el) => fadeObserver.observe(el));
+      return () => fadeObserver.disconnect();
+    }, 50);
+    return () => clearTimeout(timer);
+  }, [guides, destinations, reviews, guideSearch, guideFilterLang, guideFilterRating]);
 
 
   // Auth state listener
