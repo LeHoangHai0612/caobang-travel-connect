@@ -1057,6 +1057,40 @@ export default function CaoBangEcoTour() {
               <h2 className="section-title" id="team-heading">Đội Ngũ Hướng Dẫn Viên Biểu Tượng</h2>
               <p className="section-subtitle">Những hướng dẫn viên giàu kinh nghiệm, tận tâm và am hiểu sâu về vùng đất Cao Bằng</p>
             </div>
+            {/* ── HDV Nổi Bật ── */}
+            {guides.some(g => g.is_featured) && (
+              <div style={{ marginBottom: 48 }}>
+                <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 20 }}>
+                  <span style={{ fontSize: "1.1rem" }}>⭐</span>
+                  <h3 style={{ fontFamily: "var(--font-lora), Georgia, serif", fontStyle: "italic", fontWeight: 700, fontSize: "1.2rem", color: "#1a2e2e", margin: 0 }}>Hướng Dẫn Viên Nổi Bật</h3>
+                  <div style={{ flex: 1, height: 1, background: "linear-gradient(to right, #E5A919, transparent)", marginLeft: 8 }} />
+                </div>
+                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(280px, 1fr))", gap: 16 }}>
+                  {guides.filter(g => g.is_featured).map(g => (
+                    <a key={g.id} href={`/hdv/${g.id}`} style={{ textDecoration: "none", display: "flex", gap: 16, background: "white", borderRadius: 16, padding: 16, border: "2px solid #E5A919", boxShadow: "0 4px 20px rgba(229,169,25,.15)", transition: "transform .2s, box-shadow .2s" }}
+                      onMouseEnter={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.transform = "translateY(-3px)"; el.style.boxShadow = "0 8px 32px rgba(229,169,25,.25)"; }}
+                      onMouseLeave={e => { const el = e.currentTarget as HTMLAnchorElement; el.style.transform = ""; el.style.boxShadow = "0 4px 20px rgba(229,169,25,.15)"; }}>
+                      <img src={g.image_url} alt={g.name} style={{ width: 80, height: 80, borderRadius: 12, objectFit: "cover", objectPosition: "top", flexShrink: 0 }} />
+                      <div style={{ flex: 1, minWidth: 0 }}>
+                        <div style={{ display: "flex", alignItems: "center", gap: 6, marginBottom: 4 }}>
+                          <span style={{ background: "#E5A919", color: "white", fontSize: ".62rem", fontWeight: 800, padding: "2px 8px", borderRadius: 20, textTransform: "uppercase", letterSpacing: ".06em" }}>⭐ Nổi Bật</span>
+                        </div>
+                        <p style={{ fontWeight: 800, color: "#1a2e2e", fontSize: ".95rem", margin: "0 0 2px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.name}</p>
+                        <p style={{ fontSize: ".75rem", color: "#265C59", fontWeight: 600, margin: "0 0 6px", whiteSpace: "nowrap", overflow: "hidden", textOverflow: "ellipsis" }}>{g.specialty}</p>
+                        <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between" }}>
+                          <span style={{ color: "#E5A919", fontWeight: 700, fontSize: ".82rem" }}>{g.rating}★</span>
+                          <span style={{ fontSize: ".72rem", color: "#265C59", fontWeight: 700, display: "flex", alignItems: "center", gap: 4 }}>
+                            Xem hồ sơ <i className="fa-solid fa-arrow-right" style={{ fontSize: ".65rem" }} />
+                          </span>
+                        </div>
+                      </div>
+                    </a>
+                  ))}
+                </div>
+                <div style={{ height: 1, background: "linear-gradient(to right, transparent, #e2e8f0, transparent)", margin: "32px 0 0" }} />
+              </div>
+            )}
+
             {/* Search & filter — nền trắng nên dùng màu tối */}
             <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 28, justifyContent: "center" }}>
               <div style={{ position: "relative", flex: "1 1 220px", maxWidth: 320 }}>
