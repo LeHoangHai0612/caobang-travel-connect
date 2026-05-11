@@ -690,6 +690,68 @@ footer { padding: 0; }
 }
 
 /* =====================================================
+   MOBILE FIXES — inline-styled components
+   ===================================================== */
+
+/* Prevent horizontal overflow globally */
+html, body { overflow-x: hidden; }
+
+/* iOS: prevent input zoom (font-size must be >= 16px) */
+@media (max-width: 768px) {
+  input, select, textarea { font-size: 16px !important; }
+}
+
+/* About marquee — nhỏ lại trên phone */
+@media (max-width: 640px) {
+  .about-marquee-text { font-size: clamp(1.6rem, 6vw, 2.2rem); -webkit-text-stroke: 1.5px rgba(45,90,39,.42); }
+  .about-marquee-track { padding: 10px 0; }
+}
+
+/* Gallery scrapbook — ẩn scatter, hiện horizontal scroll */
+@media (max-width: 640px) {
+  .gallery-scrapbook-scatter { display: none !important; }
+  .gallery-scrapbook-mobile  { display: flex !important; }
+}
+@media (min-width: 641px) {
+  .gallery-scrapbook-mobile { display: none !important; }
+}
+
+/* Booking form — dat-lich */
+@media (max-width: 640px) {
+  .booking-layout { grid-template-columns: 1fr !important; }
+  .booking-pkg-grid { grid-template-columns: 1fr !important; }
+  .booking-info-grid { grid-template-columns: 1fr !important; }
+}
+
+/* Thu vien masonry — 2 cột trên phone nhỏ */
+@media (max-width: 400px) {
+  .tv-masonry { columns: 1 !important; }
+}
+
+/* HDV search filters — wrap tốt hơn trên mobile */
+@media (max-width: 480px) {
+  .guide-search-bar { flex-direction: column !important; }
+  .guide-search-bar > * { width: 100% !important; max-width: 100% !important; flex: 1 1 100% !important; }
+}
+
+/* Cam-nang section padding */
+@media (max-width: 480px) {
+  .cam-nang { padding: 56px 0 !important; }
+  .cam-nang-grid { gap: 12px; }
+  .cam-nang-card { padding: 16px; }
+}
+
+/* Destinations map */
+@media (max-width: 480px) {
+  .dest-map-wrapper { height: 180px; }
+}
+
+/* Footer V2 */
+@media (max-width: 360px) {
+  .ftv2-grid { grid-template-columns: 1fr !important; }
+}
+
+/* =====================================================
    ZALO BUTTON – guide cards
    ===================================================== */
 .team-zalo-btn {

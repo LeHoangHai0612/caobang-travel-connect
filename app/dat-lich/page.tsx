@@ -495,12 +495,18 @@ export default function DatLichPage() {
 
       <style>{`
         @media (max-width: 768px) {
-          div[style*="grid-template-columns: 1fr 380px"] {
-            grid-template-columns: 1fr !important;
-          }
-          div[style*="grid-template-columns: 1fr 1fr"] {
-            grid-template-columns: 1fr !important;
-          }
+          div[style*="grid-template-columns: 1fr 380px"] { grid-template-columns: 1fr !important; }
+          div[style*="grid-template-columns: 1fr 1fr"]   { grid-template-columns: 1fr !important; }
+          div[style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr 1fr !important; }
+        }
+        @media (max-width: 480px) {
+          div[style*="grid-template-columns: 1fr 380px"] { grid-template-columns: 1fr !important; }
+          div[style*="grid-template-columns: 1fr 1fr"]   { grid-template-columns: 1fr !important; }
+          div[style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
+          /* Package buttons: stack vertically */
+          div[style*="grid-template-columns: 1fr 1fr"][style*="gap: 8"] { grid-template-columns: 1fr !important; }
+          /* Input font size – prevent iOS zoom */
+          input, select, textarea { font-size: 16px !important; }
         }
       `}</style>
     </div>

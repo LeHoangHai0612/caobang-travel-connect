@@ -1062,7 +1062,7 @@ export default function CaoBangEcoTour() {
               <p className="section-subtitle">Những hướng dẫn viên giàu kinh nghiệm, tận tâm và am hiểu sâu về vùng đất Cao Bằng</p>
             </div>
             {/* Search & filter — nền trắng nên dùng màu tối */}
-            <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 28, justifyContent: "center" }}>
+            <div className="guide-search-bar" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 28, justifyContent: "center" }}>
               <div style={{ position: "relative", flex: "1 1 220px", maxWidth: 320 }}>
                 <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", fontSize: 13 }} />
                 <input
@@ -1317,8 +1317,8 @@ export default function CaoBangEcoTour() {
             </div>
           </div>
 
-          {/* Full-width scatter area */}
-          <div style={{ position: "relative", width: "100%", height: 480, overflow: "hidden" }}>
+          {/* Full-width scatter area — desktop only */}
+          <div className="gallery-scrapbook-scatter" style={{ position: "relative", width: "100%", height: 480, overflow: "hidden" }}>
 
             {/* Photo 0 — far left, clipped */}
             {galleryImages[0] && (
@@ -1424,8 +1424,23 @@ export default function CaoBangEcoTour() {
             <div style={{ position:"absolute", bottom:0, left:"50%", transform:"translateX(-50%)", fontSize:"1.6rem", pointerEvents:"none", userSelect:"none", opacity:.7 }}>🌸🌺🌸</div>
           </div>
 
+          {/* Mobile: horizontal scroll polaroid */}
+          <div className="gallery-scrapbook-mobile" style={{ overflowX: "auto", overflowY: "visible", padding: "16px 20px 24px", gap: 14, WebkitOverflowScrolling: "touch" as any, scrollbarWidth: "none" as any }}>
+            {galleryImages.slice(0, 6).map((img, i) => {
+              const rots = [-4, 3, -2, 4, -3, 2];
+              return (
+                <a key={img.id} href="/thu-vien" style={{ display: "block", flexShrink: 0, width: 160, background: "white", padding: "8px 8px 28px", boxShadow: "0 4px 16px rgba(0,0,0,.12)", transform: `rotate(${rots[i]}deg)`, textDecoration: "none" }}>
+                  <div style={{ width: "100%", aspectRatio: "1", overflow: "hidden", background: "#e8e4de" }}>
+                    <img src={img.image_url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
+                  </div>
+                  <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: ".85rem", color: "#7a6a50", textAlign: "center", marginTop: 6, fontWeight: 600 }}>#caobangtravel</p>
+                </a>
+              );
+            })}
+          </div>
+
           {/* CTA */}
-          <div style={{ textAlign: "center", marginTop: 36 }}>
+          <div style={{ textAlign: "center", marginTop: 20 }}>
             <a href="/thu-vien" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 32px", borderRadius: 50, background: "#3a6b3a", color: "white", fontWeight: 700, fontSize: ".86rem", textDecoration: "none", letterSpacing: ".04em", boxShadow: "0 4px 16px rgba(58,107,58,.3)" }}>
               <i className="fa-solid fa-images" /> Xem Tất Cả Hình Ảnh <i className="fa-solid fa-arrow-right" />
             </a>
