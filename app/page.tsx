@@ -86,6 +86,11 @@ export default function CaoBangEcoTour() {
   const [currentPage, setCurrentPage] = useState(0);
   const [cardsPerPage, setCardsPerPage] = useState(3);
 
+  useEffect(() => {
+    document.body.classList.toggle("menu-open", isMobileMenuOpen);
+    return () => { document.body.classList.remove("menu-open"); };
+  }, [isMobileMenuOpen]);
+
   // Data state – khởi tạo bằng fallback, cập nhật từ Supabase
   const [guides, setGuides] = useState<Guide[]>(FALLBACK_GUIDES);
   const [destinations, setDestinations] = useState<Destination[]>(FALLBACK_DESTINATIONS);
@@ -1237,14 +1242,14 @@ export default function CaoBangEcoTour() {
         </section>
 
         {/* ==================== TOURS ==================== */}
-        <section id="tours" style={{ padding: "72px 0", background: `linear-gradient(rgba(248,249,248,.91),rgba(248,249,248,.91)),url('${toursBg}') center/cover no-repeat` }}>
+        <section id="tours" className="section-tours" style={{ background: `linear-gradient(rgba(248,249,248,.91),rgba(248,249,248,.91)),url('${toursBg}') center/cover no-repeat` }}>
           <div className="container">
             <div className="section-header">
               <span className="section-tag">Khám Phá Ngay</span>
               <h2 className="section-title">Các Gói Tour Nổi Bật</h2>
               <p className="section-subtitle">Lựa chọn hành trình phù hợp — từ tour 1 ngày đến khám phá dài ngày trọn vẹn</p>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 20, marginBottom: 28 }}>
+            <div className="tours-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 20, marginBottom: 28 }}>
               {tours.map((t) => (
                 <a key={t.id} href={`/tour/${t.id}`} style={{ textDecoration: "none", display: "block" }}>
                   <div style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 14px rgba(0,0,0,.07)", transition: "transform .2s,box-shadow .2s", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}

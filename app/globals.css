@@ -97,10 +97,19 @@ nav { display: flex; align-items: center; justify-content: space-between; height
 .hamburger.open span:nth-child(2) { opacity: 0; }
 .hamburger.open span:nth-child(3) { transform: translateY(-7px) rotate(-45deg); }
 
-.mobile-nav { display: none; flex-direction: column; background: white; padding: 16px 24px 24px; border-top: 1px solid rgba(38,92,89,.08); gap: 4px; }
-.mobile-nav.open { display: flex; }
-.mobile-nav a { font-size: .9rem; font-weight: 600; color: var(--text-mid); padding: 10px 0; border-bottom: 1px solid rgba(38,92,89,.06); letter-spacing: .04em; }
-.mobile-nav .btn-cta { margin-top: 12px; justify-content: center; }
+.mobile-nav { display: none; flex-direction: column; gap: 4px; }
+.mobile-nav.open {
+  display: flex;
+  position: fixed; top: 68px; left: 0; right: 0; bottom: 0;
+  z-index: 9999;
+  background: white;
+  overflow-y: auto;
+  padding: 16px 24px 40px;
+  border-top: 1px solid rgba(38,92,89,.08);
+}
+.mobile-nav a { font-size: .9rem; font-weight: 600; color: var(--text-mid); padding: 12px 0; border-bottom: 1px solid rgba(38,92,89,.06); letter-spacing: .04em; }
+.mobile-nav .btn-cta { margin-top: 16px; justify-content: center; }
+body.menu-open { overflow: hidden; }
 
 /* HERO SECTION */
 .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: stretch; overflow: hidden; background: var(--teal-dark); }
@@ -295,6 +304,7 @@ footer#footer {
 
 /* GALLERY */
 .gallery { padding: 88px 0; background: var(--white); }
+.section-tours { padding: 72px 0; }
 .gallery-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 16px; }
 .gallery-item { border-radius: var(--radius-sm); overflow: hidden; position: relative; aspect-ratio: 1; cursor: pointer; }
 .gallery-img { width: 100%; height: 100%; object-fit: cover; transition: transform .6s cubic-bezier(.4,0,.2,1); }
@@ -555,10 +565,19 @@ footer { padding: 0; }
   .ftv2-grid     { grid-template-columns: 1fr 1fr; gap: 28px; padding: 40px 0 32px; }
 
   /* Sections */
-  .why-us, .destinations, .team, .pricing, .gallery, .testimonials { padding: 56px 0; }
-  .section-header { margin-bottom: 32px; }
+  .why-us, .destinations, .team, .pricing, .gallery, .testimonials, .section-tours { padding: 44px 0; }
+  .section-header { margin-bottom: 24px; }
   .section-title  { font-size: 1.3rem; }
   .section-subtitle { font-size: .9rem; }
+
+  /* Limit items per section — show View All button instead */
+  .team-grid .team-card:nth-child(n+5)       { display: none; }
+  .dest-grid .dest-card:nth-child(n+4)        { display: none; }
+  .tours-grid > a:nth-child(n+4)              { display: none; }
+  .cam-nang-grid .cam-nang-card:nth-child(n+4){ display: none; }
+
+  /* Hide HDV search bar on mobile (showing top 4 only) */
+  .guide-search-bar { display: none !important; }
 
   /* Components */
   .team-card-img-wrap { height: 165px; }
@@ -580,7 +599,7 @@ footer { padding: 0; }
   .section-tag      { font-size: .68rem; padding: 4px 12px; }
 
   /* Sections padding */
-  .why-us, .destinations, .team, .pricing, .gallery, .testimonials { padding: 44px 0; }
+  .why-us, .destinations, .team, .pricing, .gallery, .testimonials, .section-tours { padding: 32px 0; }
 
   /* Grids → single column */
   .features-grid { grid-template-columns: 1fr; }
@@ -736,7 +755,7 @@ html, body { overflow-x: hidden; }
 
 /* Cam-nang section padding */
 @media (max-width: 480px) {
-  .cam-nang { padding: 56px 0 !important; }
+  .cam-nang { padding: 32px 0 !important; }
   .cam-nang-grid { gap: 12px; }
   .cam-nang-card { padding: 16px; }
 }
