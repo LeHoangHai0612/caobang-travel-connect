@@ -189,7 +189,7 @@ export default function DatLichPage() {
         </div>
 
         {success ? (
-          <div className="max-w-md mx-auto bg-white/95 backdrop-blur-md rounded-2xl p-8 md:p-10 text-center shadow-2xl">
+          <div className="max-w-md mx-auto bg-white backdrop-blur-md rounded-2xl p-8 md:p-10 text-center shadow-2xl">
             <div className="w-20 h-20 rounded-full bg-teal-50 border-4 border-teal-800 flex items-center justify-center mx-auto mb-6">
               <i className="fa-solid fa-circle-check text-teal-800 text-4xl" />
             </div>
@@ -219,7 +219,7 @@ export default function DatLichPage() {
         ) : (
           <div className="flex flex-col lg:grid lg:grid-cols-[1fr_380px] gap-6 items-start">
             {/* Left: form */}
-            <div className="bg-white/95 backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl w-full">
+            <div className="bg-white backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl w-full">
               <div className="bg-gradient-to-br from-teal-900 to-teal-800 p-5 md:p-6">
                 <h2 className="text-white font-extrabold text-base md:text-lg uppercase tracking-wider mb-1">Thông Tin Đặt Lịch</h2>
                 <p className="text-white/70 text-sm">
@@ -342,7 +342,7 @@ export default function DatLichPage() {
             <div className="flex flex-col gap-5 w-full">
               {/* Selected guide card */}
               {selectedGuide ? (
-                <div className="bg-white/95 backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl">
+                <div className="bg-white backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl">
                   <div className="relative aspect-video sm:aspect-[4/3] overflow-hidden">
                     <img src={selectedGuide.image_url} alt={selectedGuide.name} className="w-full h-full object-cover" />
                     <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
@@ -387,7 +387,7 @@ export default function DatLichPage() {
               )}
 
               {/* Booking summary */}
-              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 shadow-2xl">
+              <div className="bg-white backdrop-blur-md rounded-2xl p-5 shadow-2xl">
                 <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Tóm tắt đặt lịch</p>
                 <div className="flex flex-col gap-3">
                   {[
@@ -408,7 +408,7 @@ export default function DatLichPage() {
 
               {/* Deposit calculation */}
               {hasPricing && (
-                <div className="bg-white/95 backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl">
+                <div className="bg-white backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl">
                   <div className="bg-gradient-to-br from-teal-900 to-teal-800 p-4 flex items-center gap-2.5">
                     <i className="fa-solid fa-calculator text-white/80" />
                     <p className="text-white font-extrabold text-sm tracking-wide m-0">Bảng Tính Tiền Cọc</p>

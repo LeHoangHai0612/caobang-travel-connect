@@ -202,13 +202,13 @@ export default function GuideProfilePage() {
       {/* Hero */}
       <div className="relative min-h-[380px] flex items-end overflow-hidden">
         <div className="absolute inset-0">
-          <Image src={guide.image_url} alt="Background" fill className="object-cover object-top blur-xl brightness-[0.55] saturate-75 scale-110" />
+          <img src={guide.image_url} alt="Background" className="absolute inset-0 w-full h-full object-cover object-top blur-xl brightness-[0.55] saturate-75 scale-110" />
         </div>
         <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
         
         <div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-8 md:pb-10 pt-20 flex flex-col sm:flex-row items-center sm:items-end gap-6 text-center sm:text-left">
-          <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl md:rounded-3xl border-4 border-white/20 shadow-2xl overflow-hidden shrink-0 relative bg-slate-200">
-            <Image src={guide.image_url} alt={guide.name} fill className="object-cover object-top" sizes="160px" />
+          <div className="w-32 h-32 md:w-48 md:h-48 rounded-2xl md:rounded-3xl border-4 border-white/20 shadow-2xl overflow-hidden shrink-0 relative bg-slate-200">
+            <img src={guide.image_url} alt={guide.name} className="absolute inset-0 w-full h-full object-cover object-top" />
           </div>
           <div className="flex-1 min-w-0 flex flex-col items-center sm:items-start">
             <p className="text-[11px] md:text-xs font-black text-white/70 uppercase tracking-[0.15em] mb-1.5">{guide.role}</p>

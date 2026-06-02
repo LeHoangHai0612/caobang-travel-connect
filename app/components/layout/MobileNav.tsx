@@ -49,7 +49,7 @@ export default function MobileNav({
       </nav>
 
       {/* Bottom Tab Bar cho Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur shadow-[0_-4px_20px_rgba(38,92,89,0.08)] border-t border-teal-dark/10 flex justify-around items-center pb-[env(safe-area-inset-bottom)] h-[64px] md:hidden">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur shadow-[0_-4px_20px_rgba(38,92,89,0.08)] border-t border-teal-dark/10 flex justify-around items-center pb-[env(safe-area-inset-bottom)] h-[64px] md:!hidden lg:!hidden">
         <a href="/" className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark">
           <i className="fa-solid fa-house text-lg mb-1" />
           <span className="text-[10px] font-bold">Trang Chủ</span>

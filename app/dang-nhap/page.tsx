@@ -146,7 +146,7 @@ export default function DangNhapPage() {
       </div>
 
       {/* ── Right form panel (Full width on Mobile) ── */}
-      <div className="w-full lg:w-[480px] bg-white flex flex-col justify-center px-6 py-10 sm:px-12 md:px-16 lg:px-12 shadow-2xl relative z-10 pt-safe pb-safe overflow-y-auto min-h-screen lg:min-h-[auto]">
+      <div className="w-full lg:w-[520px] xl:w-[600px] bg-white flex flex-col justify-center px-6 py-10 sm:px-12 md:px-16 lg:px-20 shadow-2xl relative z-10 pt-safe pb-safe overflow-y-auto min-h-screen lg:min-h-[auto]">
         <div className="mb-8">
           <h1 className="text-2xl sm:text-[28px] font-black text-slate-900 mb-2 leading-tight">
             {tab === "login" ? "Chào mừng trở lại" : tab === "register" ? "Tạo tài khoản" : "Quên mật khẩu"}

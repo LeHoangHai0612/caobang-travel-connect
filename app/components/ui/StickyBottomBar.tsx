@@ -22,7 +22,7 @@ export default function StickyBottomBar({
   const hasPrice = typeof priceFrom === 'number';
   
   return (
-    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 p-4 pb-safe shadow-[0_-8px_30px_rgba(0,0,0,0.12)] md:hidden">
+    <div className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur-md border-t border-slate-200 p-4 pb-safe shadow-[0_-8px_30px_rgba(0,0,0,0.12)] md:!hidden lg:!hidden">
       <div className="flex items-center justify-between gap-4 max-w-md mx-auto">
         <div className="flex flex-col">
           <p className="text-[11px] font-bold text-slate-500 uppercase tracking-wider mb-0.5">{leftTitle}</p>

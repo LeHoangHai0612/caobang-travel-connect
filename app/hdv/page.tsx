@@ -100,7 +100,7 @@ export default function AllGuidesPage() {
             )}
           </div>
           
-          <div className="flex overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 gap-2 custom-scrollbar snap-x">
+          <div className="flex overflow-x-auto md:flex-wrap pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 gap-2 md:gap-3 custom-scrollbar snap-x">
             {/* Rating Filter */}
             <div className="flex gap-2 snap-start shrink-0 pr-2 border-r border-slate-200">
               <button onClick={() => setFilterRating("")}
@@ -169,7 +169,7 @@ export default function AllGuidesPage() {
                 <div className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 h-full flex flex-col ${g.is_featured ? "shadow-[0_4px_24px_rgba(229,169,25,0.25)] border-2 border-amber-500 group-hover:-translate-y-1 group-hover:shadow-[0_8px_28px_rgba(229,169,25,0.35)]" : "shadow-sm border border-slate-100 group-hover:shadow-xl group-hover:-translate-y-1"}`}>
                   {/* Image */}
                   <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden shrink-0">
-                    <Image src={g.image_url} alt={g.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <img src={g.image_url} alt={g.name} className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                     <div className="absolute top-2 right-2 bg-black/60 text-amber-500 rounded-lg px-2.5 py-1 text-xs font-black backdrop-blur-md">
                       {g.rating}★
                     </div>
