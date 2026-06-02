@@ -27,7 +27,7 @@ export default function Header({
   unreadReplies,
 }: HeaderProps) {
   return (
-    <header id="site-header" className={isScrolled ? "scrolled" : ""}>
+    <header id="site-header" className={isScrolled ? "scrolled scrolled-capsule" : ""}>
       <div className="container">
         <nav role="navigation" aria-label="Điều hướng chính">
           <a href="#hero" className="nav-logo" onClick={(e) => scrollToSection(e, "hero")}>
