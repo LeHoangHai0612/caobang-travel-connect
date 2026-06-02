@@ -52,7 +52,7 @@ export default function CamNangSection({ camNangBg, camNangFromDB, camNangTips }
           })}
         </div>
         <div style={{ textAlign: "center", marginTop: 36 }}>
-          <a href="/cam-nang" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84沉", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
+          <a href="/cam-nang" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
             <i className="fa-solid fa-book-open" /> Xem Tất Cả Cẩm Nang <i className="fa-solid fa-arrow-right" />
           </a>
         </div>

@@ -14,6 +14,17 @@ export interface Guide {
   created_at: string;
 }
 
+export interface Tour {
+  id: string;
+  title: string;
+  description: string;
+  image_url: string;
+  price_from: number;
+  duration: string;
+  group_size: string;
+  zalo_number?: string;
+}
+
 export interface Destination {
   id: string;
   title: string;

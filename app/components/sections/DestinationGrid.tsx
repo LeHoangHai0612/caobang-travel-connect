@@ -47,10 +47,7 @@ export default function DestinationGrid({ destBg, destinations, setSelectedDest 
               </div>
               <h3>{dest.title}</h3>
               <p className="dest-desc">{dest.description}</p>
-              <div className="dest-meta">
-                <span><i className="fa-solid fa-location-dot" aria-hidden="true" /> {dest.location}</span>
-                <span><i className="fa-solid fa-star" aria-hidden="true" /> {dest.rating}</span>
-              </div>
+
             </article>
           ))}
         </div>
