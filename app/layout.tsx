@@ -1,4 +1,4 @@
-import type { Metadata } from "next";
+import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Caveat, Lora } from "next/font/google";
 import "./globals.css";
 
@@ -24,6 +24,13 @@ const lora = Lora({
   variable: "--font-lora",
   display: "swap",
 });
+
+export const viewport: Viewport = {
+  width: "device-width",
+  initialScale: 1,
+  viewportFit: "cover",
+  themeColor: "#265C59",
+};
 
 export const metadata: Metadata = {
   title: "Cao Bằng Travel Connect | Hướng Dẫn Viên Địa Phương Chuyên Nghiệp",

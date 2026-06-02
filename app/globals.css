@@ -770,6 +770,198 @@ html, body { overflow-x: hidden; }
   .ftv2-grid { grid-template-columns: 1fr !important; }
 }
 
+/* ── Safe area (notch / home indicator) ───────────────── */
+@supports (padding: env(safe-area-inset-bottom)) {
+  .mobile-nav.open {
+    padding-bottom: calc(40px + env(safe-area-inset-bottom));
+  }
+  .mobile-book-bar {
+    padding-bottom: calc(12px + env(safe-area-inset-bottom));
+  }
+  .music-player-root {
+    bottom: calc(22px + env(safe-area-inset-bottom)) !important;
+    right: calc(22px + env(safe-area-inset-right, 0px)) !important;
+  }
+}
+
+/* Touch: faster taps, no double-tap zoom delay on controls */
+@media (hover: none) and (pointer: coarse) {
+  .btn-cta, .btn-hero-primary, .btn-hero-outline, .btn-price,
+  .hamburger, .nav-user-btn, .carousel-btn, .team-zalo-btn,
+  .mobile-book-bar button, .mobile-book-bar a {
+    touch-action: manipulation;
+  }
+  a, button { -webkit-tap-highlight-color: rgba(38, 92, 89, 0.12); }
+}
+
+/* Performance: lighter hero on phones */
+@media (max-width: 768px) {
+  .hero { min-height: 100svh; }
+  .hero-bg { animation: none !important; transform: none !important; }
+  .hero-mist { animation: none; opacity: 0.55; }
+  header nav { gap: 6px; }
+  header .nav-user-btn { display: none; }
+  .hamburger { width: 44px; height: 44px; min-width: 44px; min-height: 44px; }
+  .mobile-nav a { min-height: 44px; display: flex; align-items: center; }
+}
+.mobile-nav-account { display: none; margin-top: 8px; }
+.mobile-nav.open .mobile-nav-account { display: inline-flex !important; }
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  .hero-bg, .hero-mist, .about-marquee-track, .fade-up { animation: none !important; }
+  .fade-up { opacity: 1; transform: none; }
+}
+
+/* ── Sub-page layout (tour, HDV, điểm đến…) ─────────────── */
+.page-header {
+  background: white;
+  border-bottom: 1px solid #e2e8f0;
+  padding: 0 max(16px, env(safe-area-inset-left, 0px));
+  padding-right: max(16px, env(safe-area-inset-right, 0px));
+  height: 58px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  box-shadow: 0 1px 8px rgba(0, 0, 0, 0.06);
+}
+.page-header-brand {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  text-decoration: none;
+  min-width: 0;
+}
+.page-header-brand span {
+  font-weight: 800;
+  font-size: clamp(0.75rem, 3.5vw, 0.88rem);
+  color: #1a2e2e;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.page-header--teal {
+  background: #265c59;
+  border-bottom: none;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.15);
+}
+
+.page-header-back {
+  color: #265c59;
+  font-size: 0.82rem;
+  font-weight: 600;
+  text-decoration: none;
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  flex-shrink: 0;
+  min-height: 44px;
+  padding: 0 4px;
+}
+.page-grid-main {
+  max-width: 900px;
+  margin: 0 auto;
+  padding: 28px 16px 60px;
+  display: grid;
+  grid-template-columns: 1fr minmax(260px, 340px);
+  gap: 24px;
+  align-items: start;
+}
+@media (max-width: 700px) {
+  .page-grid-main {
+    grid-template-columns: 1fr;
+    padding-bottom: calc(88px + env(safe-area-inset-bottom, 0px));
+  }
+  .page-sidebar-sticky { position: static !important; }
+  .page-sidebar-card--desktop-only { display: none; }
+  .mobile-book-bar { display: flex; }
+}
+.page-sidebar-sticky { position: sticky; top: 78px; }
+.mobile-book-bar {
+  display: none;
+  position: fixed;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 200;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 12px 16px;
+  background: rgba(255, 255, 255, 0.97);
+  backdrop-filter: blur(12px);
+  border-top: 1px solid #e2e8f0;
+  box-shadow: 0 -4px 24px rgba(0, 0, 0, 0.08);
+}
+.mobile-book-bar-price strong {
+  display: block;
+  font-size: 1.1rem;
+  font-weight: 900;
+  color: #265c59;
+  line-height: 1.1;
+}
+.mobile-book-bar-price span {
+  font-size: 0.68rem;
+  color: #94a3b8;
+}
+.mobile-book-bar-actions {
+  display: flex;
+  gap: 8px;
+  flex-shrink: 0;
+}
+.mobile-book-bar-actions button,
+.mobile-book-bar-actions a {
+  min-height: 44px;
+  padding: 0 18px;
+  border-radius: 12px;
+  font-weight: 800;
+  font-size: 0.85rem;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 6px;
+  text-decoration: none;
+  white-space: nowrap;
+}
+.mobile-book-bar-actions .btn-book-primary {
+  border: none;
+  background: linear-gradient(135deg, #265c59, #3a9490);
+  color: white;
+  cursor: pointer;
+}
+.mobile-book-bar-actions .btn-book-zalo {
+  border: 2px solid #265c59;
+  color: #265c59;
+  background: white;
+  padding: 0 14px;
+}
+
+/* Tour list */
+.tour-list-hero { height: 300px; }
+.tour-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(min(100%, 320px), 1fr));
+  gap: 22px;
+}
+@media (max-width: 640px) {
+  .tour-list-hero { height: 240px; }
+  .tour-list-hero h1 { font-size: 1.5rem !important; margin-bottom: 14px !important; }
+  .tour-list-body { padding: 24px 16px !important; }
+}
+@media (max-width: 400px) {
+  .tour-cards-grid { grid-template-columns: 1fr; }
+}
+
+/* HDV listing — filters full width on phone */
+@media (max-width: 768px) {
+  .hdv-filters { flex-direction: column !important; align-items: stretch !important; }
+  .hdv-filters > * { width: 100% !important; max-width: 100% !important; }
+  .hdv-cards-grid { grid-template-columns: 1fr !important; }
+}
+
 /* =====================================================
    ZALO BUTTON – guide cards
    ===================================================== */

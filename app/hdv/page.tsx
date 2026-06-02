@@ -55,12 +55,12 @@ export default function AllGuidesPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9f8" }}>
       {/* Header */}
-      <header style={{ background: "#265C59", padding: "0 24px", height: 60, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 2px 12px rgba(0,0,0,.15)" }}>
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <img src="/logo.png" alt="Logo" style={{ width: 32, height: 32, objectFit: "contain", filter: "brightness(0) invert(1)" }} />
-          <span style={{ color: "white", fontWeight: 800, fontSize: ".9rem" }}>Cao Bằng Travel Connect</span>
+      <header className="page-header page-header--teal">
+        <a href="/" className="page-header-brand">
+          <img src="/logo.png" alt="Logo" width={32} height={32} style={{ objectFit: "contain", filter: "brightness(0) invert(1)", flexShrink: 0 }} />
+          <span style={{ color: "white" }}>Cao Bằng Travel Connect</span>
         </a>
-        <a href="/" style={{ color: "rgba(255,255,255,.8)", fontSize: ".82rem", fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
+        <a href="/" className="page-header-back" style={{ color: "rgba(255,255,255,.85)" }}>
           <i className="fa-solid fa-arrow-left" /> Trang chủ
         </a>
       </header>
@@ -88,7 +88,7 @@ export default function AllGuidesPage() {
 
       <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 16px 60px" }}>
         {/* Filters */}
-        <div style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24, alignItems: "center" }}>
+        <div className="hdv-filters" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24, alignItems: "center" }}>
           <select value={filterRating} onChange={(e) => setFilterRating(e.target.value)}
             style={{ padding: "8px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", fontSize: ".83rem", outline: "none", cursor: "pointer", background: "white" }}>
             <option value="">⭐ Tất cả đánh giá</option>
@@ -130,7 +130,7 @@ export default function AllGuidesPage() {
             <p style={{ fontSize: ".85rem", marginTop: 6 }}>Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 20 }}>
+          <div className="hdv-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 20 }}>
             {filtered.map((g) => (
               <a key={g.id} href={`/hdv/${g.id}`} style={{ textDecoration: "none", display: "block" }}>
                 <div style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: g.is_featured ? "0 4px 24px rgba(229,169,25,.25)" : "0 2px 12px rgba(0,0,0,.06)", border: g.is_featured ? "2px solid #E5A919" : "none", transition: "transform .2s,box-shadow .2s", cursor: "pointer" }}

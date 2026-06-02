@@ -878,6 +878,14 @@ export default function CaoBangEcoTour() {
           <a href="#pricing" className="btn-cta" onClick={(e) => scrollToSection(e, "pricing")}>
             <i className="fa-solid fa-calendar-check" /> ĐẶT HDV NGAY
           </a>
+          <a
+            href={userSession ? "/tai-khoan" : "/dang-nhap"}
+            className="mobile-nav-account btn-cta"
+            onClick={() => setIsMobileMenuOpen(false)}
+          >
+            <i className={`fa-solid ${userSession ? "fa-user" : "fa-right-to-bracket"}`} />
+            {userSession ? "Tài Khoản" : "Đăng Nhập"}
+          </a>
         </nav>
       </header>
 

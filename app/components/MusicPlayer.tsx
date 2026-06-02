@@ -173,7 +173,7 @@ function PlayerShell({ playing, expanded, setExpanded, volume, setVolume, toggle
 
       {children}
 
-      <div style={{ position: "fixed", bottom: 22, right: 22, zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
+      <div className="music-player-root" style={{ position: "fixed", bottom: 22, right: 22, zIndex: 9999, display: "flex", flexDirection: "column", alignItems: "flex-end", gap: 10 }}>
         {expanded && (
           <div className="mpanel" style={{ background: "rgba(10,28,26,.92)", backdropFilter: "blur(20px)", borderRadius: 18, padding: "16px 18px", width: 240, border: "1px solid rgba(255,255,255,.1)", boxShadow: "0 12px 40px rgba(0,0,0,.5)" }}>
             <p style={{ fontSize: ".68rem", fontWeight: 700, color: "rgba(255,255,255,.45)", letterSpacing: ".1em", textTransform: "uppercase", marginBottom: 14 }}>🎵 Nhạc nền</p>

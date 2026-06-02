@@ -87,12 +87,12 @@ export default function TourDetailPage() {
   return (
     <div style={{ minHeight: "100vh", background: "#f8f9f8" }}>
       {/* Header */}
-      <header style={{ background: "white", borderBottom: "1px solid #e2e8f0", padding: "0 24px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", position: "sticky", top: 0, zIndex: 100, boxShadow: "0 1px 8px rgba(0,0,0,.06)" }}>
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <img src="/logo.png" alt="Logo" width={28} height={28} style={{ objectFit: "contain", mixBlendMode: "multiply" }} />
-          <span style={{ fontWeight: 800, fontSize: ".88rem", color: "#1a2e2e" }}>Cao Bằng Travel Connect</span>
+      <header className="page-header">
+        <a href="/" className="page-header-brand">
+          <img src="/logo.png" alt="Logo" width={28} height={28} style={{ objectFit: "contain", mixBlendMode: "multiply", flexShrink: 0 }} />
+          <span>Cao Bằng Travel Connect</span>
         </a>
-        <a href="/" style={{ color: "#265C59", fontSize: ".82rem", fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
+        <a href="/" className="page-header-back">
           <i className="fa-solid fa-arrow-left" /> Trang chủ
         </a>
       </header>
@@ -125,7 +125,7 @@ export default function TourDetailPage() {
       </div>
 
       {/* Content */}
-      <div style={{ maxWidth: 900, margin: "0 auto", padding: "28px 16px 60px", display: "grid", gridTemplateColumns: "1fr minmax(280px,340px)", gap: 24, alignItems: "start" }}>
+      <div className="page-grid-main">
 
         {/* Left: tour info */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -241,8 +241,8 @@ export default function TourDetailPage() {
         </div>
 
         {/* Right: booking card */}
-        <div style={{ position: "sticky", top: 78 }}>
-          <div style={{ background: "white", borderRadius: 16, padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,.1)", border: "1.5px solid #e2e8f0" }}>
+        <div className="page-sidebar-sticky">
+          <div className="page-sidebar-card--desktop-only" style={{ background: "white", borderRadius: 16, padding: "24px", boxShadow: "0 4px 20px rgba(0,0,0,.1)", border: "1.5px solid #e2e8f0" }}>
             <div style={{ marginBottom: 20 }}>
               <p style={{ fontSize: ".72rem", color: "#94a3b8", fontWeight: 700, textTransform: "uppercase", letterSpacing: ".08em", margin: "0 0 4px" }}>Giá từ</p>
               <p style={{ fontWeight: 900, fontSize: "1.7rem", color: "#265C59", margin: 0, lineHeight: 1 }}>
@@ -292,13 +292,22 @@ export default function TourDetailPage() {
         </div>
       </div>
 
-      <style>{`
-        @media (max-width: 700px) {
-          div[style*="grid-template-columns: 1fr minmax"] {
-            grid-template-columns: 1fr !important;
-          }
-        }
-      `}</style>
+      <div className="mobile-book-bar" role="region" aria-label="Đặt tour nhanh">
+        <div className="mobile-book-bar-price">
+          <strong>{tour.price_from > 0 ? tour.price_from.toLocaleString("vi-VN") + "đ" : "Liên hệ"}</strong>
+          {tour.price_from > 0 && <span>/ người</span>}
+        </div>
+        <div className="mobile-book-bar-actions">
+          {tour.zalo_number && (
+            <a href={`https://zalo.me/${tour.zalo_number}`} target="_blank" rel="noopener noreferrer" className="btn-book-zalo" aria-label="Chat Zalo">
+              <i className="fa-brands fa-comment-dots" />
+            </a>
+          )}
+          <button type="button" className="btn-book-primary" onClick={handleBook}>
+            <i className="fa-solid fa-calendar-check" /> Đặt tour
+          </button>
+        </div>
+      </div>
     </div>
   );
 }
