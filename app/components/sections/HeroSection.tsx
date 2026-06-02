@@ -1,88 +1,88 @@
-"use client";
-
 import React from "react";
+import { Input } from "@/app/components/ui/input";
+import { Button } from "@/app/components/ui/button";
+import { Search } from "lucide-react";
 
 interface HeroSectionProps {
-  heroVideo: string;
-  heroBg: string;
-  heroMistRef: React.RefObject<HTMLDivElement | null>;
-  weather: any;
-  scrollToSection: (e: React.MouseEvent<HTMLAnchorElement>, targetId: string) => void;
+  backgroundImageUrl?: string;
+  title?: string;
+  subtitle?: string;
+  onSearch?: (query: string) => void;
 }
 
-export default function HeroSection({ heroVideo, heroBg, heroMistRef, weather, scrollToSection }: HeroSectionProps) {
-  const weatherIcon = (code: number) => {
-    if (code <= 3) return { icon: "fa-sun", color: "#FDE047", label: "Nắng Đẹp" };
-    if (code <= 49) return { icon: "fa-cloud-sun", color: "#E2E8F0", label: "Nhiều Mây" };
-    if (code <= 69) return { icon: "fa-cloud-rain", color: "#93C5FD", label: "Mưa Nhẹ" };
-    if (code <= 79) return { icon: "fa-snowflake", color: "#BAE6FD", label: "Lạnh Giá" };
-    if (code <= 99) return { icon: "fa-cloud-bolt", color: "#94A3B8", label: "Giông Bão" };
-    return { icon: "fa-cloud", color: "#CBD5E1", label: "Nhiều Mây" };
+export default function HeroSection({
+  backgroundImageUrl = "https://images.unsplash.com/photo-1596422846543-75c6fc197f07?q=80&w=2000",
+  title = "Khám Phá Bản Sắc Cao Bằng",
+  subtitle = "Trải nghiệm vùng đất non nước hùng vĩ cùng người bản địa",
+  onSearch
+}: HeroSectionProps) {
+  const [searchQuery, setSearchQuery] = React.useState("");
+
+  const handleSearch = (e: React.FormEvent) => {
+    e.preventDefault();
+    if (onSearch && searchQuery.trim()) {
+      onSearch(searchQuery);
+    }
   };
 
   return (
-    <section className="hero" id="hero" aria-label="Ảnh bìa - Khám phá Cao Bằng">
-      {heroVideo ? (
-        <video
-          className="hero-bg"
-          autoPlay muted loop playsInline
-          poster={heroBg || undefined}
-          aria-hidden="true"
-        >
-          <source src={heroVideo} type="video/mp4" />
-        </video>
-      ) : (
-        <div
-          className="hero-bg"
-          role="img"
-          aria-label="Thác Bản Giốc Cao Bằng"
-          style={heroBg ? { backgroundImage: `url('${heroBg}')` } : undefined}
+    <section className="relative min-h-[100svh] flex flex-col items-center justify-center overflow-hidden" id="hero">
+      {/* Background Image */}
+      <div className="absolute inset-0 z-0">
+        <img 
+          src={backgroundImageUrl} 
+          alt="Cao Bằng Hero" 
+          className="w-full h-full object-cover"
         />
-      )}
-      <div className="hero-overlay" aria-hidden="true" />
-      <div ref={heroMistRef} className="hero-mist" aria-hidden="true" />
-      
-      <div className="hero-body">
-        <div className="hero-content">
-          <div className="hero-badge">
-            <i className="fa-solid fa-leaf" /> Hướng Dẫn Viên Địa Phương · Cao Bằng, Việt Nam
-          </div>
-          <h1>Khám Phá<br />Cao Bằng</h1>
-          <p className="hero-tagline">Cùng Hướng Dẫn Viên Địa Phương</p>
-          <p className="hero-sub">Chuyên Nghiệp · Am Hiểu · Tận Tâm · Hành trình trọn vẹn</p>
-          <div className="hero-actions">
-            <a href="#team" className="btn-hero-primary" onClick={(e) => scrollToSection(e, "team")}>
-              <i className="fa-solid fa-compass" aria-hidden="true" /> XEM CÁC HDV &amp; TOUR
-            </a>
-            <a href="#destinations" className="btn-hero-outline" onClick={(e) => scrollToSection(e, "destinations")}>
-              <i className="fa-solid fa-map-location-dot" aria-hidden="true" /> KHÁM PHÁ ĐIỂM ĐẾN
-            </a>
-          </div>
-        </div>
+        {/* Overlay */}
+        <div className="absolute inset-0 bg-black/40 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
       </div>
 
-      <div className="hero-bottom">
-        <div className="hero-stats" aria-label="Thống kê dịch vụ">
-          <div className="hero-stat"><strong>50+</strong><span>Hướng Dẫn Viên</span></div>
-          <div className="hero-stat"><strong>2000+</strong><span>Du Khách Hài Lòng</span></div>
-          <div className="hero-stat"><strong>30+</strong><span>Điểm Tham Quan</span></div>
-          <div className="hero-stat"><strong>5★</strong><span>Đánh Giá TB</span></div>
-        </div>
+      {/* Content */}
+      <div className="relative z-10 container flex flex-col items-center text-center px-4 mt-20">
+        <span className="inline-block py-1.5 px-4 rounded-full bg-white/20 backdrop-blur-md text-white text-xs font-bold tracking-widest uppercase mb-6 border border-white/30">
+          Cao Bằng Travel Connect
+        </span>
+        
+        <h1 className="font-geist text-4xl md:text-6xl lg:text-7xl font-black text-white leading-tight mb-6 drop-shadow-lg">
+          {title}
+        </h1>
+        
+        <p className="text-lg md:text-xl text-white/90 max-w-2xl font-medium mb-10 drop-shadow-md">
+          {subtitle}
+        </p>
+
+        {/* Search Bar */}
+        <form 
+          onSubmit={handleSearch}
+          className="w-full max-w-2xl bg-white/10 backdrop-blur-md p-2 rounded-full flex flex-col md:flex-row gap-2 border border-white/20 shadow-2xl"
+        >
+          <div className="relative flex-1">
+            <Search className="absolute left-4 top-1/2 -translate-y-1/2 text-white/70 w-5 h-5" />
+            <Input 
+              type="text" 
+              placeholder="Bạn muốn đi đâu? (VD: Thác Bản Giốc, Pác Bó...)"
+              className="w-full h-12 pl-12 pr-4 rounded-full bg-white/20 border-none text-white placeholder:text-white/60 focus-visible:ring-0 focus-visible:ring-offset-0 text-base"
+              value={searchQuery}
+              onChange={(e) => setSearchQuery(e.target.value)}
+            />
+          </div>
+          <Button 
+            type="submit" 
+            className="h-12 rounded-full bg-warm-yellow hover:bg-yellow-500 text-nature-green font-bold px-8 text-base transition-colors"
+          >
+            Tìm Kiếm
+          </Button>
+        </form>
       </div>
 
-      {weather && (() => {
-        const w = weatherIcon(weather.code);
-        return (
-          <div style={{ position: "absolute", top: 80, right: 20, background: "rgba(0,0,0,.5)", backdropFilter: "blur(10px)", borderRadius: 14, padding: "10px 16px", display: "flex", alignItems: "center", gap: 10, color: "white", border: "1px solid rgba(255,255,255,.18)", zIndex: 10 }}>
-            <i className={`fa-solid ${w.icon}`} style={{ fontSize: 20, color: w.color }} />
-            <div>
-              <p style={{ margin: 0, fontWeight: 800, fontSize: "1rem", lineHeight: 1 }}>{weather.temp}°C</p>
-              <p style={{ margin: "2px 0 0", fontSize: ".65rem", opacity: .75 }}>{w.label} · {weather.wind} km/h</p>
-              <p style={{ margin: "1px 0 0", fontSize: ".6rem", opacity: .5 }}>Cao Bằng, Việt Nam</p>
-            </div>
-          </div>
-        );
-      })()}
+      {/* Scroll Indicator */}
+      <div className="absolute bottom-8 left-1/2 -translate-x-1/2 z-10 animate-bounce">
+        <a href="#destinations" className="flex flex-col items-center text-white/70 hover:text-white transition-colors">
+          <span className="text-xs font-semibold tracking-widest uppercase mb-2">Khám Phá</span>
+          <i className="fa-solid fa-chevron-down" />
+        </a>
+      </div>
     </section>
   );
 }

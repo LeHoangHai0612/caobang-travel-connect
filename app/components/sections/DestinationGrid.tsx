@@ -34,8 +34,14 @@ export default function DestinationGrid({ destBg, destinations, setSelectedDest 
           {destinations.map((dest) => (
             <article key={dest.id} className="dest-card fade-up" onClick={() => setSelectedDest(dest)}
               style={{ cursor: "pointer" }}>
-              <div className="dest-card-img-wrap" style={{ position: "relative" }}>
-                <img className="dest-card-img" src={dest.image_url} alt={dest.title} loading="lazy" />
+              <div className="dest-card-img-wrap" style={{ position: "relative", background: "#1a2e2e" }}>
+                {dest.image_url ? (
+                  <img className="dest-card-img" src={dest.image_url} alt={dest.title} loading="lazy" />
+                ) : (
+                  <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <i className="fa-solid fa-map" style={{ fontSize: 40, color: "rgba(255,255,255,.3)" }} />
+                  </div>
+                )}
                 <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0)", transition: "background .2s", display: "flex", alignItems: "center", justifyContent: "center" }}
                   onMouseEnter={(e) => (e.currentTarget as HTMLDivElement).style.background = "rgba(0,0,0,.3)"}
                   onMouseLeave={(e) => (e.currentTarget as HTMLDivElement).style.background = "rgba(0,0,0,0)"}>

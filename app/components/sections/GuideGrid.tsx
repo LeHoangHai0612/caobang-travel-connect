@@ -84,8 +84,14 @@ export default function GuideGrid({ teamBg, guides }: GuideGridProps) {
             </div>
           ) : filteredGuides.map((member) => (
             <article key={member.id} className="team-card fade-up">
-              <a href={`/hdv/${member.id}`} className="team-card-img-wrap" aria-label={`Xem hồ sơ ${member.name}`} style={{ display: "block", textDecoration: "none", cursor: "pointer" }}>
-                <img className="team-card-img" src={member.image_url} alt={`HDV ${member.name}`} loading="lazy" />
+              <a href={`/hdv/${member.id}`} className="team-card-img-wrap" aria-label={`Xem hồ sơ ${member.name}`} style={{ display: "block", textDecoration: "none", cursor: "pointer", background: "#e2e8f0" }}>
+                {member.image_url ? (
+                  <img className="team-card-img" src={member.image_url} alt={`HDV ${member.name}`} loading="lazy" />
+                ) : (
+                  <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}>
+                    <i className="fa-solid fa-user-tie" style={{ fontSize: 40, color: "#94a3b8" }} />
+                  </div>
+                )}
                 <span className="team-card-badge">{member.rating}★</span>
                 <span style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0)", transition: "background .25s", borderRadius: "inherit", display: "flex", alignItems: "center", justifyContent: "center" }} className="team-card-hover-overlay">
                   <span style={{ background: "rgba(38,92,89,.85)", color: "white", padding: "7px 16px", borderRadius: 20, fontSize: ".75rem", fontWeight: 700, opacity: 0, transition: "opacity .25s" }} className="team-card-view-label">

@@ -2,6 +2,9 @@
 @import "tailwindcss";
 
 @theme {
+  --color-nature-green: #265C59;
+  --color-warm-yellow: #FBBF24;
+  --color-beige-bg: #F9F9EC;
   --color-teal-dark: #265C59;
   --color-teal-mid: #2e7370;
   --color-teal-light: #3a9490;
@@ -13,7 +16,7 @@
   --color-text-light: #6b8888;
   
   --font-be: var(--font-be), sans-serif;
-  --font-lora: var(--font-lora), serif;
+  --font-geist: var(--font-geist), sans-serif;
   --font-caveat: var(--font-caveat), cursive;
 }
 

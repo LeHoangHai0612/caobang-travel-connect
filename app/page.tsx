@@ -25,7 +25,10 @@ import AboutSection from "./components/sections/AboutSection";
 import WhyUsSection from "./components/sections/WhyUsSection";
 import GuideGrid from "./components/sections/GuideGrid";
 import DestinationGrid from "./components/sections/DestinationGrid";
-import TourGrid from "./components/sections/TourGrid";
+import TourCategory from "./components/sections/TourCategory";
+import TourCard from "./components/ui-custom/TourCard";
+import FAQAccordion from "./components/sections/FAQAccordion";
+import ContactForm from "./components/sections/ContactForm";
 import GalleryScrapbook from "./components/sections/GalleryScrapbook";
 import Testimonials from "./components/sections/Testimonials";
 import PricingBooking from "./components/sections/PricingBooking";
@@ -841,11 +844,8 @@ export default function CaoBangEcoTour() {
 
       <main>
         <HeroSection
-          heroVideo={heroVideo}
-          heroBg={heroBg}
-          weather={weather}
-          scrollToSection={scrollToSection}
-          heroMistRef={heroMistRef}
+          backgroundImageUrl={heroBg}
+          onSearch={(q) => console.log("Search:", q)}
         />
 
         <AboutSection
@@ -866,10 +866,23 @@ export default function CaoBangEcoTour() {
           setSelectedDest={setSelectedDest}
         />
 
-        <TourGrid
-          toursBg={toursBg}
-          tours={tours}
-        />
+        <TourCategory id="tours" title="Các Gói Tour Nổi Bật" subtitle="Lựa chọn hành trình phù hợp — từ tour 1 ngày đến khám phá dài ngày trọn vẹn" bgClass="bg-slate-50">
+          {tours.map((t) => (
+            <TourCard
+              key={t.id}
+              id={t.id}
+              title={t.title}
+              imageUrl={t.image_url}
+              locationTag={t.group_size || "Tour Cao Bằng"}
+              duration={t.duration}
+              price={`${t.price_from.toLocaleString("vi-VN")}đ`}
+              onBookNow={() => {
+                setBookingPackage(t.title);
+                setIsBookingOpen(true);
+              }}
+            />
+          ))}
+        </TourCategory>
 
         <GalleryScrapbook galleryImages={galleryImages} />
 
@@ -891,19 +904,30 @@ export default function CaoBangEcoTour() {
           openReview={openReview}
         />
 
+        <FAQAccordion
+          faqs={[
+            { id: "faq-1", question: "Thời điểm lý tưởng nhất để du lịch Cao Bằng?", answer: "Từ tháng 8 đến tháng 10 là thời điểm Thác Bản Giốc nhiều nước và trong xanh nhất. Tháng 11-12 có hoa dã quỳ và tam giác mạch." },
+            { id: "faq-2", question: "Đường đi từ Hà Nội lên Cao Bằng có khó không?", answer: "Đường quốc lộ đã được nâng cấp rất đẹp, đi xe khách giường nằm mất khoảng 6-7 tiếng. Nếu tự lái xe, bạn cần chú ý đèo dốc." },
+            { id: "faq-3", question: "Tôi nên thuê xe máy hay ô tô?", answer: "Nếu thích trải nghiệm, bạn nên thuê xe máy để tận hưởng cảnh quan. Nếu đi gia đình, ô tô kèm tài xế bản địa là lựa chọn an toàn." },
+            { id: "faq-4", question: "Cao Bằng có đặc sản gì?", answer: "Phở chua, vịt quay 7 vị, hạt dẻ Trùng Khánh, lạp xưởng hun khói, bánh cuốn nước xương." }
+          ]}
+        />
+
+        <ContactForm />
+
         {/* ==================== SOS / KHẨN CẤP ==================== */}
-        <section id="sos" style={{ padding: "40px 0", background: `linear-gradient(rgba(20,40,40,.92),rgba(20,40,40,.92)),url('${sosBg}') center/cover no-repeat` }}>
-          <div className="container">
-            <div style={{ display: "flex", alignItems: "center", gap: 16, marginBottom: 24, flexWrap: "wrap" }}>
-              <div style={{ width: 44, height: 44, borderRadius: 12, background: "#dc2626", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                <i className="fa-solid fa-triangle-exclamation" style={{ color: "white", fontSize: 18 }} />
+        <section id="sos" className="py-10 bg-slate-900 bg-cover bg-center" style={{ backgroundImage: `linear-gradient(rgba(15,23,42,.92),rgba(15,23,42,.92)),url('${sosBg}')` }}>
+          <div className="container px-4">
+            <div className="flex items-center gap-4 mb-6">
+              <div className="w-11 h-11 rounded-xl bg-red-600 flex items-center justify-center shrink-0">
+                <i className="fa-solid fa-triangle-exclamation text-white text-lg" />
               </div>
               <div>
-                <h2 style={{ color: "white", fontWeight: 800, fontSize: "1rem", margin: 0 }}>Hotline Khẩn Cấp tại Cao Bằng</h2>
-                <p style={{ color: "rgba(255,255,255,.55)", fontSize: ".78rem", margin: "3px 0 0" }}>Lưu lại các số điện thoại này trước khi lên đường</p>
+                <h2 className="text-white font-black text-base m-0 font-geist">Hotline Khẩn Cấp tại Cao Bằng</h2>
+                <p className="text-white/60 text-xs mt-1">Lưu lại các số điện thoại này trước khi lên đường</p>
               </div>
             </div>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(220px, 1fr))", gap: 12 }}>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-3">
               {[
                 { icon: "fa-shield-halved",    label: "Công An Cao Bằng",   num: "069.259.3068",  color: "#3B82F6" },
                 { icon: "fa-truck-medical",    label: "Cấp Cứu 115",         num: "115",           color: "#EF4444" },
@@ -913,13 +937,13 @@ export default function CaoBangEcoTour() {
                 { icon: "fa-headset",          label: "Hỗ Trợ Tour 24/7",    num: "1800.CAOBANG",  color: "#265C59" },
               ].map((c) => (
                 <a key={c.label} href={`tel:${c.num.replace(/\./g, "")}`}
-                  style={{ display: "flex", alignItems: "center", gap: 12, background: "rgba(255,255,255,.06)", border: "1px solid rgba(255,255,255,.1)", borderRadius: 12, padding: "14px 16px", textDecoration: "none" }}>
-                  <div style={{ width: 38, height: 38, borderRadius: 10, background: c.color + "22", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
+                  className="flex items-center gap-3 bg-white/5 border border-white/10 rounded-xl p-3.5 hover:bg-white/10 transition-colors">
+                  <div className="w-10 h-10 rounded-lg flex items-center justify-center shrink-0" style={{ background: c.color + "22" }}>
                     <i className={`fa-solid ${c.icon}`} style={{ color: c.color, fontSize: 15 }} />
                   </div>
                   <div>
-                    <p style={{ color: "rgba(255,255,255,.65)", fontSize: ".68rem", margin: 0 }}>{c.label}</p>
-                    <p style={{ color: "white", fontWeight: 800, fontSize: ".88rem", margin: "2px 0 0", fontFamily: "monospace" }}>{c.num}</p>
+                    <p className="text-white/60 text-[11px] uppercase tracking-wider mb-0.5 font-bold">{c.label}</p>
+                    <p className="text-white font-black text-sm font-mono">{c.num}</p>
                   </div>
                 </a>
               ))}
