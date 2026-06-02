@@ -567,14 +567,31 @@ footer { padding: 0; }
   .hamburger { display: flex; }
   .hero-stats { display: none; }
 
-  /* Grids */
-  .features-grid { grid-template-columns: repeat(2, 1fr); }
-  .dest-grid     { grid-template-columns: repeat(2, 1fr); }
-  .team-grid     { grid-template-columns: repeat(2, 1fr); }
+  /* Grids -> Horizontal Swipe for Premium Mobile App Feel */
+  .features-grid, .dest-grid, .team-grid, .cam-nang-grid, .tours-grid {
+    display: flex;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    scroll-snap-type: x mandatory;
+    gap: 16px;
+    padding-bottom: 32px;
+    margin: 0 -24px;
+    padding-left: 24px;
+    padding-right: 24px;
+    scrollbar-width: none; /* Firefox */
+    -ms-overflow-style: none;  /* IE and Edge */
+  }
+  .features-grid::-webkit-scrollbar, .dest-grid::-webkit-scrollbar, .team-grid::-webkit-scrollbar, .cam-nang-grid::-webkit-scrollbar, .tours-grid::-webkit-scrollbar {
+    display: none;
+  }
+  .feature-card, .dest-card, .team-card, .cam-nang-card, .tours-card {
+    flex: 0 0 82%;
+    scroll-snap-align: center;
+  }
+
   .pricing-grid  { grid-template-columns: 1fr; }
   .carousel-track { grid-template-columns: 1fr; }
   .gallery-grid  { grid-template-columns: repeat(2, 1fr); }
-  .cam-nang-grid { grid-template-columns: 1fr; }
   .footer-grid   { grid-template-columns: 1fr; gap: 28px; padding-bottom: 36px; }
   .ftv2-grid     { grid-template-columns: 1fr 1fr; gap: 28px; padding: 40px 0 32px; }
 
@@ -585,10 +602,11 @@ footer { padding: 0; }
   .section-subtitle { font-size: .9rem; }
 
   /* Limit items per section — show View All button instead */
-  .team-grid .team-card:nth-child(n+5)       { display: none; }
-  .dest-grid .dest-card:nth-child(n+4)        { display: none; }
-  .tours-grid > a:nth-child(n+4)              { display: none; }
-  .cam-nang-grid .cam-nang-card:nth-child(n+4){ display: none; }
+  /* No limits for horizontal scroll - let users swipe! */
+  /* .team-grid .team-card:nth-child(n+5)       { display: none; } */
+  /* .dest-grid .dest-card:nth-child(n+4)        { display: none; } */
+  /* .tours-grid > a:nth-child(n+4)              { display: none; } */
+  /* .cam-nang-grid .cam-nang-card:nth-child(n+4){ display: none; } */
 
   /* Hide HDV search bar on mobile (showing top 4 only) */
   .guide-search-bar { display: none !important; }
@@ -606,32 +624,35 @@ footer { padding: 0; }
 
 /* ── Phones ≤ 480px ──────────────────────────────────── */
 @media (max-width: 480px) {
-  /* Typography */
+  /* Typography Premium Mobile */
   .section-header   { margin-bottom: 24px; }
-  .section-title    { font-size: 1.18rem; letter-spacing: .02em; }
-  .section-subtitle { font-size: .85rem; }
-  .section-tag      { font-size: .68rem; padding: 4px 12px; }
+  .section-title    { font-size: 1.65rem; letter-spacing: .02em; line-height: 1.25; }
+  .section-subtitle { font-size: .92rem; }
+  .section-tag      { font-size: .7rem; padding: 6px 14px; }
 
   /* Sections padding */
   .why-us, .destinations, .team, .pricing, .gallery, .testimonials, .section-tours { padding: 32px 0; }
 
-  /* Grids → single column */
-  .features-grid { grid-template-columns: 1fr; }
-  .dest-grid     { grid-template-columns: 1fr; }
-  .team-grid     { grid-template-columns: 1fr; }
+  /* Grids → Keep Horizontal Swipe */
   .gallery-grid  { grid-template-columns: repeat(2, 1fr); }
-
-  /* Hero */
-  .hero { min-height: 85vh; }
-  .hero-badge  { font-size: .72rem; padding: 5px 14px; margin-bottom: 14px; }
-  .hero-tagline { font-size: .9rem; }
-  .hero-sub     { font-size: .82rem; margin-bottom: 22px; }
-  .hero-actions { flex-direction: column; align-items: center; gap: 10px; }
-  .btn-hero-primary, .btn-hero-outline {
-    font-size: .82rem; padding: 13px 24px;
-    width: 100%; max-width: 300px; justify-content: center;
-    min-height: 48px;
+  .feature-card, .dest-card, .team-card, .cam-nang-card, .tours-card {
+    flex: 0 0 88vw;
   }
+
+  /* Hero App-like */
+  .hero { min-height: 88vh; }
+  .hero h1 { font-size: 2.5rem; line-height: 1.15; margin-bottom: 16px; }
+  .hero-badge  { font-size: .75rem; padding: 6px 16px; margin-bottom: 16px; backdrop-filter: blur(12px); background: rgba(255,255,255,.15); }
+  .hero-tagline { font-size: 1rem; margin-bottom: 10px; }
+  .hero-sub     { font-size: .85rem; margin-bottom: 28px; }
+  .hero-actions { flex-direction: column; align-items: stretch; gap: 12px; width: 100%; max-width: 320px; margin: 0 auto; }
+  .btn-hero-primary, .btn-hero-outline {
+    font-size: .88rem; padding: 15px 24px;
+    width: 100%; justify-content: center;
+    border-radius: 50px;
+    min-height: 52px;
+  }
+  .btn-hero-outline { background: rgba(255,255,255,.1); backdrop-filter: blur(8px); }
 
   /* Feature cards */
   .feature-card { padding: 22px 16px; }

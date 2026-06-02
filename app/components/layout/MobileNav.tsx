@@ -48,8 +48,9 @@ export default function MobileNav({
         </a>
       </nav>
 
-      {/* Bottom Tab Bar cho Mobile */}
-      <nav className="fixed bottom-0 left-0 right-0 z-50 bg-white/95 backdrop-blur shadow-[0_-4px_20px_rgba(38,92,89,0.08)] border-t border-teal-dark/10 flex justify-around items-center pb-[env(safe-area-inset-bottom)] h-[64px] md:!hidden lg:!hidden">
+      {/* Floating Dock cho Mobile */}
+      <nav className="fixed left-4 right-4 z-50 bg-white/85 backdrop-blur-xl shadow-[0_12px_40px_rgba(38,92,89,0.25)] border border-white/50 rounded-full flex justify-around items-center h-[64px] md:!hidden lg:!hidden"
+           style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}>
         <a href="/" className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark">
           <i className="fa-solid fa-house text-lg mb-1" />
           <span className="text-[10px] font-bold">Trang Chủ</span>
