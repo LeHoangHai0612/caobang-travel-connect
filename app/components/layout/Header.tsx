@@ -29,7 +29,7 @@ export default function Header({
   return (
     <header id="site-header" className={isScrolled ? "scrolled" : ""}>
       <div className="container">
-        <nav role="navigation" aria="Điều hướng chính">
+        <nav role="navigation" aria-label="Điều hướng chính">
           <a href="#hero" className="nav-logo" onClick={(e) => scrollToSection(e, "hero")}>
             <img src="/logo.png" alt="Cao Bằng Travel Connect" style={{ height: 38, width: 38, objectFit: "contain", filter: isScrolled ? "none" : "brightness(0) invert(1)", mixBlendMode: isScrolled ? "multiply" : "normal", transition: "filter .35s" }} />
             <div className="nav-logo-text">
