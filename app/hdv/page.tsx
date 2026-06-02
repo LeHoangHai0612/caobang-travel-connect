@@ -66,7 +66,7 @@ export default function AllGuidesPage() {
       </header>
 
       {/* Hero */}
-      <div style={{ background: "linear-gradient(135deg,#1a3c3a,#265C59,#3a9490)", padding: "48px 24px 40px", textAlign: "center" }}>
+      <div className="subpage-hero" style={{ background: "linear-gradient(135deg,#1a3c3a,#265C59,#3a9490)", padding: "48px 24px 40px", textAlign: "center" }}>
         <span style={{ background: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.85)", fontSize: ".72rem", fontWeight: 700, padding: "4px 14px", borderRadius: 20, letterSpacing: ".1em", textTransform: "uppercase" }}>
           Đội Ngũ Chuyên Nghiệp
         </span>
@@ -86,7 +86,7 @@ export default function AllGuidesPage() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 16px 60px" }}>
+      <div className="subpage-content" style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 16px 60px" }}>
         {/* Filters */}
         <div className="hdv-filters" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24, alignItems: "center" }}>
           <select value={filterRating} onChange={(e) => setFilterRating(e.target.value)}

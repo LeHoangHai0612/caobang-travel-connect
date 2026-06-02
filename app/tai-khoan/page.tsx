@@ -238,7 +238,7 @@ export default function TaiKhoanPage() {
         </div>
 
         {/* ── Points + Tiers ── */}
-        <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div className="tk-tiers-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
 
           {/* Points */}
           <div style={{ background: "white", borderRadius: 18, padding: "22px 24px", boxShadow: "0 2px 12px rgba(0,0,0,.05)" }}>

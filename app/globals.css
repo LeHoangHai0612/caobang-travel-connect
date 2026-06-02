@@ -1128,3 +1128,144 @@ html, body { overflow-x: hidden; }
   .admin-sidebar { width: 210px; }
   .admin-content { padding: 16px; }
 }
+
+/* =====================================================
+   ADDITIONAL RESPONSIVE FIXES
+   ===================================================== */
+
+/* Layered parallax sections — reduce margin/radius on mobile */
+@media (max-width: 768px) {
+  #why-us, #team, .destinations, #tours, #gallery, .cam-nang, .pricing, .testimonials, #sos, footer#footer {
+    margin-top: -24px;
+    border-radius: 28px 28px 0 0;
+  }
+  #why-us { padding-top: 52px; }
+  #team { padding-top: 56px; }
+  .destinations { padding-top: 60px !important; }
+  #tours { padding-top: 52px; }
+  #gallery { padding-top: 56px; }
+  .cam-nang { padding-top: 60px !important; }
+  .pricing { padding-top: 60px !important; }
+  .testimonials { padding-top: 60px !important; }
+}
+
+@media (max-width: 480px) {
+  #why-us, #team, .destinations, #tours, #gallery, .cam-nang, .pricing, .testimonials, #sos, footer#footer {
+    margin-top: -16px;
+    border-radius: 20px 20px 0 0;
+  }
+  #why-us { padding-top: 40px; }
+  #team { padding-top: 44px; }
+  .destinations { padding-top: 48px !important; }
+  #tours { padding-top: 40px; }
+  #gallery { padding-top: 44px; }
+  .cam-nang { padding-top: 48px !important; }
+  .pricing { padding-top: 48px !important; }
+  .testimonials { padding-top: 48px !important; }
+}
+
+/* Sub-pages shared responsive classes */
+.subpage-hero {
+  position: relative;
+  overflow: hidden;
+}
+
+.subpage-content {
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.subpage-grid {
+  display: grid;
+}
+
+@media (max-width: 768px) {
+  .subpage-content {
+    padding: 24px 16px !important;
+  }
+  .subpage-hero {
+    min-height: 220px !important;
+    height: auto !important;
+  }
+  .subpage-grid {
+    grid-template-columns: repeat(auto-fill, minmax(260px, 1fr)) !important;
+    gap: 16px !important;
+  }
+}
+
+@media (max-width: 480px) {
+  .subpage-content {
+    padding: 16px 12px !important;
+  }
+  .subpage-hero {
+    min-height: 180px !important;
+  }
+  .subpage-grid {
+    grid-template-columns: 1fr !important;
+    gap: 12px !important;
+  }
+}
+
+/* Music player panel — prevent overflow on very small screens */
+@media (max-width: 400px) {
+  .music-panel,
+  [class*="music-panel"] {
+    width: calc(100vw - 44px) !important;
+    max-width: 280px !important;
+    right: -8px !important;
+  }
+}
+
+/* SOS grid responsive */
+@media (max-width: 480px) {
+  #sos { padding-top: 48px; }
+}
+
+/* Weather widget — reposition on mobile */
+@media (max-width: 768px) {
+  .hero-weather {
+    position: static !important;
+    margin: 16px auto 0 !important;
+    transform: none !important;
+  }
+}
+
+/* Admin layout — better tablet support */
+@media (max-width: 768px) {
+  .admin-sidebar {
+    width: 100% !important;
+    height: auto !important;
+    position: relative !important;
+    flex-direction: row !important;
+  }
+  .admin-sidebar-nav {
+    flex-direction: row !important;
+    overflow-x: auto !important;
+    padding: 8px 12px !important;
+    gap: 4px !important;
+  }
+  .admin-nav-link {
+    white-space: nowrap !important;
+    padding: 8px 14px !important;
+    font-size: .78rem !important;
+  }
+  .admin-sidebar-footer { display: none !important; }
+  .admin-sidebar-section { display: none !important; }
+  .admin-layout { flex-direction: column !important; }
+  .admin-topbar { padding: 0 16px !important; }
+  .admin-content { padding: 16px !important; }
+}
+
+/* Admin dashboard chart grid */
+@media (max-width: 768px) {
+  .admin-chart-grid {
+    grid-template-columns: 1fr !important;
+  }
+}
+
+/* Account page tiers grid */
+@media (max-width: 768px) {
+  .tk-tiers-grid {
+    grid-template-columns: 1fr !important;
+  }
+}

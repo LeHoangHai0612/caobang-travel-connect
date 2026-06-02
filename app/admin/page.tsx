@@ -143,7 +143,7 @@ export default function AdminDashboard() {
           </div>
 
           {/* Chart + Recent bookings */}
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 24 }}>
+          <div className="admin-chart-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 24 }}>
 
             {/* Monthly chart */}
             <div className="admin-card">

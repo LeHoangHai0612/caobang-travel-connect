@@ -26,7 +26,7 @@ export default function DiemDenList() {
 
   return (
     <div style={{ minHeight: "100vh", background: "#f8faf8" }}>
-      <div style={{ position: "relative", height: 300, overflow: "hidden" }}>
+      <div className="subpage-hero" style={{ position: "relative", height: 300, overflow: "hidden" }}>
         <div style={{ position: "absolute", inset: 0, backgroundImage: `url('${bg}')`, backgroundSize: "cover", backgroundPosition: "center" }} />
         <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,.3), rgba(14,52,50,.78))" }} />
         <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "0 24px 40px" }}>
@@ -47,13 +47,13 @@ export default function DiemDenList() {
         </div>
       </div>
 
-      <div style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px" }}>
+      <div className="subpage-content" style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px" }}>
         {loading ? (
           <div style={{ textAlign: "center", padding: "60px 0" }}><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 28, color: "#265C59" }} /></div>
         ) : (
           <>
             <p style={{ fontSize: ".82rem", color: "#94a3b8", marginBottom: 24, fontWeight: 600 }}>{filtered.length} điểm đến</p>
-            <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
+            <div className="subpage-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
               {filtered.map(d => (
                 <article key={d.id} style={{ background: "white", borderRadius: 18, overflow: "hidden", border: "1px solid #e2e8f0", transition: "all .2s" }}
                   onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = "translateY(-4px)"; el.style.boxShadow = "0 12px 36px rgba(0,0,0,.1)"; }}
