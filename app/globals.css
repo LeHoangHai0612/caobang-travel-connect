@@ -1,7 +1,21 @@
 @import url('https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css');
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import "tailwindcss";
+
+@theme {
+  --color-teal-dark: #265C59;
+  --color-teal-mid: #2e7370;
+  --color-teal-light: #3a9490;
+  --color-beige: #F9F9EC;
+  --color-beige-dark: #F0F0DC;
+  --color-cyan-light: #D4E6E6;
+  --color-text-dark: #1a2e2e;
+  --color-text-mid: #3d5555;
+  --color-text-light: #6b8888;
+  
+  --font-be: var(--font-be), sans-serif;
+  --font-lora: var(--font-lora), serif;
+  --font-caveat: var(--font-caveat), cursive;
+}
 
 
 

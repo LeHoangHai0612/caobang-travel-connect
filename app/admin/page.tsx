@@ -100,85 +100,93 @@ export default function AdminDashboard() {
     confirmed: "Đã xác nhận",
     cancelled: "Đã hủy",
   };
+  
+  const statusColors: Record<string, string> = {
+    pending: "bg-amber-100 text-amber-700",
+    confirmed: "bg-emerald-100 text-emerald-700",
+    cancelled: "bg-red-100 text-red-700",
+  }
 
   const statCards = [
-    { icon: "fa-person-hiking",    label: "Hướng Dẫn Viên", value: stats.guides,   color: "#265C59", sub: null },
-    { icon: "fa-calendar-check",   label: "Đặt Tour",        value: stats.bookings, color: "#3a9490", sub: stats.pendingBookings > 0 ? `${stats.pendingBookings} chờ xử lý` : null },
-    { icon: "fa-envelope",         label: "Liên Hệ",         value: stats.contacts, color: "#E5A919", sub: stats.unreadContacts > 0 ? `${stats.unreadContacts} chưa đọc` : null },
-    { icon: "fa-star",             label: "Đánh Giá",        value: stats.reviews,  color: "#c48d10", sub: stats.pendingReviews > 0 ? `${stats.pendingReviews} chờ duyệt` : null },
+    { icon: "fa-person-hiking",    label: "Hướng Dẫn Viên", value: stats.guides,   color: "text-teal-800", bg: "bg-teal-50", sub: null },
+    { icon: "fa-calendar-check",   label: "Đặt Tour",        value: stats.bookings, color: "text-teal-700", bg: "bg-teal-50", sub: stats.pendingBookings > 0 ? `${stats.pendingBookings} chờ xử lý` : null, subColor: "text-amber-600" },
+    { icon: "fa-envelope",         label: "Liên Hệ",         value: stats.contacts, color: "text-amber-600", bg: "bg-amber-50", sub: stats.unreadContacts > 0 ? `${stats.unreadContacts} chưa đọc` : null, subColor: "text-amber-600" },
+    { icon: "fa-star",             label: "Đánh Giá",        value: stats.reviews,  color: "text-amber-600", bg: "bg-amber-50", sub: stats.pendingReviews > 0 ? `${stats.pendingReviews} chờ duyệt` : null, subColor: "text-amber-600" },
   ];
 
   const maxTotal = Math.max(...monthStats.map((m) => m.total), 1);
 
   return (
-    <div className="admin-content">
-      <div className="admin-header">
+    <div className="flex flex-col gap-6">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4">
         <div>
-          <h1 className="admin-header-title">Tổng Quan</h1>
-          <p className="admin-header-subtitle">Chào mừng trở lại, Admin</p>
+          <h1 className="text-xl sm:text-2xl font-black text-slate-900 mb-1">Tổng Quan</h1>
+          <p className="text-sm font-medium text-slate-500">Chào mừng trở lại, Admin</p>
         </div>
       </div>
 
       {loading ? (
-        <div style={{ textAlign: "center", padding: "60px 0", color: "#265C59" }}>
-          <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 28 }} />
-          <p style={{ marginTop: 12 }}>Đang tải dữ liệu...</p>
+        <div className="text-center py-16 text-teal-800">
+          <i className="fa-solid fa-spinner fa-spin text-3xl" />
+          <p className="mt-3 font-bold text-sm">Đang tải dữ liệu...</p>
         </div>
       ) : (
         <>
           {/* Stat cards */}
-          <div className="admin-stat-grid">
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-6">
             {statCards.map((card) => (
-              <div key={card.label} className="admin-card" style={{ display: "flex", alignItems: "center", gap: 18 }}>
-                <div style={{ width: 52, height: 52, borderRadius: 14, background: card.color + "18", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                  <i className={`fa-solid ${card.icon}`} style={{ fontSize: 20, color: card.color }} />
+              <div key={card.label} className="bg-white rounded-2xl p-5 shadow-sm border border-slate-100 flex items-center gap-4 hover:shadow-md transition-shadow">
+                <div className={`w-12 h-12 rounded-xl flex items-center justify-center shrink-0 ${card.bg}`}>
+                  <i className={`fa-solid ${card.icon} text-xl ${card.color}`} />
                 </div>
                 <div>
-                  <p style={{ fontSize: 13, color: "#6b8888", fontWeight: 600, marginBottom: 2 }}>{card.label}</p>
-                  <p style={{ fontSize: 30, fontWeight: 800, color: "#1a2e2e", lineHeight: 1, margin: 0 }}>{card.value}</p>
-                  {card.sub && <p style={{ fontSize: ".72rem", color: "#E5A919", fontWeight: 700, margin: "4px 0 0" }}>{card.sub}</p>}
+                  <p className="text-xs text-slate-500 font-bold uppercase tracking-wider mb-1">{card.label}</p>
+                  <p className="text-2xl sm:text-3xl font-black text-slate-900 leading-none">{card.value}</p>
+                  {card.sub && <p className={`text-[11px] font-bold mt-1.5 ${card.subColor}`}>{card.sub}</p>}
                 </div>
               </div>
             ))}
           </div>
 
           {/* Chart + Recent bookings */}
-          <div className="admin-chart-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 20, marginTop: 24 }}>
+          <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 sm:gap-6">
 
             {/* Monthly chart */}
-            <div className="admin-card">
-              <h2 style={{ fontSize: 15, fontWeight: 700, color: "#1a2e2e", marginBottom: 6 }}>
-                <i className="fa-solid fa-chart-column" style={{ marginRight: 8, color: "#265C59" }} />
+            <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
+              <h2 className="text-base font-bold text-slate-900 mb-2">
+                <i className="fa-solid fa-chart-column mr-2 text-teal-800" />
                 Đặt lịch 6 tháng gần đây
               </h2>
-              <p style={{ fontSize: ".75rem", color: "#94a3b8", marginBottom: 20 }}>
-                <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: "#265C59", marginRight: 5 }} />Tổng
-                <span style={{ display: "inline-block", width: 10, height: 10, borderRadius: 2, background: "#a7f3d0", marginRight: 5, marginLeft: 12 }} />Đã xác nhận
+              <p className="text-xs text-slate-500 mb-6 font-medium flex items-center gap-4">
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-teal-800" />Tổng</span>
+                <span className="flex items-center gap-1.5"><span className="w-2.5 h-2.5 rounded-sm bg-teal-200" />Đã xác nhận</span>
               </p>
-              <div style={{ display: "flex", alignItems: "flex-end", gap: 10, height: 140, padding: "0 4px" }}>
+              
+              <div className="flex items-end gap-2 sm:gap-4 h-[140px] px-1">
                 {monthStats.map((m) => (
-                  <div key={m.label} style={{ flex: 1, display: "flex", flexDirection: "column", alignItems: "center", gap: 6 }}>
-                    <span style={{ fontSize: ".72rem", fontWeight: 700, color: "#475569" }}>{m.total || ""}</span>
-                    <div style={{ width: "100%", position: "relative", display: "flex", flexDirection: "column", justifyContent: "flex-end", height: 100 }}>
+                  <div key={m.label} className="flex-1 flex flex-col items-center gap-1.5">
+                    <span className="text-[11px] font-bold text-slate-600">{m.total || ""}</span>
+                    <div className="w-full relative flex flex-col justify-end h-[100px] group">
                       {/* Total bar */}
-                      <div style={{ width: "100%", background: "#265C59", borderRadius: "4px 4px 0 0", height: `${(m.total / maxTotal) * 100}%`, minHeight: m.total ? 4 : 0, position: "absolute", bottom: 0, transition: "height .4s ease" }} />
+                      <div className="w-full bg-teal-800 rounded-t-sm absolute bottom-0 transition-all duration-500 hover:opacity-90" style={{ height: `${(m.total / maxTotal) * 100}%`, minHeight: m.total ? 4 : 0 }} />
                       {/* Confirmed bar */}
                       {m.confirmed > 0 && (
-                        <div style={{ width: "100%", background: "#a7f3d0", borderRadius: "4px 4px 0 0", height: `${(m.confirmed / maxTotal) * 100}%`, minHeight: 4, position: "absolute", bottom: 0, transition: "height .4s ease" }} />
+                        <div className="w-full bg-teal-200 rounded-t-sm absolute bottom-0 transition-all duration-500 hover:opacity-90" style={{ height: `${(m.confirmed / maxTotal) * 100}%`, minHeight: 4 }} />
                       )}
                     </div>
-                    <span style={{ fontSize: ".72rem", color: "#94a3b8", fontWeight: 600 }}>{m.label}</span>
+                    <span className="text-[10px] sm:text-[11px] text-slate-500 font-bold">{m.label}</span>
                   </div>
                 ))}
               </div>
-              <div style={{ marginTop: 16, padding: "12px 0 0", borderTop: "1px solid #f1f5f9", display: "flex", justifyContent: "space-between" }}>
+              
+              <div className="mt-5 pt-4 border-t border-slate-100 flex justify-between items-center">
                 <div>
-                  <p style={{ margin: 0, fontSize: ".7rem", color: "#94a3b8" }}>Tổng 6 tháng</p>
-                  <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#265C59" }}>{monthStats.reduce((s, m) => s + m.total, 0)}</p>
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Tổng 6 tháng</p>
+                  <p className="text-xl font-black text-teal-800 leading-none">{monthStats.reduce((s, m) => s + m.total, 0)}</p>
                 </div>
-                <div style={{ textAlign: "right" }}>
-                  <p style={{ margin: 0, fontSize: ".7rem", color: "#94a3b8" }}>Tỷ lệ xác nhận</p>
-                  <p style={{ margin: 0, fontSize: 18, fontWeight: 800, color: "#3a9490" }}>
+                <div className="text-right">
+                  <p className="text-[11px] font-bold text-slate-400 uppercase tracking-widest mb-0.5">Tỷ lệ xác nhận</p>
+                  <p className="text-xl font-black text-teal-700 leading-none">
                     {monthStats.reduce((s, m) => s + m.total, 0) > 0
                       ? Math.round(monthStats.reduce((s, m) => s + m.confirmed, 0) / monthStats.reduce((s, m) => s + m.total, 0) * 100)
                       : 0}%
@@ -188,25 +196,28 @@ export default function AdminDashboard() {
             </div>
 
             {/* Recent bookings */}
-            <div className="admin-card">
-              <h2 style={{ fontSize: 15, fontWeight: 700, color: "#1a2e2e", marginBottom: 16 }}>
-                <i className="fa-solid fa-clock-rotate-left" style={{ marginRight: 8, color: "#265C59" }} />
+            <div className="bg-white rounded-2xl p-5 sm:p-6 shadow-sm border border-slate-100">
+              <h2 className="text-base font-bold text-slate-900 mb-4 sm:mb-5">
+                <i className="fa-solid fa-clock-rotate-left mr-2 text-teal-800" />
                 Đặt lịch gần đây
               </h2>
               {recentBookings.length === 0 ? (
-                <p style={{ color: "#94a3b8", textAlign: "center", padding: "24px 0", fontSize: ".85rem" }}>Chưa có đặt lịch nào.</p>
+                <div className="text-center py-10">
+                  <i className="fa-solid fa-calendar-xmark text-3xl text-slate-300 mb-3 block" />
+                  <p className="text-sm font-medium text-slate-500">Chưa có đặt lịch nào.</p>
+                </div>
               ) : (
-                <div style={{ display: "flex", flexDirection: "column", gap: 10 }}>
-                  {recentBookings.map((b) => (
-                    <div key={b.id} style={{ display: "flex", alignItems: "center", gap: 12, padding: "10px 0", borderBottom: "1px solid #f1f5f9" }}>
-                      <div style={{ width: 36, height: 36, borderRadius: "50%", background: "#f0faf9", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <span style={{ fontWeight: 800, fontSize: ".78rem", color: "#265C59" }}>{b.client_name[0].toUpperCase()}</span>
+                <div className="flex flex-col">
+                  {recentBookings.map((b, i) => (
+                    <div key={b.id} className={`flex items-center gap-3 py-3 ${i !== recentBookings.length - 1 ? "border-b border-slate-100" : ""}`}>
+                      <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center shrink-0">
+                        <span className="font-black text-sm text-teal-800">{b.client_name[0].toUpperCase()}</span>
                       </div>
-                      <div style={{ flex: 1, minWidth: 0 }}>
-                        <p style={{ margin: 0, fontWeight: 700, fontSize: ".84rem", color: "#0f172a" }}>{b.client_name}</p>
-                        <p style={{ margin: 0, fontSize: ".72rem", color: "#94a3b8", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{b.package_type}</p>
+                      <div className="flex-1 min-w-0">
+                        <p className="font-bold text-sm text-slate-900 truncate">{b.client_name}</p>
+                        <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">{b.package_type}</p>
                       </div>
-                      <span className={`admin-badge admin-badge-${b.status === "confirmed" ? "success" : b.status === "cancelled" ? "danger" : "warning"}`} style={{ fontSize: ".7rem", flexShrink: 0 }}>
+                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide shrink-0 ${statusColors[b.status] || "bg-slate-100 text-slate-600"}`}>
                         {statusLabel[b.status] ?? b.status}
                       </span>
                     </div>

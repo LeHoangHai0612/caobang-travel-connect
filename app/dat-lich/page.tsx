@@ -7,7 +7,6 @@ import { getTier, POINTS_PER_BOOKING, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BON
 import type { Guide, UserProfile } from "@/lib/database.types";
 import type { Session } from "@supabase/supabase-js";
 
-// Giá mặc định — sẽ được ghi đè bởi DB
 const DEFAULT_PRICES = { hdv_ca_nhan: 500000, hdv_doan: 650000, hdv_xe_may: 550000 };
 
 function buildPackages(p: typeof DEFAULT_PRICES) {
@@ -29,7 +28,6 @@ export default function DatLichPage() {
   const [profile, setProfile]     = useState<UserProfile | null>(null);
   const [guideSearch, setGuideSearch] = useState("");
 
-  // Form state — khởi tạo từ URL sau khi mount (tránh lỗi Suspense với useSearchParams)
   const [pkg, setPkg]             = useState("");
   const [guideId, setGuideId]     = useState("");
   const [name, setName]           = useState("");
@@ -48,7 +46,6 @@ export default function DatLichPage() {
   const [pointsInfo, setPointsInfo] = useState<{ earned: number; newTotal: number; newTier: string } | null>(null);
   const [guideBookingCount, setGuideBookingCount] = useState(0);
 
-  // Load data + đọc query params từ URL
   useEffect(() => {
     const p = new URLSearchParams(window.location.search);
     const initPkg    = p.get("package") ?? "";
@@ -57,7 +54,6 @@ export default function DatLichPage() {
     if (initPkg)   setPkg(initPkg);
     if (initGuide) setGuideId(initGuide);
 
-    // Nếu có tour ID → load từ DB
     if (tourId) {
       supabase.from("tours").select("id,title,price_from,duration").eq("id", tourId).single()
         .then(({ data }) => {
@@ -97,7 +93,6 @@ export default function DatLichPage() {
     });
   }, []);
 
-  // Guide loyalty count
   useEffect(() => {
     if (!session || !guideId) { setGuideBookingCount(0); return; }
     supabase.from("bookings").select("id", { count: "exact", head: true })
@@ -112,13 +107,8 @@ export default function DatLichPage() {
   const selectedGuide = guides.find((g) => g.id === guideId);
   const today = new Date().toISOString().split("T")[0];
 
-  // Tính tiền cọc — ưu tiên tour price nếu đặt từ trang tour
   const selectedPkg   = PACKAGES.find((p) => pkg.startsWith(p.label));
   const basePrice     = selectedTour ? selectedTour.price_from : (selectedPkg?.basePrice ?? 0);
-  const priceLabel    = selectedTour
-    ? `${selectedTour.title}`
-    : (selectedPkg?.label ?? "Gói dịch vụ");
-  // Tour có price_from là giá trọn gói (không nhân days), package là giá/ngày
   const subtotal      = selectedTour ? basePrice : basePrice * days;
   const discountAmt   = Math.round(subtotal * totalDiscount / 100);
   const totalPrice    = subtotal - discountAmt;
@@ -165,149 +155,144 @@ export default function DatLichPage() {
   }, [loading, session, pkg, name, phone, email, date, note, guideId, totalDiscount]);
 
   return (
-    <div style={{ minHeight: "100vh", position: "relative" }}>
+    <div className="min-h-screen relative pb-safe">
       {/* Background */}
-      <div style={{ position: "fixed", inset: 0, zIndex: 0 }}>
-        <img src={bg} alt="" style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(135deg,rgba(10,30,26,.82) 0%,rgba(26,60,55,.78) 100%)", backdropFilter: "blur(2px)" }} />
+      <div className="fixed inset-0 z-0">
+        <img src={bg} alt="" className="w-full h-full object-cover" />
+        <div className="absolute inset-0 bg-gradient-to-br from-[#0a1e1a]/80 to-[#1a3c37]/80 backdrop-blur-sm" />
       </div>
 
       {/* Header */}
-      <header style={{ position: "relative", zIndex: 10, padding: "0 24px", height: 58, display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid rgba(255,255,255,.1)", background: "rgba(0,0,0,.2)", backdropFilter: "blur(12px)" }}>
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <Image src="/logo.png" alt="Logo" width={30} height={30} style={{ objectFit: "contain", filter: "brightness(0) invert(1)" }} />
-          <span style={{ color: "white", fontWeight: 800, fontSize: ".9rem" }}>Cao Bằng Travel Connect</span>
+      <header className="relative z-10 px-6 h-14 flex items-center justify-between border-b border-white/10 bg-black/20 backdrop-blur-md pt-safe">
+        <a href="/" className="flex items-center gap-2.5 no-underline">
+          <Image src="/logo.png" alt="Logo" width={30} height={30} className="object-contain invert brightness-0" />
+          <span className="text-white font-extrabold text-sm md:text-base">Cao Bằng Travel Connect</span>
         </a>
-        <a href="/" style={{ color: "rgba(255,255,255,.75)", fontSize: ".82rem", fontWeight: 600, textDecoration: "none", display: "flex", alignItems: "center", gap: 6 }}>
-          <i className="fa-solid fa-arrow-left" /> Trang chủ
+        <a href="/" className="text-white/75 text-sm font-semibold no-underline flex items-center gap-1.5">
+          <i className="fa-solid fa-arrow-left" /> <span className="hidden sm:inline">Trang chủ</span>
         </a>
       </header>
 
       {/* Content */}
-      <div style={{ position: "relative", zIndex: 1, maxWidth: 1100, margin: "0 auto", padding: "36px 16px 64px" }}>
-
+      <div className="relative z-10 max-w-6xl mx-auto px-4 py-8 md:py-12 pb-24 md:pb-16">
         {/* Title */}
-        <div style={{ textAlign: "center", marginBottom: 32 }}>
-          <span style={{ background: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.9)", fontSize: ".72rem", fontWeight: 700, padding: "4px 16px", borderRadius: 20, letterSpacing: ".12em", textTransform: "uppercase", backdropFilter: "blur(6px)" }}>
+        <div className="text-center mb-8 md:mb-12">
+          <span className="inline-block bg-white/15 text-white/90 text-xs font-bold px-4 py-1.5 rounded-full tracking-widest uppercase backdrop-blur-md">
             Đặt Lịch Hướng Dẫn Viên
           </span>
-          <h1 style={{ color: "white", fontWeight: 900, fontSize: "clamp(1.6rem,4vw,2.4rem)", margin: "14px 0 8px", textShadow: "0 2px 12px rgba(0,0,0,.3)" }}>
+          <h1 className="text-white font-black text-3xl md:text-5xl mt-4 mb-2 drop-shadow-lg">
             Bắt Đầu Hành Trình Của Bạn
           </h1>
-          <p style={{ color: "rgba(255,255,255,.65)", fontSize: ".92rem", margin: 0 }}>
+          <p className="text-white/75 text-sm md:text-base">
             Điền thông tin bên dưới — chúng tôi sẽ liên hệ xác nhận trong vòng 24 giờ
           </p>
         </div>
 
         {success ? (
-          /* Success screen */
-          <div style={{ maxWidth: 480, margin: "0 auto", background: "rgba(255,255,255,.96)", borderRadius: 20, padding: "40px 36px", textAlign: "center", boxShadow: "0 20px 60px rgba(0,0,0,.25)" }}>
-            <div style={{ width: 72, height: 72, borderRadius: "50%", background: "#f0faf9", border: "3px solid #265C59", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 20px" }}>
-              <i className="fa-solid fa-circle-check" style={{ color: "#265C59", fontSize: 32 }} />
+          <div className="max-w-md mx-auto bg-white/95 backdrop-blur-md rounded-2xl p-8 md:p-10 text-center shadow-2xl">
+            <div className="w-20 h-20 rounded-full bg-teal-50 border-4 border-teal-800 flex items-center justify-center mx-auto mb-6">
+              <i className="fa-solid fa-circle-check text-teal-800 text-4xl" />
             </div>
-            <h2 style={{ fontWeight: 900, color: "#1a2e2e", fontSize: "1.3rem", marginBottom: 10 }}>Đặt lịch thành công!</h2>
-            <p style={{ color: "#64748b", lineHeight: 1.7, marginBottom: 24 }}>
+            <h2 className="font-black text-slate-900 text-2xl mb-3">Đặt lịch thành công!</h2>
+            <p className="text-slate-500 leading-relaxed mb-6">
               Cảm ơn <strong>{name}</strong>! Chúng tôi sẽ liên hệ xác nhận với bạn trong vòng <strong>24 giờ</strong> qua số <strong>{phone}</strong>.
             </p>
             {pointsInfo && (
-              <div style={{ background: "#f0faf9", border: "1.5px solid #b2dfdb", borderRadius: 12, padding: "14px 18px", marginBottom: 20 }}>
-                <p style={{ fontWeight: 800, color: "#265C59", margin: "0 0 4px" }}>
-                  <i className="fa-solid fa-star" style={{ color: "#E5A919", marginRight: 6 }} />
-                  +{pointsInfo.earned} điểm tích lũy!
+              <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 mb-6">
+                <p className="font-extrabold text-teal-800 flex items-center justify-center gap-2 mb-1">
+                  <i className="fa-solid fa-star text-amber-500" /> +{pointsInfo.earned} điểm tích lũy!
                 </p>
-                <p style={{ color: "#64748b", fontSize: ".82rem", margin: 0 }}>Tổng: {pointsInfo.newTotal} điểm · Hạng: {getTier(pointsInfo.newTotal).label}</p>
+                <p className="text-slate-500 text-sm">
+                  Tổng: {pointsInfo.newTotal} điểm · Hạng: {getTier(pointsInfo.newTotal).label}
+                </p>
               </div>
             )}
-            <div style={{ display: "flex", gap: 10 }}>
-              <a href="/" style={{ flex: 1, padding: "11px 0", borderRadius: 10, background: "#265C59", color: "white", fontWeight: 700, fontSize: ".88rem", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+            <div className="flex flex-col sm:flex-row gap-3">
+              <a href="/" className="flex-1 py-3 rounded-xl bg-teal-800 text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform min-h-[44px]">
                 <i className="fa-solid fa-house" /> Về trang chủ
               </a>
-              <a href="/tai-khoan" style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: "1.5px solid #265C59", color: "#265C59", fontWeight: 700, fontSize: ".88rem", textDecoration: "none", display: "flex", alignItems: "center", justifyContent: "center", gap: 6 }}>
+              <a href="/tai-khoan" className="flex-1 py-3 rounded-xl border-2 border-teal-800 text-teal-800 font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform min-h-[44px]">
                 <i className="fa-solid fa-user" /> Tài khoản
               </a>
             </div>
           </div>
         ) : (
-          <div style={{ display: "grid", gridTemplateColumns: "1fr 380px", gap: 24, alignItems: "start" }}>
-
+          <div className="flex flex-col lg:grid lg:grid-cols-[1fr_380px] gap-6 items-start">
             {/* Left: form */}
-            <div style={{ background: "rgba(255,255,255,.97)", borderRadius: 20, overflow: "hidden", boxShadow: "0 20px 60px rgba(0,0,0,.25)" }}>
-              {/* Form header */}
-              <div style={{ background: "linear-gradient(135deg,#1a3c3a,#265C59)", padding: "22px 28px" }}>
-                <h2 style={{ color: "white", fontWeight: 800, fontSize: "1rem", margin: "0 0 4px", textTransform: "uppercase", letterSpacing: ".06em" }}>Thông Tin Đặt Lịch</h2>
-                <p style={{ color: "rgba(255,255,255,.65)", fontSize: ".78rem", margin: 0 }}>
+            <div className="bg-white/95 backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl w-full">
+              <div className="bg-gradient-to-br from-teal-900 to-teal-800 p-5 md:p-6">
+                <h2 className="text-white font-extrabold text-base md:text-lg uppercase tracking-wider mb-1">Thông Tin Đặt Lịch</h2>
+                <p className="text-white/70 text-sm">
                   {pkg || "Chưa chọn gói"} {totalDiscount > 0 ? `· Ưu đãi -${totalDiscount}%` : ""}
                 </p>
               </div>
 
-              <form onSubmit={handleSubmit} style={{ padding: "24px 28px", display: "flex", flexDirection: "column", gap: 18 }}>
-
+              <form onSubmit={handleSubmit} className="p-5 md:p-8 flex flex-col gap-5 md:gap-6">
                 {/* Package selector */}
                 <div>
-                  <label style={{ display: "block", fontSize: ".72rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 10 }}>Chọn gói dịch vụ *</label>
-                  <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 8 }}>
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Chọn gói dịch vụ *</label>
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
                     {PACKAGES.map((p) => (
                       <button key={p.label} type="button" onClick={() => setPkg(`${p.label} · ${p.price}`)}
-                        style={{ padding: "12px 14px", borderRadius: 12, border: `2px solid ${pkg.startsWith(p.label) ? "#265C59" : "#e2e8f0"}`, background: pkg.startsWith(p.label) ? "#f0faf9" : "white", cursor: "pointer", textAlign: "left", transition: "all .15s" }}>
-                        <i className={`fa-solid ${p.icon}`} style={{ color: "#265C59", marginBottom: 6, display: "block", fontSize: ".9rem" }} />
-                        <p style={{ fontWeight: 700, fontSize: ".82rem", color: "#1a2e2e", margin: "0 0 2px" }}>{p.label}</p>
-                        <p style={{ fontSize: ".7rem", color: "#265C59", fontWeight: 700, margin: "0 0 3px" }}>{p.price}</p>
-                        <p style={{ fontSize: ".68rem", color: "#94a3b8", margin: 0, lineHeight: 1.4 }}>{p.desc}</p>
+                        className={`p-4 rounded-xl border-2 text-left transition-all min-h-[44px] ${pkg.startsWith(p.label) ? "border-teal-800 bg-teal-50" : "border-slate-200 bg-white hover:border-teal-300"}`}>
+                        <i className={`fa-solid ${p.icon} text-teal-800 mb-2 text-lg`} />
+                        <p className="font-bold text-slate-900 text-sm mb-1">{p.label}</p>
+                        <p className="text-xs text-teal-800 font-bold mb-1">{p.price}</p>
+                        <p className="text-[11px] text-slate-500 leading-tight">{p.desc}</p>
                       </button>
                     ))}
                   </div>
                   {pkg && !PACKAGES.some((p) => pkg.startsWith(p.label)) && (
-                    <div style={{ marginTop: 8, padding: "10px 14px", background: "#f0faf9", borderRadius: 10, border: "1.5px solid #265C59", fontSize: ".84rem", color: "#265C59", fontWeight: 700 }}>
-                      <i className="fa-solid fa-tag" style={{ marginRight: 6 }} />{pkg}
+                    <div className="mt-3 p-3 bg-teal-50 rounded-xl border border-teal-800 text-sm text-teal-800 font-bold flex items-center gap-2">
+                      <i className="fa-solid fa-tag" /> {pkg}
                     </div>
                   )}
                 </div>
 
                 {/* Personal info */}
-                <div style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 14 }}>
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 md:gap-5">
                   <Field label="Họ và tên *" id="b-name" type="text" value={name} onChange={setName} placeholder="Nguyễn Văn A" required />
                   <Field label="Số điện thoại *" id="b-phone" type="tel" value={phone} onChange={setPhone} placeholder="0912 345 678" required />
                 </div>
                 <Field label="Email" id="b-email" type="email" value={email} onChange={setEmail} placeholder="email@example.com" />
-                <div style={{ display: "grid", gridTemplateColumns: selectedTour ? "1fr" : "1fr 1fr", gap: 14 }}>
+                
+                <div className={`grid gap-4 md:gap-5 ${selectedTour ? "grid-cols-1" : "grid-cols-1 sm:grid-cols-2"}`}>
                   <Field label="Ngày dự kiến" id="b-date" type="date" value={date} onChange={setDate} min={today} />
                   {!selectedTour && (
                     <div>
-                      <label htmlFor="b-days" style={{ display: "block", fontSize: ".72rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>Số ngày</label>
+                      <label htmlFor="b-days" className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">Số ngày</label>
                       <input id="b-days" type="number" value={days} min={1} max={30}
                         onChange={(e) => setDays(Math.max(1, parseInt(e.target.value) || 1))}
-                        style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: ".88rem", outline: "none", boxSizing: "border-box", fontFamily: "inherit" }}
-                        onFocus={(e) => (e.target.style.borderColor = "#265C59")}
-                        onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")} />
+                        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl text-base focus:border-teal-800 outline-none transition-colors min-h-[44px]" />
                     </div>
                   )}
                 </div>
 
                 {/* Guide selector */}
                 <div>
-                  <label style={{ display: "block", fontSize: ".72rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 8 }}>Hướng dẫn viên</label>
-                  <div style={{ position: "relative", marginBottom: 8 }}>
-                    <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 11, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", fontSize: 12 }} />
+                  <label className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-3">Hướng dẫn viên</label>
+                  <div className="relative mb-3">
+                    <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
                     <input type="text" placeholder="Tìm theo tên, chuyên môn..." value={guideSearch} onChange={(e) => setGuideSearch(e.target.value)}
-                      style={{ width: "100%", padding: "9px 12px 9px 30px", border: "1.5px solid #e2e8f0", borderRadius: 8, fontSize: ".83rem", outline: "none", boxSizing: "border-box" }} />
+                      className="w-full pl-10 pr-4 py-3 border-2 border-slate-200 rounded-xl text-base focus:border-teal-800 outline-none transition-colors min-h-[44px]" />
                   </div>
-                  <div style={{ display: "flex", flexDirection: "column", gap: 6, maxHeight: 240, overflowY: "auto", padding: "2px 0" }}>
-                    <label style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, border: `1.5px solid ${!guideId ? "#265C59" : "#e2e8f0"}`, background: !guideId ? "#f0faf9" : "white", cursor: "pointer" }}>
-                      <input type="radio" checked={!guideId} onChange={() => setGuideId("")} style={{ accentColor: "#265C59" }} />
+                  <div className="flex flex-col gap-2 max-h-60 overflow-y-auto pr-2 custom-scrollbar">
+                    <label className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors min-h-[44px] ${!guideId ? "border-teal-800 bg-teal-50" : "border-slate-200 bg-white hover:border-teal-200"}`}>
+                      <input type="radio" checked={!guideId} onChange={() => setGuideId("")} className="accent-teal-800 w-4 h-4" />
                       <div>
-                        <p style={{ fontWeight: 700, fontSize: ".83rem", color: "#1a2e2e", margin: 0 }}>Để chúng tôi sắp xếp</p>
-                        <p style={{ fontSize: ".7rem", color: "#94a3b8", margin: "1px 0 0" }}>HDV phù hợp nhất sẽ liên hệ bạn</p>
+                        <p className="font-bold text-sm text-slate-900">Để chúng tôi sắp xếp</p>
+                        <p className="text-xs text-slate-500">HDV phù hợp nhất sẽ liên hệ bạn</p>
                       </div>
                     </label>
                     {filteredGuides.map((g) => (
-                      <label key={g.id} style={{ display: "flex", alignItems: "center", gap: 10, padding: "9px 12px", borderRadius: 10, border: `1.5px solid ${guideId === g.id ? "#265C59" : "#e2e8f0"}`, background: guideId === g.id ? "#f0faf9" : "white", cursor: "pointer" }}>
-                        <input type="radio" checked={guideId === g.id} onChange={() => { setGuideId(g.id); setGuideSearch(""); }} style={{ accentColor: "#265C59" }} />
-                        <img src={g.image_url} alt={g.name} style={{ width: 36, height: 36, borderRadius: "50%", objectFit: "cover", flexShrink: 0 }} />
-                        <div style={{ flex: 1, minWidth: 0 }}>
-                          <p style={{ fontWeight: 700, fontSize: ".83rem", color: "#1a2e2e", margin: 0 }}>{g.name}</p>
-                          <p style={{ fontSize: ".7rem", color: "#64748b", margin: "1px 0 0", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{g.specialty}</p>
+                      <label key={g.id} className={`flex items-center gap-3 p-3 rounded-xl border-2 cursor-pointer transition-colors min-h-[44px] ${guideId === g.id ? "border-teal-800 bg-teal-50" : "border-slate-200 bg-white hover:border-teal-200"}`}>
+                        <input type="radio" checked={guideId === g.id} onChange={() => { setGuideId(g.id); setGuideSearch(""); }} className="accent-teal-800 w-4 h-4" />
+                        <img src={g.image_url} alt={g.name} className="w-10 h-10 rounded-full object-cover shrink-0 border border-slate-200" />
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-sm text-slate-900 truncate">{g.name}</p>
+                          <p className="text-xs text-slate-500 truncate">{g.specialty}</p>
                         </div>
-                        <span style={{ color: "#E5A919", fontSize: ".72rem", fontWeight: 700, flexShrink: 0 }}>{g.rating}★</span>
+                        <span className="text-amber-500 text-xs font-bold shrink-0">{g.rating}★</span>
                       </label>
                     ))}
                   </div>
@@ -317,11 +302,11 @@ export default function DatLichPage() {
 
                 {/* Loyalty info */}
                 {session && totalDiscount > 0 && (
-                  <div style={{ background: "#f0faf9", border: "1.5px solid #b2dfdb", borderRadius: 12, padding: "12px 16px", display: "flex", alignItems: "center", gap: 10 }}>
-                    <i className="fa-solid fa-tag" style={{ color: "#265C59", fontSize: 16 }} />
+                  <div className="bg-teal-50 border border-teal-200 rounded-xl p-4 flex items-start gap-3">
+                    <i className="fa-solid fa-tag text-teal-800 mt-1" />
                     <div>
-                      <p style={{ fontWeight: 800, color: "#265C59", margin: 0, fontSize: ".85rem" }}>Ưu đãi -{totalDiscount}% cho bạn</p>
-                      <p style={{ color: "#64748b", fontSize: ".72rem", margin: "2px 0 0" }}>
+                      <p className="font-extrabold text-teal-800 text-sm mb-1">Ưu đãi -{totalDiscount}% cho bạn</p>
+                      <p className="text-slate-500 text-xs">
                         {tierDiscount > 0 && `Hạng ${getTier(profile!.points).label}: -${tierDiscount}%`}
                         {loyaltyBonus > 0 && ` + Khách quen HDV: -${loyaltyBonus}%`}
                       </p>
@@ -330,150 +315,157 @@ export default function DatLichPage() {
                 )}
 
                 {!session && (
-                  <div style={{ background: "#fffbeb", border: "1.5px solid #fde68a", borderRadius: 12, padding: "12px 16px", fontSize: ".8rem", color: "#92400e" }}>
-                    <i className="fa-solid fa-circle-info" style={{ marginRight: 6 }} />
-                    <a href="/dang-nhap" style={{ color: "#265C59", fontWeight: 700, textDecoration: "none" }}>Đăng nhập</a> để tích điểm và nhận ưu đãi thành viên.
+                  <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 text-xs sm:text-sm text-amber-900 flex items-start gap-2">
+                    <i className="fa-solid fa-circle-info mt-0.5" />
+                    <p>
+                      <a href="/dang-nhap" className="text-teal-800 font-bold underline decoration-2 underline-offset-2 min-h-[44px] inline-flex items-center">Đăng nhập</a> để tích điểm và nhận ưu đãi thành viên.
+                    </p>
                   </div>
                 )}
 
                 {error && (
-                  <p style={{ color: "#dc2626", background: "#fef2f2", border: "1px solid #fecaca", borderRadius: 10, padding: "10px 14px", margin: 0, fontSize: ".84rem" }}>{error}</p>
+                  <div className="bg-red-50 border border-red-200 text-red-700 rounded-xl p-3 text-sm flex items-center gap-2">
+                    <i className="fa-solid fa-circle-exclamation" /> {error}
+                  </div>
                 )}
 
                 <button type="submit" disabled={loading || !name.trim() || !phone.trim()}
-                  style={{ padding: "14px 0", borderRadius: 12, border: "none", background: loading ? "#94a3b8" : "linear-gradient(135deg,#265C59,#3a9490)", color: "white", fontWeight: 800, fontSize: ".95rem", cursor: loading ? "wait" : "pointer", letterSpacing: ".04em", boxShadow: "0 4px 16px rgba(38,92,89,.35)", transition: "opacity .15s" }}>
+                  className="w-full py-4 rounded-xl border-none bg-gradient-to-br from-teal-800 to-teal-700 text-white font-extrabold text-base tracking-wider shadow-lg shadow-teal-900/20 active:scale-95 disabled:opacity-70 disabled:cursor-not-allowed transition-all min-h-[44px] mt-2">
                   {loading
-                    ? <><i className="fa-solid fa-spinner fa-spin" style={{ marginRight: 8 }} />Đang xử lý...</>
-                    : <><i className="fa-solid fa-calendar-check" style={{ marginRight: 8 }} />XÁC NHẬN ĐẶT LỊCH</>}
+                    ? <><i className="fa-solid fa-spinner fa-spin mr-2" /> Đang xử lý...</>
+                    : <><i className="fa-solid fa-calendar-check mr-2" /> XÁC NHẬN ĐẶT LỊCH</>}
                 </button>
               </form>
             </div>
 
             {/* Right: summary */}
-            <div style={{ display: "flex", flexDirection: "column", gap: 16 }}>
-
+            <div className="flex flex-col gap-5 w-full">
               {/* Selected guide card */}
               {selectedGuide ? (
-                <div style={{ background: "rgba(255,255,255,.97)", borderRadius: 18, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,.2)" }}>
-                  <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden" }}>
-                    <img src={selectedGuide.image_url} alt={selectedGuide.name} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,.7) 0%,transparent 50%)" }} />
-                    <div style={{ position: "absolute", bottom: 14, left: 16, right: 16 }}>
-                      <p style={{ color: "white", fontWeight: 900, fontSize: "1.05rem", margin: "0 0 4px" }}>{selectedGuide.name}</p>
-                      <p style={{ color: "rgba(255,255,255,.75)", fontSize: ".78rem", margin: 0 }}>{selectedGuide.specialty}</p>
+                <div className="bg-white/95 backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="relative aspect-video sm:aspect-[4/3] overflow-hidden">
+                    <img src={selectedGuide.image_url} alt={selectedGuide.name} className="w-full h-full object-cover" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    <div className="absolute bottom-4 left-4 right-4">
+                      <p className="text-white font-black text-lg mb-1">{selectedGuide.name}</p>
+                      <p className="text-white/80 text-sm truncate">{selectedGuide.specialty}</p>
                     </div>
-                    <div style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,0,0,.6)", color: "#E5A919", borderRadius: 8, padding: "4px 10px", fontSize: ".78rem", fontWeight: 800 }}>
+                    <div className="absolute top-3 right-3 bg-black/60 text-amber-500 rounded-lg px-2.5 py-1 text-xs font-black backdrop-blur-md">
                       {selectedGuide.rating}★
                     </div>
                   </div>
-                  <div style={{ padding: "16px 18px" }}>
-                    {selectedGuide.bio && <p style={{ color: "#475569", fontSize: ".82rem", lineHeight: 1.7, marginBottom: 12 }}>{selectedGuide.bio.slice(0, 120)}{selectedGuide.bio.length > 120 ? "..." : ""}</p>}
-                    <div style={{ display: "flex", gap: 8, flexWrap: "wrap", marginBottom: 12 }}>
+                  <div className="p-5">
+                    {selectedGuide.bio && <p className="text-slate-600 text-xs sm:text-sm leading-relaxed mb-4">{selectedGuide.bio.slice(0, 120)}{selectedGuide.bio.length > 120 ? "..." : ""}</p>}
+                    <div className="flex flex-wrap gap-2 mb-4">
                       {selectedGuide.years_experience > 0 && (
-                        <span style={{ background: "#f0faf9", color: "#265C59", borderRadius: 6, padding: "3px 9px", fontSize: ".72rem", fontWeight: 700 }}>
-                          <i className="fa-solid fa-clock" style={{ marginRight: 4 }} />{selectedGuide.years_experience} năm KN
+                        <span className="bg-teal-50 text-teal-800 rounded-lg px-2.5 py-1 text-xs font-bold border border-teal-100">
+                          <i className="fa-solid fa-clock mr-1.5" />{selectedGuide.years_experience} năm KN
                         </span>
                       )}
                       {selectedGuide.languages && (
-                        <span style={{ background: "#f0faf9", color: "#265C59", borderRadius: 6, padding: "3px 9px", fontSize: ".72rem", fontWeight: 700 }}>
-                          <i className="fa-solid fa-language" style={{ marginRight: 4 }} />{selectedGuide.languages}
+                        <span className="bg-teal-50 text-teal-800 rounded-lg px-2.5 py-1 text-xs font-bold border border-teal-100">
+                          <i className="fa-solid fa-language mr-1.5" />{selectedGuide.languages}
                         </span>
                       )}
                     </div>
                     {selectedGuide.zalo_number && (
                       <a href={`https://zalo.me/${selectedGuide.zalo_number}`} target="_blank" rel="noopener noreferrer"
-                        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, padding: "9px 0", borderRadius: 10, background: "#265C59", color: "white", fontWeight: 700, fontSize: ".82rem", textDecoration: "none" }}>
-                        <i className="fa-brands fa-comment-dots" />Chat Zalo với {selectedGuide.name}
+                        className="flex items-center justify-center gap-2 py-3 rounded-xl bg-teal-800 text-white font-bold text-sm active:scale-95 transition-transform min-h-[44px]">
+                        <i className="fa-brands fa-comment-dots text-lg" /> Chat Zalo ngay
                       </a>
                     )}
                   </div>
                 </div>
               ) : (
-                <div style={{ background: "rgba(255,255,255,.15)", backdropFilter: "blur(8px)", borderRadius: 18, padding: "24px 20px", textAlign: "center", border: "1.5px solid rgba(255,255,255,.25)" }}>
-                  <i className="fa-solid fa-person-hiking" style={{ color: "rgba(255,255,255,.6)", fontSize: 36, marginBottom: 12, display: "block" }} />
-                  <p style={{ color: "rgba(255,255,255,.8)", fontWeight: 700, marginBottom: 6 }}>Chưa chọn HDV</p>
-                  <p style={{ color: "rgba(255,255,255,.55)", fontSize: ".8rem", lineHeight: 1.6 }}>Chọn HDV từ danh sách bên trái hoặc để chúng tôi sắp xếp phù hợp nhất.</p>
+                <div className="bg-white/10 backdrop-blur-md rounded-2xl p-6 text-center border border-white/20">
+                  <div className="w-16 h-16 rounded-full bg-white/10 flex items-center justify-center mx-auto mb-4">
+                    <i className="fa-solid fa-person-hiking text-white/60 text-3xl" />
+                  </div>
+                  <p className="text-white/90 font-bold mb-2">Chưa chọn HDV</p>
+                  <p className="text-white/60 text-sm leading-relaxed">Chọn HDV từ danh sách hoặc để chúng tôi sắp xếp phù hợp nhất.</p>
                 </div>
               )}
 
               {/* Booking summary */}
-              <div style={{ background: "rgba(255,255,255,.97)", borderRadius: 18, padding: "20px 22px", boxShadow: "0 8px 32px rgba(0,0,0,.2)" }}>
-                <p style={{ fontSize: ".7rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".1em", marginBottom: 14 }}>Tóm tắt đặt lịch</p>
-                {[
-                  { label: "Gói dịch vụ", val: pkg || "Chưa chọn" },
-                  { label: "HDV", val: selectedGuide?.name ?? "Hệ thống sắp xếp" },
-                  { label: "Ngày", val: date ? new Date(date).toLocaleDateString("vi-VN") : "Chưa chọn" },
-                  { label: "Số ngày", val: `${days} ngày` },
-                  { label: "Ưu đãi", val: totalDiscount > 0 ? `-${totalDiscount}%` : "Không có" },
-                  { label: "Điểm thưởng", val: session ? `+${POINTS_PER_BOOKING} điểm` : "Đăng nhập để tích điểm" },
-                ].map((r) => (
-                  <div key={r.label} style={{ display: "flex", justifyContent: "space-between", padding: "7px 0", borderBottom: "1px solid #f1f5f9" }}>
-                    <span style={{ fontSize: ".8rem", color: "#64748b" }}>{r.label}</span>
-                    <span style={{ fontSize: ".8rem", fontWeight: 700, color: r.val.startsWith("-") ? "#265C59" : "#1a2e2e", maxWidth: "55%", textAlign: "right" }}>{r.val}</span>
-                  </div>
-                ))}
+              <div className="bg-white/95 backdrop-blur-md rounded-2xl p-5 shadow-2xl">
+                <p className="text-xs font-bold text-slate-400 uppercase tracking-widest mb-4">Tóm tắt đặt lịch</p>
+                <div className="flex flex-col gap-3">
+                  {[
+                    { label: "Gói dịch vụ", val: pkg || "Chưa chọn" },
+                    { label: "HDV", val: selectedGuide?.name ?? "Hệ thống sắp xếp" },
+                    { label: "Ngày", val: date ? new Date(date).toLocaleDateString("vi-VN") : "Chưa chọn" },
+                    { label: "Số ngày", val: `${days} ngày` },
+                    { label: "Ưu đãi", val: totalDiscount > 0 ? `-${totalDiscount}%` : "Không có" },
+                    { label: "Điểm thưởng", val: session ? `+${POINTS_PER_BOOKING} điểm` : "Đăng nhập để tích điểm" },
+                  ].map((r, i) => (
+                    <div key={i} className="flex justify-between items-center py-2 border-b border-slate-100 last:border-0">
+                      <span className="text-sm text-slate-500">{r.label}</span>
+                      <span className={`text-sm font-bold text-right max-w-[60%] ${r.val.startsWith("-") ? "text-teal-800" : "text-slate-900"}`}>{r.val}</span>
+                    </div>
+                  ))}
+                </div>
               </div>
 
               {/* Deposit calculation */}
               {hasPricing && (
-                <div style={{ background: "rgba(255,255,255,.97)", borderRadius: 18, overflow: "hidden", boxShadow: "0 8px 32px rgba(0,0,0,.2)" }}>
-                  <div style={{ background: "linear-gradient(135deg,#1a3c3a,#265C59)", padding: "14px 20px", display: "flex", alignItems: "center", gap: 8 }}>
-                    <i className="fa-solid fa-calculator" style={{ color: "rgba(255,255,255,.8)", fontSize: 14 }} />
-                    <p style={{ color: "white", fontWeight: 800, fontSize: ".82rem", margin: 0, letterSpacing: ".04em" }}>Bảng Tính Tiền Cọc</p>
+                <div className="bg-white/95 backdrop-blur-md rounded-2xl overflow-hidden shadow-2xl">
+                  <div className="bg-gradient-to-br from-teal-900 to-teal-800 p-4 flex items-center gap-2.5">
+                    <i className="fa-solid fa-calculator text-white/80" />
+                    <p className="text-white font-extrabold text-sm tracking-wide m-0">Bảng Tính Tiền Cọc</p>
                   </div>
-                  <div style={{ padding: "16px 20px" }}>
-                    {/* Tour info banner */}
+                  <div className="p-5">
                     {selectedTour && (
-                      <div style={{ background: "#f0faf9", border: "1.5px solid #b2dfdb", borderRadius: 10, padding: "10px 13px", marginBottom: 12, display: "flex", alignItems: "center", gap: 10 }}>
-                        <i className="fa-solid fa-map" style={{ color: "#265C59", fontSize: 14 }} />
+                      <div className="bg-teal-50 border border-teal-200 rounded-xl p-3 mb-4 flex items-center gap-3">
+                        <div className="w-10 h-10 rounded-lg bg-teal-100 flex items-center justify-center shrink-0">
+                          <i className="fa-solid fa-map text-teal-800" />
+                        </div>
                         <div>
-                          <p style={{ fontWeight: 800, fontSize: ".82rem", color: "#265C59", margin: 0 }}>{selectedTour.title}</p>
-                          <p style={{ fontSize: ".72rem", color: "#4a6260", margin: "2px 0 0" }}>
-                            <i className="fa-solid fa-clock" style={{ marginRight: 4 }} />{selectedTour.duration} · Giá trọn gói
+                          <p className="font-bold text-sm text-teal-800 m-0 line-clamp-1">{selectedTour.title}</p>
+                          <p className="text-xs text-teal-700/80 mt-0.5">
+                            <i className="fa-solid fa-clock mr-1" />{selectedTour.duration} · Giá trọn gói
                           </p>
                         </div>
                       </div>
                     )}
 
-                    {/* Rows */}
-                    {[
-                      selectedTour
-                        ? { label: `Giá tour (${selectedTour.title})`, val: fmt(basePrice), dim: true }
-                        : { label: `Đơn giá (${selectedPkg?.label ?? "Gói"})`, val: fmt(basePrice) + "/ngày", dim: true },
-                      ...(!selectedTour ? [{ label: `× ${days} ngày`, val: fmt(subtotal), dim: true }] : []),
-                      ...(discountAmt > 0 ? [{ label: `Giảm giá (-${totalDiscount}%)`, val: `- ${fmt(discountAmt)}`, green: true }] : []),
-                    ].map((r, i) => (
-                      <div key={i} style={{ display: "flex", justifyContent: "space-between", padding: "6px 0", borderBottom: "1px solid #f1f5f9" }}>
-                        <span style={{ fontSize: ".78rem", color: "#64748b" }}>{r.label}</span>
-                        <span style={{ fontSize: ".78rem", fontWeight: 700, color: (r as {green?: boolean}).green ? "#16a34a" : "#1a2e2e" }}>{r.val}</span>
-                      </div>
-                    ))}
-
-                    {/* Total */}
-                    <div style={{ display: "flex", justifyContent: "space-between", padding: "10px 0 8px", borderBottom: "2px solid #e2e8f0", marginTop: 4 }}>
-                      <span style={{ fontSize: ".85rem", fontWeight: 700, color: "#1a2e2e" }}>Tổng tiền</span>
-                      <span style={{ fontSize: ".95rem", fontWeight: 900, color: "#265C59" }}>{fmt(totalPrice)}</span>
-                    </div>
-
-                    {/* Deposit highlight */}
-                    <div style={{ background: "#fefce8", border: "1.5px solid #fde047", borderRadius: 12, padding: "12px 14px", margin: "12px 0 8px" }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                        <div>
-                          <p style={{ fontSize: ".72rem", fontWeight: 700, color: "#854d0e", textTransform: "uppercase", letterSpacing: ".06em", margin: 0 }}>
-                            <i className="fa-solid fa-coins" style={{ marginRight: 5 }} />Tiền Cọc ({depositPct}%)
-                          </p>
-                          <p style={{ fontSize: ".7rem", color: "#a16207", margin: "2px 0 0" }}>Thanh toán khi xác nhận lịch</p>
+                    <div className="flex flex-col gap-2.5 mb-4">
+                      {[
+                        selectedTour
+                          ? { label: `Giá tour (${selectedTour.title})`, val: fmt(basePrice), dim: true }
+                          : { label: `Đơn giá (${selectedPkg?.label ?? "Gói"})`, val: fmt(basePrice) + "/ngày", dim: true },
+                        ...(!selectedTour ? [{ label: `× ${days} ngày`, val: fmt(subtotal), dim: true }] : []),
+                        ...(discountAmt > 0 ? [{ label: `Giảm giá (-${totalDiscount}%)`, val: `- ${fmt(discountAmt)}`, green: true }] : []),
+                      ].map((r, i) => (
+                        <div key={i} className="flex justify-between items-center">
+                          <span className="text-sm text-slate-500">{r.label}</span>
+                          <span className={`text-sm font-bold ${(r as {green?: boolean}).green ? "text-green-600" : "text-slate-900"}`}>{r.val}</span>
                         </div>
-                        <span style={{ fontSize: "1.1rem", fontWeight: 900, color: "#b45309" }}>{fmt(depositAmt)}</span>
+                      ))}
+                    </div>
+
+                    <div className="flex justify-between items-center py-3 border-t-2 border-slate-200 mb-4">
+                      <span className="text-sm font-bold text-slate-900">Tổng tiền</span>
+                      <span className="text-lg font-black text-teal-800">{fmt(totalPrice)}</span>
+                    </div>
+
+                    <div className="bg-amber-50 border border-amber-200 rounded-xl p-4 mb-4">
+                      <div className="flex justify-between items-center mb-1">
+                        <div>
+                          <p className="text-xs font-extrabold text-amber-700 uppercase tracking-wider m-0 flex items-center gap-1.5">
+                            <i className="fa-solid fa-coins" /> Tiền Cọc ({depositPct}%)
+                          </p>
+                          <p className="text-xs text-amber-700/70 mt-1">Thanh toán khi xác nhận lịch</p>
+                        </div>
+                        <span className="text-xl font-black text-amber-600">{fmt(depositAmt)}</span>
                       </div>
                     </div>
 
-                    <div style={{ display: "flex", justifyContent: "space-between", padding: "6px 0" }}>
-                      <span style={{ fontSize: ".8rem", color: "#64748b" }}>Còn lại (thanh toán sau)</span>
-                      <span style={{ fontSize: ".82rem", fontWeight: 700, color: "#475569" }}>{fmt(remainingAmt)}</span>
+                    <div className="flex justify-between items-center py-2">
+                      <span className="text-xs sm:text-sm text-slate-500">Còn lại (thanh toán sau)</span>
+                      <span className="text-sm font-bold text-slate-600">{fmt(remainingAmt)}</span>
                     </div>
 
-                    <p style={{ fontSize: ".7rem", color: "#94a3b8", marginTop: 10, lineHeight: 1.5, fontStyle: "italic" }}>
+                    <p className="text-xs text-slate-400 mt-4 leading-relaxed italic">
                       * Giá chỉ mang tính tham khảo. Giá chính thức sẽ được xác nhận qua Zalo/điện thoại.
                     </p>
                   </div>
@@ -481,10 +473,10 @@ export default function DatLichPage() {
               )}
 
               {/* Trust badges */}
-              <div style={{ background: "rgba(255,255,255,.1)", backdropFilter: "blur(6px)", borderRadius: 14, padding: "14px 18px", border: "1px solid rgba(255,255,255,.2)" }}>
+              <div className="bg-white/10 backdrop-blur-md rounded-2xl p-4 border border-white/20">
                 {["Xác nhận trong 24 giờ", "Đặt cọc linh hoạt", "Hủy miễn phí trước 24h", "Hỗ trợ 24/7 qua Zalo"].map((t) => (
-                  <p key={t} style={{ color: "rgba(255,255,255,.8)", fontSize: ".78rem", margin: "4px 0", display: "flex", alignItems: "center", gap: 7 }}>
-                    <i className="fa-solid fa-circle-check" style={{ color: "#5eead4", fontSize: 11 }} />{t}
+                  <p key={t} className="text-white/80 text-xs sm:text-sm my-2 flex items-center gap-2">
+                    <i className="fa-solid fa-circle-check text-teal-300" /> {t}
                   </p>
                 ))}
               </div>
@@ -492,23 +484,6 @@ export default function DatLichPage() {
           </div>
         )}
       </div>
-
-      <style>{`
-        @media (max-width: 768px) {
-          div[style*="grid-template-columns: 1fr 380px"] { grid-template-columns: 1fr !important; }
-          div[style*="grid-template-columns: 1fr 1fr"]   { grid-template-columns: 1fr !important; }
-          div[style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr 1fr !important; }
-        }
-        @media (max-width: 480px) {
-          div[style*="grid-template-columns: 1fr 380px"] { grid-template-columns: 1fr !important; }
-          div[style*="grid-template-columns: 1fr 1fr"]   { grid-template-columns: 1fr !important; }
-          div[style*="grid-template-columns: 1fr 1fr 1fr"] { grid-template-columns: 1fr !important; }
-          /* Package buttons: stack vertically */
-          div[style*="grid-template-columns: 1fr 1fr"][style*="gap: 8"] { grid-template-columns: 1fr !important; }
-          /* Input font size – prevent iOS zoom */
-          input, select, textarea { font-size: 16px !important; }
-        }
-      `}</style>
     </div>
   );
 }
@@ -519,11 +494,9 @@ function Field({ label, id, type, value, onChange, placeholder, required, min }:
 }) {
   return (
     <div>
-      <label htmlFor={id} style={{ display: "block", fontSize: ".72rem", fontWeight: 700, color: "#475569", textTransform: "uppercase", letterSpacing: ".07em", marginBottom: 6 }}>{label}</label>
+      <label htmlFor={id} className="block text-xs font-bold text-slate-500 uppercase tracking-wider mb-2">{label}</label>
       <input id={id} type={type} value={value} onChange={(e) => onChange(e.target.value)} placeholder={placeholder} required={required} min={min}
-        style={{ width: "100%", padding: "10px 13px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: ".88rem", outline: "none", boxSizing: "border-box", fontFamily: "inherit", transition: "border-color .15s" }}
-        onFocus={(e) => (e.target.style.borderColor = "#265C59")}
-        onBlur={(e) => (e.target.style.borderColor = "#e2e8f0")}
+        className="w-full px-4 py-3 border-2 border-slate-200 rounded-xl text-base focus:border-teal-800 outline-none transition-colors min-h-[44px] placeholder:text-slate-400"
       />
     </div>
   );

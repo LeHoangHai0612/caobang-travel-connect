@@ -27,60 +27,66 @@ export default function CamNangList() {
   );
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f8faf8" }}>
+    <div className="min-h-screen bg-slate-50 pb-safe">
       {/* Hero */}
-      <div className="subpage-hero" style={{ position: "relative", height: 300, overflow: "hidden" }}>
-        <div style={{ position: "absolute", inset: 0, backgroundImage: `url('${bg}')`, backgroundSize: "cover", backgroundPosition: "center" }} />
-        <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to bottom, rgba(0,0,0,.25), rgba(14,42,40,.75))" }} />
-        <div style={{ position: "absolute", inset: 0, display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "flex-end", padding: "0 24px 40px" }}>
-          <span style={{ fontSize: ".72rem", fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: "rgba(255,255,255,.7)", marginBottom: 10 }}>
-            <i className="fa-solid fa-book-open" style={{ marginRight: 7 }} />Bí Quyết Khám Phá
+      <div className="relative h-[300px] md:h-[400px] overflow-hidden pt-safe">
+        <div className="absolute inset-0 bg-cover bg-center" style={{ backgroundImage: `url('${bg}')` }} />
+        <div className="absolute inset-0 bg-gradient-to-b from-black/30 to-teal-950/80" />
+        <div className="absolute inset-0 flex flex-col items-center justify-end px-6 pb-10">
+          <span className="text-[11px] font-bold tracking-[0.14em] uppercase text-white/70 mb-2.5">
+            <i className="fa-solid fa-book-open mr-2" />Bí Quyết Khám Phá
           </span>
-          <h1 style={{ color: "white", fontSize: "clamp(1.8rem,4vw,2.6rem)", fontWeight: 900, margin: "0 0 20px", textAlign: "center" }}>Cẩm Nang Du Lịch Cao Bằng</h1>
-          <div style={{ position: "relative", width: "100%", maxWidth: 420 }}>
-            <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 14, top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+          <h1 className="text-white text-3xl md:text-5xl font-black mb-6 text-center drop-shadow-lg">
+            Cẩm Nang Du Lịch Cao Bằng
+          </h1>
+          <div className="relative w-full max-w-md">
+            <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
             <input value={search} onChange={e => setSearch(e.target.value)}
-              placeholder="Tìm kiếm cẩm nang..." autoFocus
-              style={{ width: "100%", padding: "11px 14px 11px 40px", borderRadius: 50, border: "none", fontSize: ".88rem", outline: "none", boxSizing: "border-box" }} />
+              placeholder="Tìm kiếm cẩm nang..." 
+              className="w-full py-3.5 pl-11 pr-4 rounded-full border-none text-sm outline-none shadow-xl focus:ring-2 focus:ring-teal-400 min-h-[44px]" />
           </div>
         </div>
-        <div style={{ position: "absolute", top: 20, left: 20 }}>
-          <Link href="/" style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,.15)", backdropFilter: "blur(8px)", color: "white", padding: "7px 14px", borderRadius: 50, fontSize: ".8rem", fontWeight: 700, textDecoration: "none", border: "1px solid rgba(255,255,255,.25)" }}>
+        <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10 pt-safe">
+          <Link href="/" className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs md:text-sm font-bold border border-white/25 hover:bg-white/25 transition-colors active:scale-95">
             <i className="fa-solid fa-arrow-left" /> Trang Chủ
           </Link>
         </div>
       </div>
 
       {/* Grid */}
-      <div className="subpage-content" style={{ maxWidth: 1100, margin: "0 auto", padding: "40px 24px" }}>
+      <div className="max-w-6xl mx-auto px-4 sm:px-6 py-10 md:py-16">
         {loading ? (
-          <div style={{ textAlign: "center", padding: "60px 0" }}><i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 28, color: "#265C59" }} /></div>
+          <div className="text-center py-16"><i className="fa-solid fa-spinner fa-spin text-3xl text-teal-800" /></div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "60px 0", color: "#94a3b8" }}>
-            <i className="fa-solid fa-search" style={{ fontSize: 32, marginBottom: 12, display: "block" }} />
-            <p>Không tìm thấy kết quả phù hợp.</p>
+          <div className="text-center py-16 text-slate-400">
+            <i className="fa-solid fa-search text-5xl mb-4 opacity-50 block" />
+            <p className="font-semibold text-slate-600">Không tìm thấy kết quả phù hợp.</p>
           </div>
         ) : (
           <>
-            <p style={{ fontSize: ".82rem", color: "#94a3b8", marginBottom: 24, fontWeight: 600 }}>{filtered.length} bài cẩm nang</p>
-            <div className="subpage-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill, minmax(300px, 1fr))", gap: 20 }}>
+            <p className="text-sm text-slate-500 mb-6 font-bold uppercase tracking-wider">{filtered.length} bài viết</p>
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-6">
               {filtered.map(t => (
-                <Link key={t.id} href={`/cam-nang/${t.id}`} style={{ textDecoration: "none" }}>
-                  <article style={{ background: "white", borderRadius: 18, overflow: "hidden", border: "1px solid #e2e8f0", transition: "all .2s", height: "100%" }}
-                    onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform = "translateY(-4px)"; el.style.boxShadow = "0 12px 36px rgba(0,0,0,.1)"; }}
-                    onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform = ""; el.style.boxShadow = ""; }}>
-                    {t.image_url && <div style={{ height: 160, overflow: "hidden" }}><img src={t.image_url} alt={t.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} /></div>}
-                    <div style={{ padding: "20px 20px 18px" }}>
-                      <div style={{ display: "flex", alignItems: "center", gap: 10, marginBottom: 12 }}>
-                        <div style={{ width: 36, height: 36, borderRadius: 10, background: t.color + "18", display: "flex", alignItems: "center", justifyContent: "center" }}>
-                          <i className={`fa-solid ${t.icon}`} style={{ color: t.color, fontSize: 15 }} />
-                        </div>
-                        <span style={{ fontSize: ".68rem", fontWeight: 700, color: t.color, textTransform: "uppercase", letterSpacing: ".08em", background: t.color + "15", padding: "3px 10px", borderRadius: 20 }}>{t.tag}</span>
+                <Link key={t.id} href={`/cam-nang/${t.id}`} className="block group h-full">
+                  <article className="bg-white rounded-2xl overflow-hidden border border-slate-200 transition-all duration-300 hover:-translate-y-1 hover:shadow-[0_12px_36px_rgba(0,0,0,0.1)] h-full flex flex-col">
+                    {t.image_url && (
+                      <div className="h-44 overflow-hidden shrink-0">
+                        <img src={t.image_url} alt={t.title} className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
                       </div>
-                      <h3 style={{ fontSize: ".95rem", fontWeight: 800, color: "#0f172a", margin: "0 0 8px", lineHeight: 1.4 }}>{t.title}</h3>
-                      <p style={{ fontSize: ".82rem", color: "#64748b", lineHeight: 1.65, margin: "0 0 14px", display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{t.description}</p>
-                      <span style={{ fontSize: ".78rem", fontWeight: 700, color: t.color, display: "inline-flex", alignItems: "center", gap: 5 }}>
-                        Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
+                    )}
+                    <div className="p-5 md:p-6 flex flex-col flex-1">
+                      <div className="flex items-center gap-3 mb-3">
+                        <div className="w-10 h-10 rounded-xl flex items-center justify-center shrink-0" style={{ backgroundColor: t.color + "18" }}>
+                          <i className={`fa-solid ${t.icon}`} style={{ color: t.color, fontSize: 16 }} />
+                        </div>
+                        <span className="text-[10px] font-black uppercase tracking-widest px-2.5 py-1 rounded-full" style={{ color: t.color, backgroundColor: t.color + "15" }}>
+                          {t.tag}
+                        </span>
+                      </div>
+                      <h3 className="text-base md:text-lg font-black text-slate-900 mb-2 leading-snug line-clamp-2">{t.title}</h3>
+                      <p className="text-xs md:text-sm text-slate-500 leading-relaxed mb-4 line-clamp-3 flex-1">{t.description}</p>
+                      <span className="text-xs font-bold flex items-center gap-1.5 mt-auto" style={{ color: t.color }}>
+                        Đọc thêm <i className="fa-solid fa-arrow-right text-[10px]" />
                       </span>
                     </div>
                   </article>

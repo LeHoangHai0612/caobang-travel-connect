@@ -1,36 +1,37 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# Cao Bằng Travel Connect
 
-## Getting Started
+Dự án website kết nối Hướng dẫn viên và Tour du lịch tại Cao Bằng.
+Được xây dựng trên nền tảng **Next.js 16 + React 19 + Tailwind CSS 4 + Supabase**.
 
-First, run the development server:
+## 📱 Mobile-First UX (Optimization Notes)
+
+Dự án đã được tối ưu hóa toàn diện cho trải nghiệm trên thiết bị di động (mobile-first), tập trung vào các dòng màn hình từ 320px đến 430px (như iPhone SE, iPhone 14 Pro) và tablet.
+
+- **Bottom Navigation**: Sử dụng `StickyBottomBar` cho các trang chi tiết, với các nút CTA lớn (`>=44px`) thuận tiện cho thao tác một tay.
+- **Tailwind CSS v4 Utilities**: Chuyển đổi từ `inline-styles` và raw CSS (`<style>`) sang Tailwind classes giúp render nhanh hơn và quản lý responsive dễ dàng hơn.
+- **Safe Area Support**: Tích hợp các class `pb-safe`, `pt-safe` để tương thích hoàn hảo với màn hình có tai thỏ (notch) trên iOS/Android.
+- **Touch Targets**: Mọi button, input, và thẻ (card) đều đảm bảo kích thước tối thiểu giúp thao tác chạm chính xác.
+- **Layouts**: Layout của trang `dang-nhap`, `tai-khoan`, và bảng điều khiển `admin` được chuyển đổi thành sidebar trượt dạng drawer thay vì cố định, tiết kiệm không gian trên di động.
+
+## 🚀 Getting Started
+
+Cài đặt các gói phụ thuộc và chạy môi trường phát triển:
 
 ```bash
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+Mở [http://localhost:3000](http://localhost:3000) trên trình duyệt để xem kết quả.
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 🗄️ Supabase
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+Dự án sử dụng Supabase cho Authentication và Database:
+- Bảng `user_profiles` để quản lý người dùng và hạng thành viên (loyalty points).
+- Bảng `bookings` ghi nhận thông tin đặt tour.
+- Các Trigger (như `on_auth_user_created`) được thiết lập trên Supabase để tự động hoá việc tạo hồ sơ.
 
-## Learn More
+## 🖼️ UI/UX Design Token
 
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- **Màu sắc chính:** Teal (`#265C59`), Beige (`#F9F9EC`).
+- **Typography:** Be Vietnam Pro (chủ đạo), Lora (serif), Caveat (handwriting font).

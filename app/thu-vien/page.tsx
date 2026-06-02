@@ -2,6 +2,7 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
+import Image from "next/image";
 
 interface GalleryImage {
   id: string;
@@ -66,96 +67,64 @@ export default function ThuVienPage() {
 
   return (
     <>
-      <style>{`
-        .tv-masonry {
-          columns: 4; column-gap: 20px;
-        }
-        @media (max-width: 1024px) { .tv-masonry { columns: 3; } }
-        @media (max-width: 640px)  { .tv-masonry { columns: 2; column-gap: 12px; } }
-
-        .polaroid {
-          break-inside: avoid;
-          background: white;
-          padding: 10px 10px 40px;
-          box-shadow: 0 4px 18px rgba(0,0,0,.12), 0 1px 4px rgba(0,0,0,.08);
-          margin-bottom: 20px;
-          cursor: pointer;
-          transition: transform .3s ease, box-shadow .3s ease;
-          display: block;
-        }
-        .polaroid:hover {
-          transform: rotate(0deg) scale(1.04) !important;
-          box-shadow: 0 16px 40px rgba(0,0,0,.18);
-          z-index: 10;
-          position: relative;
-        }
-        .polaroid img { display: block; width: 100%; height: auto; }
-        .polaroid-caption {
-          font-family: var(--font-caveat), cursive;
-          font-size: 1rem; font-weight: 600;
-          color: #7a6a50; text-align: center;
-          margin-top: 10px; line-height: 1.3;
-        }
-        @media (max-width: 640px) {
-          .polaroid { padding: 7px 7px 30px; margin-bottom: 12px; }
-        }
-      `}</style>
-
-      <div style={{ minHeight: "100vh", background: "#f5f2ec" }}>
+      <div className="min-h-screen bg-[#f5f2ec] pb-safe">
         {/* Hero */}
-        <div style={{ background: "linear-gradient(135deg, #2d4a2d, #3a6b3a)", padding: "56px 24px 48px", textAlign: "center", position: "relative", overflow: "hidden" }}>
-          <div style={{ position: "absolute", inset: 0, opacity: .06, backgroundImage: "radial-gradient(circle, white 1px, transparent 1px)", backgroundSize: "28px 28px" }} />
-          <div style={{ position: "absolute", top: 20, left: 20 }}>
-            <Link href="/#gallery" style={{ display: "inline-flex", alignItems: "center", gap: 7, background: "rgba(255,255,255,.15)", backdropFilter: "blur(8px)", color: "white", padding: "7px 14px", borderRadius: 50, fontSize: ".8rem", fontWeight: 700, textDecoration: "none", border: "1px solid rgba(255,255,255,.2)" }}>
+        <div className="bg-gradient-to-br from-[#2d4a2d] to-[#3a6b3a] pt-[calc(3rem+env(safe-area-inset-top))] pb-12 px-6 text-center relative overflow-hidden">
+          <div className="absolute inset-0 opacity-[0.06] bg-[radial-gradient(circle,white_1px,transparent_1px)] bg-[size:28px_28px]" />
+          <div className="absolute top-4 left-4 md:top-6 md:left-6 z-10 pt-safe">
+            <Link href="/#gallery" className="inline-flex items-center gap-2 bg-white/15 backdrop-blur-md text-white px-4 py-2 rounded-full text-xs md:text-sm font-bold border border-white/20 hover:bg-white/25 transition-colors active:scale-95">
               <i className="fa-solid fa-arrow-left" /> Trang Chủ
             </Link>
           </div>
-          <span style={{ fontSize: "2rem", display: "block", marginBottom: 10 }}>🦋</span>
-          <h1 style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "clamp(2.2rem, 5vw, 3.4rem)", fontWeight: 700, color: "white", margin: "0 0 8px", lineHeight: 1.1 }}>
+          <span className="text-3xl md:text-4xl block mb-2 mt-4 md:mt-0">🦋</span>
+          <h1 className="font-caveat text-4xl md:text-5xl lg:text-6xl font-bold text-white mb-2 leading-tight drop-shadow-md">
             Thư Viện Kỷ Niệm
           </h1>
-          <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "1.2rem", color: "rgba(255,255,255,.75)", margin: "0 0 6px" }}>
+          <p className="font-caveat text-xl md:text-2xl text-white/80 mb-2">
             những khoảnh khắc từ hành trình Cao Bằng
           </p>
           {!loading && (
-            <p style={{ fontSize: ".78rem", color: "rgba(255,255,255,.5)", fontWeight: 600, marginTop: 12 }}>
+            <p className="text-xs text-white/60 font-bold mt-4 tracking-widest uppercase">
               {images.length}{hasMore ? "+" : ""} hình ảnh · #caobangtravel
             </p>
           )}
         </div>
 
         {/* Content */}
-        <div style={{ maxWidth: 1240, margin: "0 auto", padding: "40px 20px 80px" }}>
+        <div className="max-w-[1240px] mx-auto px-4 sm:px-5 py-10 md:py-16">
           {loading ? (
-            <div style={{ textAlign: "center", padding: "80px 0", color: "#7a6a50" }}>
-              <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 32, marginBottom: 14, display: "block" }} />
-              <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "1.2rem" }}>Đang tải ảnh…</p>
+            <div className="text-center py-20 text-[#7a6a50]">
+              <i className="fa-solid fa-spinner fa-spin text-4xl mb-4 block" />
+              <p className="font-caveat text-2xl">Đang tải ảnh…</p>
             </div>
           ) : images.length === 0 ? (
-            <div style={{ textAlign: "center", padding: "80px 0", color: "#a09080" }}>
-              <span style={{ fontSize: "3rem", display: "block", marginBottom: 16 }}>📷</span>
-              <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "1.3rem" }}>Chưa có hình ảnh nào.</p>
+            <div className="text-center py-20 text-[#a09080]">
+              <span className="text-5xl block mb-4">📷</span>
+              <p className="font-caveat text-2xl">Chưa có hình ảnh nào.</p>
             </div>
           ) : (
             <>
-              <div className="tv-masonry">
+              <div className="columns-2 sm:columns-3 lg:columns-4 gap-3 sm:gap-4 space-y-3 sm:space-y-4">
                 {images.map((img, i) => {
                   const rot = ROTATIONS[i % ROTATIONS.length];
                   return (
-                    <div key={img.id} className="polaroid"
+                    <div key={img.id} 
+                      className="break-inside-avoid bg-white p-2 md:p-3 pb-8 md:pb-10 shadow-md hover:shadow-xl cursor-pointer transition-all duration-300 block relative hover:z-10 group"
                       style={{ transform: `rotate(${rot}deg)` }}
                       onClick={() => openLightbox(img, i)}>
-                      <img src={img.image_url} alt={`Ảnh Cao Bằng ${i + 1}`} loading="lazy" />
-                      <p className="polaroid-caption">#caobangtravel</p>
+                      <div className="relative w-full aspect-square bg-slate-100 overflow-hidden">
+                        <img src={img.image_url} alt={`Ảnh Cao Bằng ${i + 1}`} loading="lazy" className="w-full h-full object-cover transition-transform duration-500 group-hover:scale-105" />
+                      </div>
+                      <p className="font-caveat text-lg md:text-xl font-bold text-[#7a6a50] text-center mt-3 leading-snug">#caobangtravel</p>
                     </div>
                   );
                 })}
               </div>
 
               {hasMore && (
-                <div style={{ textAlign: "center", marginTop: 48 }}>
+                <div className="text-center mt-12 md:mt-16">
                   <button onClick={loadMore} disabled={loadingMore}
-                    style={{ display: "inline-flex", alignItems: "center", gap: 9, padding: "13px 36px", borderRadius: 50, border: "2px solid #3a6b3a", background: "white", color: "#3a6b3a", fontWeight: 700, fontSize: ".88rem", cursor: loadingMore ? "not-allowed" : "pointer", boxShadow: "0 4px 16px rgba(58,107,58,.15)", fontFamily: "inherit" }}>
+                    className="inline-flex items-center gap-2 px-8 py-3.5 rounded-full border-2 border-[#3a6b3a] bg-white text-[#3a6b3a] font-bold text-sm hover:bg-[#3a6b3a] hover:text-white transition-colors disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-[#3a6b3a]/10 min-h-[44px]">
                     {loadingMore
                       ? <><i className="fa-solid fa-spinner fa-spin" /> Đang tải…</>
                       : <><i className="fa-solid fa-chevron-down" /> Xem Thêm Hình Ảnh</>}
@@ -164,7 +133,7 @@ export default function ThuVienPage() {
               )}
 
               {!hasMore && images.length > 0 && (
-                <p style={{ textAlign: "center", marginTop: 48, color: "#a09080", fontFamily: "var(--font-caveat), cursive", fontSize: "1.1rem" }}>
+                <p className="text-center mt-12 md:mt-16 text-[#a09080] font-caveat text-xl md:text-2xl">
                   ✨ Đã xem tất cả {images.length} khoảnh khắc
                 </p>
               )}
@@ -175,29 +144,29 @@ export default function ThuVienPage() {
 
       {/* Lightbox */}
       {lightbox && (
-        <div style={{ position: "fixed", inset: 0, zIndex: 3000, background: "rgba(0,0,0,.92)", display: "flex", alignItems: "center", justifyContent: "center" }}
-          onClick={closeLightbox}>
-          <button onClick={closeLightbox}
-            style={{ position: "absolute", top: 16, right: 16, width: 40, height: 40, borderRadius: "50%", border: "none", background: "rgba(255,255,255,.15)", color: "white", fontSize: "1.1rem", cursor: "pointer", zIndex: 10 }}>
+        <div className="fixed inset-0 z-[3000] bg-black/95 flex items-center justify-center p-4" onClick={closeLightbox}>
+          <button onClick={closeLightbox} className="absolute top-4 right-4 md:top-6 md:right-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-xl transition-colors z-10 active:scale-95">
             <i className="fa-solid fa-xmark" />
           </button>
-          <span style={{ position: "absolute", top: 20, left: "50%", transform: "translateX(-50%)", color: "rgba(255,255,255,.5)", fontSize: ".78rem", fontWeight: 700 }}>
+          
+          <span className="absolute top-6 left-1/2 -translate-x-1/2 text-white/50 text-xs font-bold tracking-widest">
             {lightboxIdx + 1} / {images.length}
           </span>
-          <button onClick={e => { e.stopPropagation(); prevImg(); }}
-            style={{ position: "absolute", left: 16, width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,.15)", color: "white", fontSize: "1rem", cursor: "pointer", zIndex: 10 }}>
+          
+          <button onClick={e => { e.stopPropagation(); prevImg(); }} className="absolute left-2 md:left-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg transition-colors z-10 active:scale-95">
             <i className="fa-solid fa-chevron-left" />
           </button>
-          <div onClick={e => e.stopPropagation()}
-            style={{ background: "white", padding: "12px 12px 48px", boxShadow: "0 24px 80px rgba(0,0,0,.5)", maxWidth: "88vw" }}>
-            <img src={lightbox.image_url} alt=""
-              style={{ maxWidth: "80vw", maxHeight: "78vh", objectFit: "contain", display: "block" }} />
-            <p style={{ fontFamily: "var(--font-caveat), cursive", textAlign: "center", marginTop: 10, color: "#7a6a50", fontSize: "1.1rem", fontWeight: 600 }}>
+          
+          <div onClick={e => e.stopPropagation()} className="bg-white p-3 pb-10 shadow-[0_24px_80px_rgba(0,0,0,0.5)] max-w-[90vw] md:max-w-[85vw] max-h-[85vh] flex flex-col">
+            <div className="relative overflow-hidden flex-1 flex items-center justify-center bg-black/5">
+              <img src={lightbox.image_url} alt="" className="max-w-[85vw] max-h-[75vh] object-contain block" />
+            </div>
+            <p className="font-caveat text-center mt-3 text-[#7a6a50] text-xl font-bold">
               #caobangtravel
             </p>
           </div>
-          <button onClick={e => { e.stopPropagation(); nextImg(); }}
-            style={{ position: "absolute", right: 16, width: 44, height: 44, borderRadius: "50%", border: "none", background: "rgba(255,255,255,.15)", color: "white", fontSize: "1rem", cursor: "pointer", zIndex: 10 }}>
+          
+          <button onClick={e => { e.stopPropagation(); nextImg(); }} className="absolute right-2 md:right-6 w-11 h-11 rounded-full bg-white/10 hover:bg-white/20 text-white flex items-center justify-center text-lg transition-colors z-10 active:scale-95">
             <i className="fa-solid fa-chevron-right" />
           </button>
         </div>

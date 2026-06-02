@@ -17,6 +17,20 @@ interface Tour {
   zalo_number: string;
 }
 import { getTier, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BONUS_PCT } from "@/lib/loyalty";
+import Header from "./components/layout/Header";
+import MobileNav from "./components/layout/MobileNav";
+import Footer from "./components/layout/Footer";
+import HeroSection from "./components/sections/HeroSection";
+import AboutSection from "./components/sections/AboutSection";
+import WhyUsSection from "./components/sections/WhyUsSection";
+import GuideGrid from "./components/sections/GuideGrid";
+import DestinationGrid from "./components/sections/DestinationGrid";
+import TourGrid from "./components/sections/TourGrid";
+import GalleryScrapbook from "./components/sections/GalleryScrapbook";
+import Testimonials from "./components/sections/Testimonials";
+import PricingBooking from "./components/sections/PricingBooking";
+import CamNangSection from "./components/sections/CamNangSection";
+
 
 // ── Fallback data (hiển thị ngay khi chờ Supabase) ──────────────────────────
 const FALLBACK_GUIDES: Guide[] = [
@@ -484,33 +498,29 @@ export default function CaoBangEcoTour() {
 
   const today = new Date().toISOString().split("T")[0];
 
-  // Filtered guides
-  const allFiltered = guides.filter((g) => {
-    if (g.is_active === false) return false; // ẩn guide bị tắt khỏi grid tìm kiếm
-    const q = guideSearch.toLowerCase();
-    const matchSearch = !q || g.name.toLowerCase().includes(q) || g.specialty.toLowerCase().includes(q);
-    const matchLang   = !guideFilterLang   || g.languages?.toLowerCase().includes(guideFilterLang.toLowerCase());
-    const matchRating = !guideFilterRating || g.rating >= parseFloat(guideFilterRating);
-    return matchSearch && matchLang && matchRating;
-  });
-  const GUIDE_LIMIT = 8;
-  const hasMore = allFiltered.length > GUIDE_LIMIT && !showAllGuides && !guideSearch && !guideFilterLang && !guideFilterRating;
-  const filteredGuides = hasMore ? allFiltered.slice(0, GUIDE_LIMIT) : allFiltered;
 
-  // Weather icon from WMO code
-  const weatherIcon = (code: number) => {
-    if (code === 0) return { icon: "fa-sun", label: "Nắng đẹp", color: "#F59E0B" };
-    if (code <= 3)  return { icon: "fa-cloud-sun", label: "Có mây", color: "#6B7280" };
-    if (code <= 49) return { icon: "fa-cloud", label: "Nhiều mây", color: "#9CA3AF" };
-    if (code <= 69) return { icon: "fa-cloud-rain", label: "Mưa", color: "#3B82F6" };
-    if (code <= 79) return { icon: "fa-snowflake", label: "Tuyết", color: "#93C5FD" };
-    if (code <= 99) return { icon: "fa-cloud-bolt", label: "Giông bão", color: "#7C3AED" };
-    return { icon: "fa-cloud", label: "Nhiều mây", color: "#9CA3AF" };
-  };
 
   // ── Render ────────────────────────────────────────────────────────────────
   return (
     <>
+      <Header
+        isScrolled={isScrolled}
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        activeSection={activeSection}
+        scrollToSection={scrollToSection}
+        userSession={userSession}
+        userProfile={userProfile}
+        unreadReplies={unreadReplies}
+      />
+      <MobileNav
+        isMobileMenuOpen={isMobileMenuOpen}
+        setIsMobileMenuOpen={setIsMobileMenuOpen}
+        scrollToSection={scrollToSection}
+        userSession={userSession}
+        unreadReplies={unreadReplies}
+      />
+
       {/* ==================== BOOKING MODAL ==================== */}
       {isBookingOpen && (
         <div
@@ -574,7 +584,7 @@ export default function CaoBangEcoTour() {
                   </div>
                   <div className="form-group" style={{ margin: 0 }}>
                     <label htmlFor="b-date">Ngày dự kiến</label>
-                    <input id="b-date" type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} min={today} />
+                    <input id="b-date" type="date" value={bookingDate} onChange={(e) => setBookingDate(e.target.value)} min={new Date().toISOString().split("T")[0]} />
                     {bookingDate && guideBusyDates.has(bookingDate) && (
                       <p style={{ margin: "6px 0 0", fontSize: ".78rem", color: "#b45309", background: "#fff7ed", border: "1px solid #fed7aa", borderRadius: 7, padding: "6px 10px", display: "flex", alignItems: "center", gap: 6 }}>
                         <i className="fa-solid fa-triangle-exclamation" />
@@ -590,7 +600,6 @@ export default function CaoBangEcoTour() {
                   {/* Chọn HDV */}
                   <div className="form-group" style={{ margin: 0 }}>
                     <label htmlFor="b-guide">Chọn Hướng Dẫn Viên</label>
-                    {/* Search HDV */}
                     <div style={{ position: "relative", marginBottom: 6 }}>
                       <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 10, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", fontSize: 12 }} />
                       <input
@@ -622,14 +631,14 @@ export default function CaoBangEcoTour() {
                         ))}
                     </select>
                     {bookingGuideSearch && (
-                      <button onClick={() => setBookingGuideSearch("")}
+                      <button type="button" onClick={() => setBookingGuideSearch("")}
                         style={{ marginTop: 4, background: "none", border: "none", color: "#94a3b8", fontSize: ".72rem", cursor: "pointer", padding: 0 }}>
                         <i className="fa-solid fa-xmark" style={{ marginRight: 4 }} />Xóa tìm kiếm
                       </button>
                     )}
                   </div>
 
-                  {/* Loyalty discount banner (chỉ hiện khi đăng nhập) */}
+                  {/* Loyalty discount banner */}
                   {userSession && userProfile && (() => {
                     const tierDiscount = getTier(userProfile.points).discount;
                     const tierInfo = getTier(userProfile.points);
@@ -731,7 +740,7 @@ export default function CaoBangEcoTour() {
                         </button>
                       ))}
                     </div>
-                    <p style={{ textAlign: "center", fontSize: ".78rem", color: "#94a3b8", marginTop: 6 }}>
+                    <p style={{ textAlign: "center", fontSize: ".78rem", color: "#94a3b8", margin: "6px 0 0 0" }}>
                       {["", "Rất tệ", "Tệ", "Bình thường", "Tốt", "Xuất sắc"][reviewHover || reviewStars]}
                     </p>
                   </div>
@@ -792,893 +801,95 @@ export default function CaoBangEcoTour() {
         </div>
       )}
 
-      {/* ==================== HEADER ==================== */}
-      <header id="site-header" className={isScrolled ? "scrolled" : ""}>
-        <div className="container">
-          <nav role="navigation" aria-label="Điều hướng chính">
-            <a href="#hero" className="nav-logo" onClick={(e) => scrollToSection(e, "hero")}>
-              <img src="/logo.png" alt="Cao Bằng Travel Connect" style={{ height: 38, width: 38, objectFit: "contain", filter: isScrolled ? "none" : "brightness(0) invert(1)", mixBlendMode: isScrolled ? "multiply" : "normal", transition: "filter .35s" }} />
-              <div className="nav-logo-text">
-                <strong>Cao Bằng</strong>
-                <span>Travel Connect</span>
-              </div>
-            </a>
-
-            <ul className="nav-links" role="list">
-              {[
-                { id: "hero",         label: "Trang Chủ" },
-                { id: "why-us",       label: "Giới Thiệu" },
-                { id: "team",         label: "HDV" },
-                { id: "tours",        label: "Tours" },
-                { id: "destinations", label: "Điểm Đến" },
-                { id: "gallery",      label: "Hình Ảnh" },
-                { id: "cam-nang",     label: "Cẩm Nang" },
-                { id: "footer",       label: "Liên Hệ" },
-              ].map(({ id, label }) => (
-                <li key={id}>
-                  <a href={`#${id}`} className={activeSection === id ? "active" : ""} onClick={(e) => scrollToSection(e, id)}>
-                    {label}
+      {/* ==================== DESTINATION MODAL ==================== */}
+      {selectedDest && (
+        <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,.65)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
+          onClick={() => setSelectedDest(null)}>
+          <div style={{ background: "white", borderRadius: 20, width: "100%", maxWidth: 580, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,.3)" }}
+            onClick={(e) => e.stopPropagation()}>
+            <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden" }}>
+              <img src={selectedDest.image_url} alt={selectedDest.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
+              <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%)" }} />
+              <button onClick={() => setSelectedDest(null)}
+                style={{ position: "absolute", top: 12, right: 12, width: 36, height: 36, borderRadius: "50%", border: "none", background: "rgba(0,0,0,.45)", color: "white", cursor: "pointer", fontSize: ".9rem" }}>
+                <i className="fa-solid fa-xmark" />
+              </button>
+              <h2 style={{ position: "absolute", bottom: 16, left: 20, color: "white", fontWeight: 900, fontSize: "1.3rem", margin: 0, textShadow: "0 2px 8px rgba(0,0,0,.4)" }}>{selectedDest.title}</h2>
+            </div>
+            <div style={{ padding: "24px 28px" }}>
+              <p style={{ color: "#334155", fontSize: ".92rem", lineHeight: 1.8, marginBottom: 24 }}>{selectedDest.description}</p>
+              <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
+                <button onClick={() => { setSelectedDest(null); openBooking(`Tham quan ${selectedDest.title}`); }}
+                  style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: "none", background: "#265C59", color: "white", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
+                  <i className="fa-solid fa-calendar-check" style={{ marginRight: 7 }} />Đặt tour tham quan
+                </button>
+                {destsFromDB && (
+                  <a href={`/diem-den/${selectedDest.id}`}
+                    style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #265C59", background: "white", color: "#265C59", fontWeight: 700, fontSize: ".88rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
+                    <i className="fa-solid fa-arrow-up-right-from-square" />Xem chi tiết
                   </a>
-                </li>
-              ))}
-            </ul>
-
-            <a href="#pricing" className="btn-cta" onClick={(e) => scrollToSection(e, "pricing")}>
-              <i className="fa-solid fa-calendar-check" aria-hidden="true" /> ĐẶT HDV NGAY
-            </a>
-
-            {userSession ? (
-              <a href="/tai-khoan" className="nav-user-btn" style={{ position: "relative" }}>
-                <i className={`fa-solid ${userProfile ? getTier(userProfile.points).icon : "fa-award"}`}
-                   style={{ color: userProfile ? getTier(userProfile.points).color : "#cd7f32" }} />
-                <span>Tài Khoản</span>
-                {unreadReplies > 0 && (
-                  <span style={{
-                    position: "absolute", top: -4, right: -4,
-                    background: "#dc2626", color: "white",
-                    borderRadius: "50%", width: 17, height: 17,
-                    fontSize: ".6rem", fontWeight: 800,
-                    display: "flex", alignItems: "center", justifyContent: "center",
-                    border: "2px solid white",
-                  }}>{unreadReplies}</span>
                 )}
-              </a>
-            ) : (
-              <a href="/dang-nhap" className="nav-user-btn">
-                <i className="fa-solid fa-user" />
-                <span>Đăng Nhập</span>
-              </a>
-            )}
-
-            <button
-              className={`hamburger ${isMobileMenuOpen ? "open" : ""}`}
-              aria-label="Mở menu"
-              aria-expanded={isMobileMenuOpen}
-              onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-            >
-              <span /><span /><span />
-            </button>
-          </nav>
+                <button onClick={() => setSelectedDest(null)}
+                  style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "white", color: "#475569", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
+                  Đóng
+                </button>
+              </div>
+            </div>
+          </div>
         </div>
-
-        <nav className={`mobile-nav ${isMobileMenuOpen ? "open" : ""}`} aria-label="Menu điều hướng di động">
-          {[
-            { id: "hero",         label: "Trang Chủ" },
-            { id: "why-us",       label: "Giới Thiệu" },
-            { id: "team",         label: "HDV" },
-            { id: "tours",        label: "Tours" },
-            { id: "destinations", label: "Điểm Đến" },
-            { id: "gallery",      label: "Hình Ảnh" },
-            { id: "cam-nang",     label: "Cẩm Nang" },
-            { id: "pricing",      label: "Bảng Giá" },
-            { id: "footer",       label: "Liên Hệ" },
-          ].map(({ id, label }) => (
-            <a key={id} href={`#${id}`} onClick={(e) => scrollToSection(e, id)}>{label}</a>
-          ))}
-          <a href="#pricing" className="btn-cta" onClick={(e) => scrollToSection(e, "pricing")}>
-            <i className="fa-solid fa-calendar-check" /> ĐẶT HDV NGAY
-          </a>
-          <a
-            href={userSession ? "/tai-khoan" : "/dang-nhap"}
-            className="mobile-nav-account btn-cta"
-            onClick={() => setIsMobileMenuOpen(false)}
-          >
-            <i className={`fa-solid ${userSession ? "fa-user" : "fa-right-to-bracket"}`} />
-            {userSession ? "Tài Khoản" : "Đăng Nhập"}
-          </a>
-        </nav>
-      </header>
+      )}
 
       <main>
-        {/* ==================== HERO ==================== */}
-        <section className="hero" id="hero" aria-label="Ảnh bìa - Khám phá Cao Bằng">
-          {heroVideo ? (
-            <video
-              className="hero-bg"
-              autoPlay muted loop playsInline
-              poster={heroBg || undefined}
-              aria-hidden="true"
-            >
-              <source src={heroVideo} type="video/mp4" />
-            </video>
-          ) : (
-            <div
-              className="hero-bg"
-              role="img"
-              aria-label="Thác Bản Giốc Cao Bằng"
-              style={heroBg ? { backgroundImage: `url('${heroBg}')` } : undefined}
-            />
-          )}
-          <div className="hero-overlay" aria-hidden="true" />
-          <div ref={heroMistRef} className="hero-mist" aria-hidden="true" />
-          {/* Body — flex-1, centered */}
-          <div className="hero-body">
-            <div className="hero-content">
-              <div className="hero-badge">
-                <i className="fa-solid fa-leaf" /> Hướng Dẫn Viên Địa Phương · Cao Bằng, Việt Nam
-              </div>
-              <h1>Khám Phá<br />Cao Bằng</h1>
-              <p className="hero-tagline">Cùng Hướng Dẫn Viên Địa Phương</p>
-              <p className="hero-sub">Chuyên Nghiệp · Am Hiểu · Tận Tâm · Hành trình trọn vẹn</p>
-              <div className="hero-actions">
-                <a href="#team" className="btn-hero-primary" onClick={(e) => scrollToSection(e, "team")}>
-                  <i className="fa-solid fa-compass" aria-hidden="true" /> XEM CÁC HDV &amp; TOUR
-                </a>
-                <a href="#destinations" className="btn-hero-outline" onClick={(e) => scrollToSection(e, "destinations")}>
-                  <i className="fa-solid fa-map-location-dot" aria-hidden="true" /> KHÁM PHÁ ĐIỂM ĐẾN
-                </a>
-              </div>
-            </div>
-          </div>
+        <HeroSection
+          heroVideo={heroVideo}
+          heroBg={heroBg}
+          weather={weather}
+          scrollToSection={scrollToSection}
+          heroMistRef={heroMistRef}
+        />
 
-          {/* Bottom — stats */}
-          <div className="hero-bottom">
-            <div className="hero-stats" aria-label="Thống kê dịch vụ">
-              <div className="hero-stat"><strong>50+</strong><span>Hướng Dẫn Viên</span></div>
-              <div className="hero-stat"><strong>2000+</strong><span>Du Khách Hài Lòng</span></div>
-              <div className="hero-stat"><strong>30+</strong><span>Điểm Tham Quan</span></div>
-              <div className="hero-stat"><strong>5★</strong><span>Đánh Giá TB</span></div>
-            </div>
-          </div>
+        <AboutSection
+          aboutImage={aboutImage}
+          scrollToSection={scrollToSection}
+        />
 
-          {/* Weather widget — ngoài hero-content, không đè lên stats */}
-          {weather && (() => {
-            const w = weatherIcon(weather.code);
-            return (
-              <div style={{ position: "absolute", top: 80, right: 20, background: "rgba(0,0,0,.5)", backdropFilter: "blur(10px)", borderRadius: 14, padding: "10px 16px", display: "flex", alignItems: "center", gap: 10, color: "white", border: "1px solid rgba(255,255,255,.18)", zIndex: 10 }}>
-                <i className={`fa-solid ${w.icon}`} style={{ fontSize: 20, color: w.color }} />
-                <div>
-                  <p style={{ margin: 0, fontWeight: 800, fontSize: "1rem", lineHeight: 1 }}>{weather.temp}°C</p>
-                  <p style={{ margin: "2px 0 0", fontSize: ".65rem", opacity: .75 }}>{w.label} · {weather.wind} km/h</p>
-                  <p style={{ margin: "1px 0 0", fontSize: ".6rem", opacity: .5 }}>Cao Bằng, Việt Nam</p>
-                </div>
-              </div>
-            );
-          })()}
-        </section>
+        <WhyUsSection whyusBg={whyusBg} />
 
-        {/* ==================== ABOUT / GIỚI THIỆU ==================== */}
-        <section style={{ background: "#f0ede4", position: "relative", zIndex: 1, overflow: "hidden" }}>
-          {/* Linen texture */}
-          <div style={{ position: "absolute", inset: 0, backgroundImage: "repeating-linear-gradient(0deg,transparent,transparent 28px,rgba(180,160,120,.04) 28px,rgba(180,160,120,.04) 29px),repeating-linear-gradient(90deg,transparent,transparent 28px,rgba(180,160,120,.03) 28px,rgba(180,160,120,.03) 29px)", pointerEvents: "none" }} />
+        <GuideGrid
+          teamBg={teamBg}
+          guides={guides}
+        />
 
-          <div className="container about-grid">
-            {/* LEFT — Text */}
-            <div>
-              <p style={{ fontSize: ".72rem", fontWeight: 700, letterSpacing: ".14em", textTransform: "uppercase", color: "#6b8f5e", marginBottom: 20, display: "flex", alignItems: "center", gap: 10 }}>
-                <span style={{ display: "inline-block", width: 32, height: 2, background: "#6b8f5e", borderRadius: 2 }} />
-                Khám Phá Cao Bằng
-              </p>
+        <DestinationGrid
+          destBg={destBg}
+          destinations={destinations}
+          setSelectedDest={setSelectedDest}
+        />
 
-              <h2 style={{ fontFamily: "var(--font-lora), Georgia, serif", fontSize: "clamp(1.5rem, 3vw, 2.5rem)", fontWeight: 700, fontStyle: "italic", lineHeight: 1.38, marginBottom: 28, color: "#1a3a18" }}>
-                Cao Bằng — vùng đất biên cương hùng vĩ phương Bắc,{" "}
-                <span style={{ opacity: .38, fontWeight: 400 }}>nơi thiên nhiên hoang sơ và văn hóa dân tộc hòa quyện thành những hành trình không thể quên.</span>
-              </h2>
+        <TourGrid
+          toursBg={toursBg}
+          tours={tours}
+        />
 
-              <p style={{ fontSize: ".95rem", color: "#3d3d2d", lineHeight: 1.88, marginBottom: 18 }}>
-                Nằm ở cực Đông Bắc Việt Nam, Cao Bằng là vùng đất của những thác nước hùng vĩ, hang động kỳ bí và bản làng dân tộc còn nguyên vẹn nét đẹp ngàn đời.{" "}
-                <strong style={{ color: "#2d5a27" }}>Thác Bản Giốc</strong> — một trong những thác nước đẹp nhất Đông Nam Á,{" "}
-                <strong style={{ color: "#2d5a27" }}>Động Ngườm Ngao</strong>,{" "}
-                <strong style={{ color: "#2d5a27" }}>hồ Thang Hen</strong>... mỗi địa danh là một trang thơ của tạo hóa.
-              </p>
+        <GalleryScrapbook galleryImages={galleryImages} />
 
-              <p style={{ fontSize: ".95rem", color: "#3d3d2d", lineHeight: 1.88, marginBottom: 44 }}>
-                Không chỉ là thiên nhiên, Cao Bằng còn là cái nôi lịch sử với{" "}
-                <strong style={{ color: "#2d5a27" }}>di tích Pác Bó</strong> thiêng liêng. Văn hóa Tày, Nùng đặc sắc cùng ẩm thực độc đáo — phở chua, bánh coóng phù, hạt dẻ Trùng Khánh — tạo nên hành trình đa chiều, sâu sắc và đầy cảm xúc.
-              </p>
+        <PricingBooking
+          pricingBg={pricingBg}
+          destinations={destinations}
+          openBooking={openBooking}
+        />
 
-              <a href="#destinations" onClick={e => scrollToSection(e, "destinations")}
-                style={{ display: "inline-flex", alignItems: "center", gap: 10, background: "#2d5a27", color: "white", padding: "14px 32px", borderRadius: 4, fontWeight: 700, fontSize: ".86rem", letterSpacing: ".08em", textTransform: "uppercase", textDecoration: "none" }}
-                onMouseEnter={e => (e.currentTarget as HTMLAnchorElement).style.background = "#1e3e1a"}
-                onMouseLeave={e => (e.currentTarget as HTMLAnchorElement).style.background = "#2d5a27"}>
-                Khám Phá Ngay <i className="fa-solid fa-arrow-right" />
-              </a>
-            </div>
+        <CamNangSection
+          camNangBg={camNangBg}
+          camNangFromDB={camNangFromDB}
+          camNangTips={camNangTips}
+        />
 
-            {/* RIGHT — Polaroid */}
-            <div style={{ display: "flex", justifyContent: "center", alignItems: "center" }}>
-              <div style={{ position: "relative", transform: "rotate(3deg)", transition: "transform .4s ease" }}
-                onMouseEnter={e => (e.currentTarget as HTMLDivElement).style.transform = "rotate(0deg) scale(1.02)"}
-                onMouseLeave={e => (e.currentTarget as HTMLDivElement).style.transform = "rotate(3deg)"}>
-                {/* Paper clip */}
-                <div style={{ position: "absolute", top: -28, right: 36, fontSize: "2.2rem", transform: "rotate(-12deg)", userSelect: "none", zIndex: 2, filter: "drop-shadow(0 2px 4px rgba(0,0,0,.2))" }}>📎</div>
-                {/* Polaroid */}
-                <div style={{ background: "white", padding: "12px 12px 56px", boxShadow: "0 10px 40px rgba(0,0,0,.16), 0 2px 8px rgba(0,0,0,.08)", maxWidth: 400 }}>
-                  <div style={{ width: "100%", aspectRatio: "4/3", overflow: "hidden", background: "#d4c9aa" }}>
-                    {aboutImage
-                      ? <img src={aboutImage} alt="Cao Bằng Travel Team" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                      : <div style={{ width: "100%", height: "100%", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", gap: 10, color: "#9a8a6a" }}>
-                          <i className="fa-solid fa-camera" style={{ fontSize: 36 }} />
-                          <span style={{ fontSize: ".82rem", fontWeight: 600 }}>Thêm ảnh từ Admin → Cài Đặt</span>
-                        </div>
-                    }
-                  </div>
-                  {/* IG actions */}
-                  <div style={{ display: "flex", alignItems: "center", gap: 12, marginTop: 12, marginBottom: 8, paddingTop: 4, borderTop: "1px solid #f0f0f0" }}>
-                    <i className="fa-solid fa-heart" style={{ color: "#e33", fontSize: "1.15rem" }} />
-                    <i className="fa-regular fa-comment" style={{ color: "#444", fontSize: "1rem" }} />
-                    <i className="fa-regular fa-paper-plane" style={{ color: "#444", fontSize: "1rem" }} />
-                    <span style={{ marginLeft: "auto", fontSize: ".7rem", color: "#999", fontWeight: 600 }}>#caobangtravel</span>
-                  </div>
-                  <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "1.5rem", fontWeight: 700, color: "#2d5a27", margin: 0, lineHeight: 1.15 }}>
-                    Cao Bằng Travel Team
-                  </p>
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Marquee */}
-          <div style={{ overflow: "hidden", borderTop: "1px solid rgba(45,90,39,.12)", marginTop: 0 }}>
-            <div className="about-marquee-track">
-              {[0, 1].map(i => (
-                <span key={i} className="about-marquee-text">
-                  Chuyên Nghiệp · Am Hiểu · Tận Tâm · Hành Trình Trọn Vẹn ·&nbsp;&nbsp;
-                </span>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ==================== WHY CHOOSE US ==================== */}
-        <section className="why-us" id="why-us" aria-labelledby="why-heading"
-          style={{ background: `linear-gradient(rgba(237,231,218,.90),rgba(237,231,218,.90)),url('${whyusBg}') center/cover no-repeat` }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-tag">Vì Sao Chọn Chúng Tôi</span>
-              <h2 className="section-title" id="why-heading">Tại Sao Chọn Chúng Tôi?</h2>
-              <p className="section-subtitle">Chúng tôi cung cấp những trải nghiệm du lịch sinh thái độc đáo và chân thực nhất tại Cao Bằng</p>
-            </div>
-            <div className="features-grid">
-              {[
-                { icon: "fa-map-pin",  title: "Kiến Thức Bản Địa Điểm", desc: "Hướng dẫn viên sinh ra và lớn lên tại Cao Bằng, am hiểu sâu về văn hóa, lịch sử và địa hình từng điểm đến bản địa." },
-                { icon: "fa-route",    title: "Lộ Trình Thiết Kế Riêng", desc: "Mỗi chuyến đi được cá nhân hóa theo sở thích và nhu cầu của từng đoàn khách, đảm bảo trải nghiệm tốt nhất." },
-                { icon: "fa-headset",  title: "Hỗ Trợ 24/7",             desc: "Đội ngũ hỗ trợ luôn sẵn sàng giải đáp mọi thắc mắc và đảm bảo an toàn cho du khách trên toàn bộ hành trình." },
-              ].map(({ icon, title, desc }) => (
-                <article key={title} className="feature-card fade-up">
-                  <div className="feature-icon" aria-hidden="true"><i className={`fa-solid ${icon}`} /></div>
-                  <h3>{title}</h3>
-                  <p>{desc}</p>
-                </article>
-              ))}
-            </div>
-          </div>
-        </section>
-
-        {/* ==================== TEAM ==================== */}
-        <section className="team" id="team" aria-labelledby="team-heading"
-          style={{ background: `linear-gradient(rgba(255,255,255,.91),rgba(255,255,255,.91)),url('${teamBg}') center/cover no-repeat` }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-tag">Đội Ngũ Chuyên Nghiệp</span>
-              <h2 className="section-title" id="team-heading">Đội Ngũ Hướng Dẫn Viên Biểu Tượng</h2>
-              <p className="section-subtitle">Những hướng dẫn viên giàu kinh nghiệm, tận tâm và am hiểu sâu về vùng đất Cao Bằng</p>
-            </div>
-            {/* Search & filter — nền trắng nên dùng màu tối */}
-            <div className="guide-search-bar" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 28, justifyContent: "center" }}>
-              <div style={{ position: "relative", flex: "1 1 220px", maxWidth: 320 }}>
-                <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 13, top: "50%", transform: "translateY(-50%)", color: "#94a3b8", fontSize: 13 }} />
-                <input
-                  type="text" value={guideSearch} onChange={(e) => { setGuideSearch(e.target.value); setCurrentPage(0); }}
-                  placeholder="Tìm theo tên, chuyên môn..."
-                  style={{ width: "100%", padding: "10px 14px 10px 36px", border: "1.5px solid #e2e8f0", borderRadius: 10, background: "white", color: "#1a2e2e", fontSize: ".84rem", outline: "none", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}
-                />
-              </div>
-              <select value={guideFilterLang} onChange={(e) => { setGuideFilterLang(e.target.value); setCurrentPage(0); }}
-                style={{ padding: "10px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, background: "white", color: "#1a2e2e", fontSize: ".84rem", outline: "none", cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
-                <option value="">🌐 Ngôn ngữ</option>
-                <option value="English">English</option>
-                <option value="Tiếng Việt">Tiếng Việt</option>
-              </select>
-              <select value={guideFilterRating} onChange={(e) => { setGuideFilterRating(e.target.value); setCurrentPage(0); }}
-                style={{ padding: "10px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, background: "white", color: "#1a2e2e", fontSize: ".84rem", outline: "none", cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
-                <option value="">⭐ Đánh giá</option>
-                <option value="5">5 sao</option>
-                <option value="4.5">4.5+ sao</option>
-                <option value="4">4+ sao</option>
-              </select>
-              {(guideSearch || guideFilterLang || guideFilterRating) && (
-                <button onClick={() => { setGuideSearch(""); setGuideFilterLang(""); setGuideFilterRating(""); }}
-                  style={{ padding: "10px 14px", border: "1.5px solid #e2e8f0", borderRadius: 10, background: "white", color: "#64748b", fontSize: ".82rem", cursor: "pointer", boxShadow: "0 1px 4px rgba(0,0,0,.06)" }}>
-                  <i className="fa-solid fa-xmark" style={{ marginRight: 5 }} />Xóa lọc
-                </button>
-              )}
-            </div>
-
-            <div className="team-grid">
-              {filteredGuides.length === 0 ? (
-                <div style={{ gridColumn: "1/-1", textAlign: "center", padding: "40px 0", color: "#94a3b8" }}>
-                  <i className="fa-solid fa-person-hiking" style={{ fontSize: 36, marginBottom: 12, display: "block" }} />
-                  <p style={{ fontWeight: 700, color: "#475569" }}>Không tìm thấy HDV phù hợp</p>
-                  <p style={{ fontSize: ".82rem", marginTop: 4 }}>Thử điều chỉnh bộ lọc của bạn</p>
-                </div>
-              ) : filteredGuides.map((member) => (
-                <article key={member.id} className="team-card fade-up">
-                  <a href={`/hdv/${member.id}`} className="team-card-img-wrap" aria-label={`Xem hồ sơ ${member.name}`} style={{ display: "block", textDecoration: "none", cursor: "pointer" }}>
-                    <img className="team-card-img" src={member.image_url} alt={`HDV ${member.name}`} loading="lazy" />
-                    <span className="team-card-badge">{member.rating}★</span>
-                    <span style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0)", transition: "background .25s", borderRadius: "inherit", display: "flex", alignItems: "center", justifyContent: "center" }} className="team-card-hover-overlay">
-                      <span style={{ background: "rgba(38,92,89,.85)", color: "white", padding: "7px 16px", borderRadius: 20, fontSize: ".75rem", fontWeight: 700, opacity: 0, transition: "opacity .25s" }} className="team-card-view-label">
-                        <i className="fa-solid fa-eye" style={{ marginRight: 5 }} />Xem hồ sơ
-                      </span>
-                    </span>
-                  </a>
-                  <h3>{member.name}</h3>
-                  <p>{member.specialty}</p>
-                  <p className="hdv-role">{member.role}</p>
-                  <div className="team-stars" aria-label={`${member.rating} sao`}>
-                    <StarIcons rating={member.rating} />
-                  </div>
-                  {member.zalo_number && (
-                    <a
-                      href={`https://zalo.me/${member.zalo_number}`}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      className="team-zalo-btn"
-                      aria-label={`Chat Zalo với ${member.name}`}
-                    >
-                      <i className="fa-brands fa-comment-dots" /> Chat Zalo
-                    </a>
-                  )}
-                </article>
-              ))}
-            </div>
-
-            {/* Nút xem tất cả / thu gọn */}
-            {/* Xem tất cả → trang /hdv riêng */}
-            <div style={{ textAlign: "center", marginTop: 32, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-              <a href="/hdv"
-                style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 32px", borderRadius: 12, border: "2px solid #265C59", background: "#265C59", color: "white", fontWeight: 700, fontSize: ".9rem", textDecoration: "none", boxShadow: "0 4px 16px rgba(38,92,89,.25)" }}>
-                <i className="fa-solid fa-users" />Xem tất cả hướng dẫn viên
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ==================== DESTINATIONS ==================== */}
-        <section className="destinations" id="destinations" aria-labelledby="dest-heading"
-          style={{ background: `linear-gradient(to bottom,rgba(20,52,52,.55),rgba(20,52,52,.62)),url('${destBg}') center/cover no-repeat` }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-tag" style={{ background: "rgba(38,92,89,.12)", color: "var(--teal-dark)" }}>Khám Phá Ngay</span>
-              <h2 className="section-title" id="dest-heading">Điểm Đến Không Thể Bỏ Lỡ</h2>
-              <p className="section-subtitle">Những địa danh hùng vĩ và đặc sắc nhất tại vùng đất Cao Bằng đang chờ bạn khám phá</p>
-            </div>
-
-            <div className="dest-map-wrapper" aria-label="Bản đồ du lịch Cao Bằng">
-              <iframe
-                src="https://www.google.com/maps/embed?pb=!1m18!1m12!1m3!1d239558.34!2d105.75!3d22.67!2m3!1f0!2f0!3f0!3m2!1i1024!2i768!4f13.1!3m3!1m2!1s0x36cd16a1c9ef9d73%3A0x9c7f8b0ba2a3e4f0!2zQ2FvIELhbaG_bmcsIFZp4buHdCBOYW0!5e0!3m2!1svi!2svn!4v1700000000000!5m2!1svi!2svn"
-                title="Bản đồ du lịch Cao Bằng Việt Nam"
-                loading="lazy"
-                allowFullScreen
-              />
-              <div className="dest-map-overlay" aria-hidden="true" />
-            </div>
-
-            <div className="dest-grid">
-              {destinations.map((dest) => (
-                <article key={dest.id} className="dest-card fade-up" onClick={() => setSelectedDest(dest)}
-                  style={{ cursor: "pointer" }}>
-                  <div className="dest-card-img-wrap" style={{ position: "relative" }}>
-                    <img className="dest-card-img" src={dest.image_url} alt={dest.title} loading="lazy" />
-                    <div style={{ position: "absolute", inset: 0, background: "rgba(0,0,0,0)", transition: "background .2s", display: "flex", alignItems: "center", justifyContent: "center" }}
-                      onMouseEnter={(e) => (e.currentTarget as HTMLDivElement).style.background = "rgba(0,0,0,.3)"}
-                      onMouseLeave={(e) => (e.currentTarget as HTMLDivElement).style.background = "rgba(0,0,0,0)"}>
-                      <span style={{ background: "rgba(38,92,89,.9)", color: "white", padding: "7px 16px", borderRadius: 20, fontSize: ".75rem", fontWeight: 700, opacity: 0, transition: "opacity .2s" }}
-                        className="dest-hover-label">
-                        <i className="fa-solid fa-circle-info" style={{ marginRight: 5 }} />Xem chi tiết
-                      </span>
-                    </div>
-                  </div>
-                  <div className="dest-card-body">
-                    <h3>{dest.title}</h3>
-                    <p>{dest.description}</p>
-                    {destsFromDB && (
-                      <a href={`/diem-den/${dest.id}`} onClick={e => e.stopPropagation()}
-                        style={{ marginTop: 12, display: "inline-flex", alignItems: "center", gap: 5, color: "#265C59", fontSize: ".78rem", fontWeight: 700, textDecoration: "none" }}>
-                        Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
-                      </a>
-                    )}
-                  </div>
-                </article>
-              ))}
-            </div>
-
-            {/* Destination detail modal */}
-            {selectedDest && (
-              <div style={{ position: "fixed", inset: 0, zIndex: 2000, background: "rgba(0,0,0,.65)", backdropFilter: "blur(4px)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
-                onClick={() => setSelectedDest(null)}>
-                <div style={{ background: "white", borderRadius: 20, width: "100%", maxWidth: 580, maxHeight: "90vh", overflowY: "auto", boxShadow: "0 24px 64px rgba(0,0,0,.3)" }}
-                  onClick={(e) => e.stopPropagation()}>
-                  <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden" }}>
-                    <img src={selectedDest.image_url} alt={selectedDest.title} style={{ width: "100%", height: "100%", objectFit: "cover" }} />
-                    <div style={{ position: "absolute", inset: 0, background: "linear-gradient(to top,rgba(0,0,0,.6) 0%,transparent 50%)" }} />
-                    <button onClick={() => setSelectedDest(null)}
-                      style={{ position: "absolute", top: 12, right: 12, width: 36, height: 36, borderRadius: "50%", border: "none", background: "rgba(0,0,0,.45)", color: "white", cursor: "pointer", fontSize: ".9rem" }}>
-                      <i className="fa-solid fa-xmark" />
-                    </button>
-                    <h2 style={{ position: "absolute", bottom: 16, left: 20, color: "white", fontWeight: 900, fontSize: "1.3rem", margin: 0, textShadow: "0 2px 8px rgba(0,0,0,.4)" }}>{selectedDest.title}</h2>
-                  </div>
-                  <div style={{ padding: "24px 28px" }}>
-                    <p style={{ color: "#334155", fontSize: ".92rem", lineHeight: 1.8, marginBottom: 24 }}>{selectedDest.description}</p>
-                    <div style={{ display: "flex", gap: 12, flexWrap: "wrap" }}>
-                      <button onClick={() => { setSelectedDest(null); openBooking(`Tham quan ${selectedDest.title}`); }}
-                        style={{ flex: 1, padding: "11px 0", borderRadius: 10, border: "none", background: "#265C59", color: "white", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
-                        <i className="fa-solid fa-calendar-check" style={{ marginRight: 7 }} />Đặt tour tham quan
-                      </button>
-                      {destsFromDB && (
-                        <a href={`/diem-den/${selectedDest.id}`}
-                          style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #265C59", background: "white", color: "#265C59", fontWeight: 700, fontSize: ".88rem", textDecoration: "none", display: "inline-flex", alignItems: "center", gap: 6 }}>
-                          <i className="fa-solid fa-arrow-up-right-from-square" />Xem chi tiết
-                        </a>
-                      )}
-                      <button onClick={() => setSelectedDest(null)}
-                        style={{ padding: "11px 20px", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "white", color: "#475569", fontWeight: 700, fontSize: ".88rem", cursor: "pointer" }}>
-                        Đóng
-                      </button>
-                    </div>
-                  </div>
-                </div>
-              </div>
-            )}
-            <div style={{ textAlign: "center", marginTop: 36 }}>
-              <a href="/diem-den" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
-                <i className="fa-solid fa-map-location-dot" /> Xem Tất Cả Điểm Đến <i className="fa-solid fa-arrow-right" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ==================== TOURS ==================== */}
-        <section id="tours" className="section-tours" style={{ background: `linear-gradient(rgba(248,249,248,.91),rgba(248,249,248,.91)),url('${toursBg}') center/cover no-repeat` }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-tag">Khám Phá Ngay</span>
-              <h2 className="section-title">Các Gói Tour Nổi Bật</h2>
-              <p className="section-subtitle">Lựa chọn hành trình phù hợp — từ tour 1 ngày đến khám phá dài ngày trọn vẹn</p>
-            </div>
-            <div className="tours-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 20, marginBottom: 28 }}>
-              {tours.map((t) => (
-                <a key={t.id} href={`/tour/${t.id}`} style={{ textDecoration: "none", display: "block" }}>
-                  <div style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 14px rgba(0,0,0,.07)", transition: "transform .2s,box-shadow .2s", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}
-                    onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-4px)"; el.style.boxShadow = "0 10px 30px rgba(0,0,0,.13)"; }}
-                    onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.transform = ""; el.style.boxShadow = "0 2px 14px rgba(0,0,0,.07)"; }}>
-                    {/* Image */}
-                    <div style={{ position: "relative", aspectRatio: "16/9", overflow: "hidden", background: "#e2e8f0", flexShrink: 0 }}>
-                      {t.image_url
-                        ? <img src={t.image_url} alt={t.title} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .3s" }} />
-                        : <div style={{ width: "100%", height: "100%", display: "flex", alignItems: "center", justifyContent: "center" }}><i className="fa-solid fa-map" style={{ fontSize: 40, color: "#94a3b8" }} /></div>}
-                      {t.price_from > 0 && (
-                        <div style={{ position: "absolute", top: 10, right: 10, background: "#265C59", color: "white", borderRadius: 8, padding: "4px 10px", fontSize: ".72rem", fontWeight: 800 }}>
-                          Từ {t.price_from.toLocaleString("vi-VN")}đ
-                        </div>
-                      )}
-                    </div>
-                    {/* Body */}
-                    <div style={{ padding: "18px 20px 16px", flex: 1, display: "flex", flexDirection: "column" }}>
-                      <div style={{ display: "flex", gap: 8, marginBottom: 8, flexWrap: "wrap" }}>
-                        <span style={{ background: "#f0faf9", color: "#265C59", borderRadius: 6, padding: "3px 9px", fontSize: ".7rem", fontWeight: 700 }}>
-                          <i className="fa-solid fa-clock" style={{ marginRight: 4 }} />{t.duration}
-                        </span>
-                        <span style={{ background: "#f0faf9", color: "#265C59", borderRadius: 6, padding: "3px 9px", fontSize: ".7rem", fontWeight: 700 }}>
-                          <i className="fa-solid fa-users" style={{ marginRight: 4 }} />{t.group_size}
-                        </span>
-                      </div>
-                      <h3 style={{ fontWeight: 800, color: "#0f172a", fontSize: ".95rem", margin: "0 0 8px", lineHeight: 1.4 }}>{t.title}</h3>
-                      <p style={{ color: "#64748b", fontSize: ".82rem", lineHeight: 1.7, margin: "0 0 14px", flex: 1, display: "-webkit-box", WebkitLineClamp: 3, WebkitBoxOrient: "vertical", overflow: "hidden" }}>
-                        {t.description}
-                      </p>
-                      <div style={{ display: "flex", gap: 8 }}>
-                        {t.zalo_number && (
-                          <a href={`https://zalo.me/${t.zalo_number}`} target="_blank" rel="noopener noreferrer"
-                            onClick={(e) => e.stopPropagation()}
-                            style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, background: "#265C59", color: "white", fontWeight: 700, fontSize: ".75rem", textDecoration: "none" }}>
-                            <i className="fa-brands fa-comment-dots" />Zalo: {t.zalo_number}
-                          </a>
-                        )}
-                        <span style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", color: "#475569", fontSize: ".75rem", fontWeight: 600 }}>
-                          Xem chi tiết <i className="fa-solid fa-arrow-right" />
-                        </span>
-                      </div>
-                    </div>
-                  </div>
-                </a>
-              ))}
-            </div>
-            <div style={{ textAlign: "center", marginTop: 36 }}>
-              <a href="/tour" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid #265C59", color: "#265C59", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", background: "white", letterSpacing: ".04em" }}>
-                <i className="fa-solid fa-map" /> Xem Tất Cả Gói Tour <i className="fa-solid fa-arrow-right" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ==================== GALLERY SCRAPBOOK ==================== */}
-        <section className="gallery" id="gallery" aria-labelledby="gallery-heading"
-          style={{ background: "#f5f2ec", padding: "72px 0 64px", overflow: "hidden" }}>
-
-          {/* Title — centered above scatter */}
-          <div style={{ textAlign: "center", marginBottom: 40, position: "relative" }}>
-            <div style={{ display: "inline-block", position: "relative" }}>
-              <span style={{ position: "absolute", top: -10, left: -40, fontSize: "1.9rem", transform: "rotate(-18deg)", pointerEvents: "none", userSelect: "none" }}>🦋</span>
-              <h2 id="gallery-heading" style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "clamp(2.6rem, 5vw, 4rem)", fontWeight: 700, color: "#3a6b3a", lineHeight: 1.05, margin: 0 }}>
-                Khoảnh Khắc Đáng Nhớ
-              </h2>
-              <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: "1.3rem", color: "#7a9e5a", fontWeight: 600, margin: "4px 0 0" }}>
-                that will last a lifetime
-              </p>
-            </div>
-          </div>
-
-          {/* Full-width scatter area — desktop only */}
-          <div className="gallery-scrapbook-scatter" style={{ position: "relative", width: "100%", height: 480, overflow: "hidden" }}>
-
-            {/* Photo 0 — far left, clipped */}
-            {galleryImages[0] && (
-              <a href="/thu-vien" style={{ position: "absolute", left: "-1%", top: 80, width: "13%", minWidth: 110, zIndex: 2, textDecoration: "none", background: "white", padding: "8px 8px 30px", boxShadow: "0 6px 20px rgba(0,0,0,.14)", transform: "rotate(-8deg)", transition: "transform .3s, box-shadow .3s", display: "block" }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(0deg) scale(1.06)"; el.style.zIndex="20"; el.style.boxShadow="0 16px 36px rgba(0,0,0,.2)"; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(-8deg)"; el.style.zIndex="2"; el.style.boxShadow="0 6px 20px rgba(0,0,0,.14)"; }}>
-                <div style={{ aspectRatio:"1", overflow:"hidden", background:"#ddd" }}><img src={galleryImages[0].image_url} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} /></div>
-              </a>
-            )}
-
-            {/* Photo 1 */}
-            {galleryImages[1] && (
-              <a href="/thu-vien" style={{ position: "absolute", left: "8%", top: 110, width: "16%", minWidth: 130, zIndex: 3, textDecoration: "none", background: "white", padding: "9px 9px 32px", boxShadow: "0 6px 20px rgba(0,0,0,.13)", transform: "rotate(5deg)", transition: "transform .3s, box-shadow .3s", display: "block" }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(0deg) scale(1.06)"; el.style.zIndex="20"; el.style.boxShadow="0 16px 36px rgba(0,0,0,.2)"; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(5deg)"; el.style.zIndex="3"; el.style.boxShadow="0 6px 20px rgba(0,0,0,.13)"; }}>
-                <div style={{ aspectRatio:"1", overflow:"hidden", background:"#ddd" }}><img src={galleryImages[1].image_url} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} /></div>
-                <p style={{ fontFamily:"var(--font-caveat),cursive", fontSize:".85rem", color:"#7a6a50", textAlign:"center", marginTop:7, fontWeight:600 }}>#caobangtravel</p>
-              </a>
-            )}
-
-            {/* Photo 2 */}
-            {galleryImages[2] && (
-              <a href="/thu-vien" style={{ position: "absolute", left: "22%", top: 40, width: "17%", minWidth: 140, zIndex: 4, textDecoration: "none", background: "white", padding: "9px 9px 32px", boxShadow: "0 6px 20px rgba(0,0,0,.13)", transform: "rotate(-4deg)", transition: "transform .3s, box-shadow .3s", display: "block" }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(0deg) scale(1.06)"; el.style.zIndex="20"; el.style.boxShadow="0 16px 36px rgba(0,0,0,.2)"; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(-4deg)"; el.style.zIndex="4"; el.style.boxShadow="0 6px 20px rgba(0,0,0,.13)"; }}>
-                <div style={{ aspectRatio:"1", overflow:"hidden", background:"#ddd" }}><img src={galleryImages[2].image_url} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} /></div>
-                <p style={{ fontFamily:"var(--font-caveat),cursive", fontSize:".85rem", color:"#7a6a50", textAlign:"center", marginTop:7, fontWeight:600 }}>#caobangtravel</p>
-              </a>
-            )}
-
-            {/* Photo 3 — CENTER Instagram mockup */}
-            {galleryImages[3] && (
-              <a href="/thu-vien" style={{ position: "absolute", left: "50%", top: 18, transform: "translateX(-50%)", width: "22%", minWidth: 200, zIndex: 5, textDecoration: "none", background: "white", padding: "0", boxShadow: "0 8px 32px rgba(0,0,0,.18)", display: "block", borderRadius: 4, transition: "transform .3s, box-shadow .3s" }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform="translateX(-50%) scale(1.05)"; el.style.boxShadow="0 20px 50px rgba(0,0,0,.25)"; el.style.zIndex="20"; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform="translateX(-50%)"; el.style.boxShadow="0 8px 32px rgba(0,0,0,.18)"; el.style.zIndex="5"; }}>
-                {/* IG header */}
-                <div style={{ display:"flex", alignItems:"center", gap:8, padding:"8px 10px", borderBottom:"1px solid #f0f0f0" }}>
-                  <div style={{ width:26, height:26, borderRadius:"50%", overflow:"hidden", flexShrink:0, background:"#ddd" }}>
-                    <img src={galleryImages[3].image_url} alt="" style={{ width:"100%", height:"100%", objectFit:"cover" }} />
-                  </div>
-                  <span style={{ fontSize:".72rem", fontWeight:700, color:"#1a1a1a" }}>caobangtravel</span>
-                </div>
-                {/* Image */}
-                <div style={{ aspectRatio:"1", overflow:"hidden", position:"relative" }}>
-                  <img src={galleryImages[3].image_url} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} />
-                  <div style={{ position:"absolute", inset:0, display:"flex", alignItems:"center", justifyContent:"center" }}>
-                    <div style={{ width:48, height:48, borderRadius:"50%", background:"rgba(255,220,50,.9)", display:"flex", alignItems:"center", justifyContent:"center", boxShadow:"0 2px 12px rgba(0,0,0,.2)" }}>
-                      <i className="fa-solid fa-play" style={{ color:"#1a1a1a", fontSize:"1rem", marginLeft:3 }} />
-                    </div>
-                  </div>
-                </div>
-                {/* IG actions */}
-                <div style={{ padding:"8px 10px 4px" }}>
-                  <div style={{ display:"flex", gap:12, marginBottom:5 }}>
-                    <i className="fa-solid fa-heart" style={{ color:"#e33", fontSize:"1.1rem" }} />
-                    <i className="fa-regular fa-comment" style={{ color:"#333", fontSize:"1.1rem" }} />
-                    <i className="fa-regular fa-paper-plane" style={{ color:"#333", fontSize:"1.1rem" }} />
-                  </div>
-                  <p style={{ fontSize:".7rem", fontWeight:700, color:"#1a1a1a", margin:"2px 0" }}>1,234 lượt thích</p>
-                  <p style={{ fontSize:".68rem", color:"#555", margin:0 }}><strong>caobangtravel</strong> <span style={{ fontFamily:"var(--font-caveat),cursive" }}>#caobangtravel 🌿</span></p>
-                </div>
-              </a>
-            )}
-
-            {/* Note sticker */}
-            <div style={{ position:"absolute", left:"62%", top:50, width:130, zIndex:6, background:"#fffef0", padding:"12px 14px", boxShadow:"0 4px 16px rgba(0,0,0,.10)", transform:"rotate(4deg)", pointerEvents:"none", userSelect:"none" }}>
-              <p style={{ fontFamily:"var(--font-caveat),cursive", fontSize:".95rem", color:"#7a6a50", lineHeight:1.5, fontWeight:600, fontStyle:"italic" }}>
-                The pearl amidst the misty place
-              </p>
-              <p style={{ fontSize:"1.2rem", marginTop:6 }}>🌸🌼</p>
-            </div>
-
-            {/* Photo 4 */}
-            {galleryImages[4] && (
-              <a href="/thu-vien" style={{ position: "absolute", left: "63%", top: 105, width: "16%", minWidth: 130, zIndex: 4, textDecoration: "none", background: "white", padding: "9px 9px 32px", boxShadow: "0 6px 20px rgba(0,0,0,.13)", transform: "rotate(6deg)", transition: "transform .3s, box-shadow .3s", display: "block" }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(0deg) scale(1.06)"; el.style.zIndex="20"; el.style.boxShadow="0 16px 36px rgba(0,0,0,.2)"; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(6deg)"; el.style.zIndex="4"; el.style.boxShadow="0 6px 20px rgba(0,0,0,.13)"; }}>
-                <div style={{ aspectRatio:"1", overflow:"hidden", background:"#ddd" }}><img src={galleryImages[4].image_url} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} /></div>
-                <p style={{ fontFamily:"var(--font-caveat),cursive", fontSize:".85rem", color:"#7a6a50", textAlign:"center", marginTop:7, fontWeight:600 }}>#caobangtravel</p>
-              </a>
-            )}
-
-            {/* Photo 5 */}
-            {galleryImages[5] && (
-              <a href="/thu-vien" style={{ position: "absolute", left: "77%", top: 35, width: "16%", minWidth: 130, zIndex: 3, textDecoration: "none", background: "white", padding: "9px 9px 32px", boxShadow: "0 6px 20px rgba(0,0,0,.13)", transform: "rotate(-5deg)", transition: "transform .3s, box-shadow .3s", display: "block" }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(0deg) scale(1.06)"; el.style.zIndex="20"; el.style.boxShadow="0 16px 36px rgba(0,0,0,.2)"; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(-5deg)"; el.style.zIndex="3"; el.style.boxShadow="0 6px 20px rgba(0,0,0,.13)"; }}>
-                <div style={{ aspectRatio:"1", overflow:"hidden", background:"#ddd" }}><img src={galleryImages[5].image_url} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} /></div>
-                <p style={{ fontFamily:"var(--font-caveat),cursive", fontSize:".85rem", color:"#7a6a50", textAlign:"center", marginTop:7, fontWeight:600 }}>#caobangtravel</p>
-              </a>
-            )}
-
-            {/* Photo 6 — far right, clipped */}
-            {galleryImages[6] && (
-              <a href="/thu-vien" style={{ position: "absolute", right: "-1%", top: 90, width: "13%", minWidth: 110, zIndex: 2, textDecoration: "none", background: "white", padding: "8px 8px 30px", boxShadow: "0 6px 20px rgba(0,0,0,.14)", transform: "rotate(5deg)", transition: "transform .3s, box-shadow .3s", display: "block" }}
-                onMouseEnter={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(0deg) scale(1.06)"; el.style.zIndex="20"; el.style.boxShadow="0 16px 36px rgba(0,0,0,.2)"; }}
-                onMouseLeave={e => { const el = e.currentTarget as HTMLElement; el.style.transform="rotate(5deg)"; el.style.zIndex="2"; el.style.boxShadow="0 6px 20px rgba(0,0,0,.14)"; }}>
-                <div style={{ aspectRatio:"1", overflow:"hidden", background:"#ddd" }}><img src={galleryImages[6].image_url} alt="" loading="lazy" style={{ width:"100%", height:"100%", objectFit:"cover", display:"block" }} /></div>
-              </a>
-            )}
-
-            {/* Cherry blossom */}
-            <div style={{ position:"absolute", bottom:0, left:"50%", transform:"translateX(-50%)", fontSize:"1.6rem", pointerEvents:"none", userSelect:"none", opacity:.7 }}>🌸🌺🌸</div>
-          </div>
-
-          {/* Mobile: horizontal scroll polaroid */}
-          <div className="gallery-scrapbook-mobile" style={{ overflowX: "auto", overflowY: "visible", padding: "16px 20px 24px", gap: 14, WebkitOverflowScrolling: "touch" as any, scrollbarWidth: "none" as any }}>
-            {galleryImages.slice(0, 6).map((img, i) => {
-              const rots = [-4, 3, -2, 4, -3, 2];
-              return (
-                <a key={img.id} href="/thu-vien" style={{ display: "block", flexShrink: 0, width: 160, background: "white", padding: "8px 8px 28px", boxShadow: "0 4px 16px rgba(0,0,0,.12)", transform: `rotate(${rots[i]}deg)`, textDecoration: "none" }}>
-                  <div style={{ width: "100%", aspectRatio: "1", overflow: "hidden", background: "#e8e4de" }}>
-                    <img src={img.image_url} alt="" loading="lazy" style={{ width: "100%", height: "100%", objectFit: "cover", display: "block" }} />
-                  </div>
-                  <p style={{ fontFamily: "var(--font-caveat), cursive", fontSize: ".85rem", color: "#7a6a50", textAlign: "center", marginTop: 6, fontWeight: 600 }}>#caobangtravel</p>
-                </a>
-              );
-            })}
-          </div>
-
-          {/* CTA */}
-          <div style={{ textAlign: "center", marginTop: 20 }}>
-            <a href="/thu-vien" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 32px", borderRadius: 50, background: "#3a6b3a", color: "white", fontWeight: 700, fontSize: ".86rem", textDecoration: "none", letterSpacing: ".04em", boxShadow: "0 4px 16px rgba(58,107,58,.3)" }}>
-              <i className="fa-solid fa-images" /> Xem Tất Cả Hình Ảnh <i className="fa-solid fa-arrow-right" />
-            </a>
-          </div>
-        </section>
-
-        {/* ==================== CẨM NANG ==================== */}
-        <section className="cam-nang" id="cam-nang" aria-labelledby="cam-nang-heading"
-          style={{ background: `linear-gradient(rgba(14,42,40,.82),rgba(14,42,40,.78)),url('${camNangBg}') center/cover no-repeat` }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-tag" style={{ background: "rgba(255,255,255,.12)", color: "rgba(255,255,255,.9)", border: "1px solid rgba(255,255,255,.22)" }}>Cẩm Nang Du Lịch</span>
-              <h2 className="section-title" id="cam-nang-heading" style={{ color: "white" }}>Bí Quyết Khám Phá Cao Bằng</h2>
-              <p className="section-subtitle" style={{ color: "rgba(255,255,255,.72)" }}>Những điều bạn cần biết để có chuyến đi trọn vẹn và an toàn</p>
-            </div>
-            <div className="cam-nang-grid">
-              {(camNangFromDB ? camNangTips : [
-                { id:"1", icon:"fa-calendar-sun",       tag:"Thời Điểm", color:"#f59e0b", title:"Mùa Đẹp Nhất",            description:"Tháng 9–11: lúa chín vàng, thác đầy nước, thời tiết mát mẻ. Tháng 3–4: hoa tam giác mạch nở rộ trên các sườn núi.", sort_order:1 },
-                { id:"2", icon:"fa-bowl-food",          tag:"Ẩm Thực",   color:"#ef4444", title:"Đặc Sản Không Thể Bỏ Qua",description:"Bánh coóng phù, phở chua, lợn quay lá mắc mật, hạt dẻ Trùng Khánh — hương vị đặc trưng chỉ có ở Cao Bằng.",        sort_order:2 },
-                { id:"3", icon:"fa-motorcycle",         tag:"Di Chuyển", color:"#8b5cf6", title:"Phương Tiện Phù Hợp",      description:"Xe máy là lựa chọn tốt nhất. Đường đèo quanh co nhưng cảnh đẹp hùng vĩ — thuê xe tại thị xã hoặc đi cùng HDV.",   sort_order:3 },
-                { id:"4", icon:"fa-camera-retro",       tag:"Nhiếp Ảnh", color:"#06b6d4", title:"Góc Chụp Ảnh Đẹp Nhất",   description:"Cầu treo Bản Giốc, thuyền trên sông Quây Sơn, ruộng bậc thang Phia Oắc — ánh sáng buổi sáng sớm là lý tưởng nhất.", sort_order:4 },
-                { id:"5", icon:"fa-hand-holding-heart", tag:"Văn Hóa",   color:"#10b981", title:"Tôn Trọng Phong Tục",      description:"Dân tộc Tày, Nùng chiếm đa số. Hỏi phép trước khi chụp ảnh, tìm hiểu phong tục trước khi đến thăm bản làng.",      sort_order:5 },
-                { id:"6", icon:"fa-shield-halved",      tag:"An Toàn",   color:"#f97316", title:"Lưu Ý Quan Trọng",         description:"Mang theo thuốc chống muỗi, kem chống nắng và giày trekking chắc chắn. Đặt HDV địa phương để đảm bảo an toàn tối đa.", sort_order:6 },
-              ]).map(({ id, icon, tag, color, title, description }) => {
-                const cardInner = (
-                  <>
-                    <div className="cam-nang-card-top">
-                      <span className="cam-nang-tag" style={{ background: color + "22", color }}>{tag}</span>
-                      <div className="cam-nang-icon" style={{ background: color + "18" }}>
-                        <i className={`fa-solid ${icon}`} style={{ color }} />
-                      </div>
-                    </div>
-                    <h3>{title}</h3>
-                    <p>{description}</p>
-                    {camNangFromDB && (
-                      <div style={{ marginTop: 14, display: "inline-flex", alignItems: "center", gap: 6, color, fontSize: ".78rem", fontWeight: 700 }}>
-                        Đọc thêm <i className="fa-solid fa-arrow-right" style={{ fontSize: ".7rem" }} />
-                      </div>
-                    )}
-                  </>
-                );
-                return camNangFromDB
-                  ? <a key={id} href={`/cam-nang/${id}`} className="cam-nang-card fade-up" style={{ textDecoration: "none", display: "block" }}>{cardInner}</a>
-                  : <article key={id} className="cam-nang-card fade-up">{cardInner}</article>;
-              })}
-            </div>
-            <div style={{ textAlign: "center", marginTop: 36 }}>
-              <a href="/cam-nang" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
-                <i className="fa-solid fa-book-open" /> Xem Tất Cả Cẩm Nang <i className="fa-solid fa-arrow-right" />
-              </a>
-            </div>
-          </div>
-        </section>
-
-        {/* ==================== PRICING ==================== */}
-        <section className="pricing" id="pricing" aria-labelledby="pricing-heading"
-          style={{ background: `linear-gradient(135deg,rgba(10,35,35,.90),rgba(26,60,55,.86),rgba(15,45,40,.90)),url('${pricingBg}') center/cover no-repeat` }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-tag">Bảng Giá Minh Bạch</span>
-              <h2 className="section-title" id="pricing-heading">Bảng Giá Dịch Vụ HDV</h2>
-              <p className="section-subtitle">Lựa chọn gói dịch vụ phù hợp với nhu cầu và ngân sách của bạn</p>
-            </div>
-
-            <div className="pricing-grid">
-              {/* HDV Cá Nhân */}
-              <article className="price-card fade-up">
-                <h3>HDV Cá Nhân</h3>
-                <p className="price-subtitle">Dành cho 1–2 người</p>
-                <ul>
-                  {["HDV 1 cả ngày", "Lộ trình riêng", "Phiên dịch", "Cá nhân hóa", "Hỗ trợ 24/7"].map((item) => (
-                    <li key={item}><i className="fa-solid fa-check" /> {item}</li>
-                  ))}
-                </ul>
-                <button className="btn-price" onClick={() => openBooking("HDV Cá Nhân · 500.000đ / Ngày")} aria-label="Đặt gói HDV Cá Nhân">
-                  500.000đ / Ngày
-                </button>
-              </article>
-
-              {/* HDV Đoàn */}
-              <article className="price-card featured fade-up">
-                <h3>HDV Đoàn</h3>
-                <p className="price-subtitle">Dành cho 5–20 người</p>
-                <ul>
-                  {["HDV 1 cả ngày", "HDV trưởng nhóm", "Lộ trình đoàn", "Xe riêng", "Hỗ trợ 24/7"].map((item) => (
-                    <li key={item}><i className="fa-solid fa-check" /> {item}</li>
-                  ))}
-                </ul>
-                <button className="btn-price" onClick={() => openBooking("HDV Đoàn · 650.000đ / Ngày")} aria-label="Đặt gói HDV Đoàn">
-                  650.000đ / Ngày
-                </button>
-              </article>
-
-              {/* HDV Xe Máy */}
-              <article className="price-card fade-up">
-                <h3>HDV Xe Máy</h3>
-                <p className="price-subtitle">Phượt cung đường đẹp</p>
-                <ul>
-                  {["HDV 1 cả ngày", "Cho thuê xe máy", "HDV địa hình núi", "Bảo hiểm chuyến đi", "Hỗ trợ 24/7"].map((item) => (
-                    <li key={item}><i className="fa-solid fa-check" /> {item}</li>
-                  ))}
-                </ul>
-                <button className="btn-price" onClick={() => openBooking("HDV Xe Máy · 550.000đ / Ngày")} aria-label="Đặt gói HDV Xe Máy">
-                  550.000đ / Ngày
-                </button>
-              </article>
-
-              {/* Tìm kiếm HDV */}
-              <div className="search-card fade-up" role="search">
-                <h3>Tìm Kiếm HDV</h3>
-                <div className="form-group">
-                  <label htmlFor="tour-type">Loại Tour</label>
-                  <select id="tour-type" name="tour-type">
-                    <option value="">Tất cả loại tour</option>
-                    <option>Tour Sinh Thái</option>
-                    <option>Tour Văn Hóa</option>
-                    <option>Tour Lịch Sử</option>
-                    <option>Tour Phượt Xe Máy</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="destination-filter">Điểm Đến</label>
-                  <select id="destination-filter" name="destination">
-                    <option value="">Tất cả địa điểm</option>
-                    {destinations.map((d) => (
-                      <option key={d.id}>{d.title}</option>
-                    ))}
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label htmlFor="budget">Ngân Sách</label>
-                  <select id="budget" name="budget">
-                    <option value="">Tất cả mức giá</option>
-                    <option>Dưới 500.000đ</option>
-                    <option>500.000 – 700.000đ</option>
-                    <option>Trên 700.000đ</option>
-                  </select>
-                </div>
-                <div className="form-group">
-                  <label>Ngôn Ngữ HDV</label>
-                  <div className="checkbox-group">
-                    <label><input type="checkbox" name="lang" value="vi" defaultChecked /> Tiếng Việt</label>
-                    <label><input type="checkbox" name="lang" value="en" /> Tiếng Anh</label>
-                  </div>
-                </div>
-                <button className="btn-search" type="button" onClick={() => openBooking("Tư vấn chọn HDV")}>
-                  <i className="fa-solid fa-magnifying-glass" aria-hidden="true" /> Tìm Kiếm
-                </button>
-              </div>
-            </div>
-          </div>
-        </section>
-
-        {/* ==================== TESTIMONIALS ==================== */}
-        <section className="testimonials" id="testimonials" aria-labelledby="testi-heading"
-          style={{ background: `linear-gradient(150deg,rgba(13,40,38,.88),rgba(26,60,58,.85),rgba(17,46,44,.88)),url('${testimonialsBg}') center/cover no-repeat` }}>
-          <div className="container">
-            <div className="section-header">
-              <span className="section-tag">Khách Hàng Nói Gì</span>
-              <h2 className="section-title" id="testi-heading">Ý Kiến Khách Hàng</h2>
-              <p className="section-subtitle">Những chia sẻ chân thực từ du khách đã trải nghiệm dịch vụ của chúng tôi</p>
-              <button
-                onClick={openReview}
-                style={{
-                  marginTop: 16, display: "inline-flex", alignItems: "center", gap: 8,
-                  padding: "10px 22px", borderRadius: 30,
-                  background: "var(--teal-dark)", color: "white",
-                  border: "none", cursor: "pointer",
-                  fontFamily: "inherit", fontSize: ".84rem", fontWeight: 700,
-                  boxShadow: "0 4px 14px rgba(38,92,89,.3)", transition: "all .2s",
-                }}
-              >
-                <i className="fa-solid fa-star" /> Viết Đánh Giá
-              </button>
-            </div>
-
-            <div className="carousel-wrapper">
-              <div className="carousel-track">
-                {reviews.map((review, i) => {
-                  const isVisible = i >= currentPage * cardsPerPage && i < (currentPage + 1) * cardsPerPage;
-                  const initials = review.reviewer_name
-                    .split(" ").map((w: string) => w[0]).slice(-2).join("").toUpperCase();
-                  return (
-                    <article key={review.id} className="review-card" style={{ display: isVisible ? "flex" : "none" }}>
-                      <div className="review-stars" aria-label={`${review.stars} sao`}>
-                        <StarIcons rating={review.stars} />
-                        <span style={{ fontSize: ".74rem", fontWeight: 700, color: "#94a3b8", marginLeft: 6 }}>
-                          {review.stars}.0
-                        </span>
-                      </div>
-                      <blockquote className="review-text">{review.review_text}</blockquote>
-                      <footer className="reviewer">
-                        {review.avatar_url
-                          ? <img className="reviewer-avatar" src={review.avatar_url} alt={review.reviewer_name} loading="lazy" />
-                          : <div className="reviewer-initial">{initials}</div>}
-                        <div className="reviewer-info">
-                          <h4>{review.reviewer_name}</h4>
-                          <span>{review.reviewer_location}</span>
-                        </div>
-                      </footer>
-                    </article>
-                  );
-                })}
-              </div>
-            </div>
-
-            <div className="carousel-nav">
-              <button className="carousel-btn prev" onClick={() => handlePageChange(currentPage - 1)}
-                disabled={currentPage === 0} aria-label="Trang trước">
-                <i className="fa-solid fa-chevron-left" />
-              </button>
-              <div className="carousel-dots">
-                {Array.from({ length: totalPages }).map((_, i) => (
-                  <button key={i}
-                    className={`carousel-dot${i === currentPage ? " active" : ""}`}
-                    onClick={() => handlePageChange(i)} aria-label={`Trang ${i + 1}`} />
-                ))}
-              </div>
-              <button className="carousel-btn next" onClick={() => handlePageChange(currentPage + 1)}
-                disabled={currentPage === totalPages - 1} aria-label="Trang tiếp theo">
-                <i className="fa-solid fa-chevron-right" />
-              </button>
-            </div>
-          </div>
-        </section>
+        <Testimonials
+          testimonialsBg={testimonialsBg}
+          reviews={reviews}
+          openReview={openReview}
+        />
 
         {/* ==================== SOS / KHẨN CẤP ==================== */}
         <section id="sos" style={{ padding: "40px 0", background: `linear-gradient(rgba(20,40,40,.92),rgba(20,40,40,.92)),url('${sosBg}') center/cover no-repeat` }}>
@@ -1717,129 +928,7 @@ export default function CaoBangEcoTour() {
         </section>
       </main>
 
-      {/* ==================== FOOTER ==================== */}
-      <footer id="footer" aria-label="Chân trang" style={{ position: "relative", overflow: "hidden", color: "#1a2e2e", padding: 0 }}>
-        {/* Background */}
-        <div style={{ position: "absolute", inset: 0, backgroundImage: "url(https://images.unsplash.com/photo-1501854140801-50d01698950b?w=1600&q=75)", backgroundSize: "cover", backgroundPosition: "center" }} />
-        <div style={{ position: "absolute", inset: 0, background: "rgba(238,234,222,.88)" }} />
-
-        {/* Watermark chữ CAO BẰNG */}
-        <div className="ftv2-watermark">CAO BẰNG</div>
-
-        {/* Hiệu ứng đám mây */}
-        <div className="ftv2-cloud ftv2-cloud-1" />
-        <div className="ftv2-cloud ftv2-cloud-2" />
-        <div className="ftv2-cloud ftv2-cloud-3" />
-        <div className="ftv2-cloud ftv2-cloud-4" />
-
-        <div className="container" style={{ position: "relative", zIndex: 1 }}>
-          {/* TOP GRID */}
-          <div className="ftv2-grid">
-
-            {/* Brand */}
-            <div className="ftv2-brand">
-              <img src="/logo.png" alt="Cao Bằng Travel" style={{ width: 64, height: 64, objectFit: "contain" }} />
-              <div className="ftv2-brand-text">
-                <strong>CAO BẰNG</strong>
-                <span>TRAVEL CONNECT</span>
-              </div>
-            </div>
-
-            {/* TOUR */}
-            <div className="ftv2-col">
-              <h5 className="ftv2-heading">TOUR</h5>
-              <a href="/hdv" className="ftv2-link">Tour Xe Máy</a>
-              <a href="/hdv" className="ftv2-link">Tour Jeep</a>
-              <a href="/hdv" className="ftv2-link">Tour Gói</a>
-              <a href="/dat-lich" className="ftv2-link">Đặt Lịch Tùy Chỉnh</a>
-            </div>
-
-            {/* KHÁM PHÁ */}
-            <div className="ftv2-col">
-              <h5 className="ftv2-heading">KHÁM PHÁ</h5>
-              <a href="#destinations" className="ftv2-link" onClick={(e) => scrollToSection(e, "destinations")}>Điểm Đến</a>
-              <a href="#gallery" className="ftv2-link" onClick={(e) => scrollToSection(e, "gallery")}>Thư Viện Ảnh</a>
-              <a href="#reviews" className="ftv2-link" onClick={(e) => scrollToSection(e, "reviews")}>Đánh Giá</a>
-              <a href="/tai-khoan" className="ftv2-link">Tài Khoản</a>
-            </div>
-
-            {/* LIÊN HỆ + HOTLINE */}
-            <div className="ftv2-col">
-              <h5 className="ftv2-heading">LIÊN HỆ</h5>
-              <div className="ftv2-info"><i className="fa-solid fa-location-dot" /> Tp. Cao Bằng, Việt Nam</div>
-              <div className="ftv2-info"><i className="fa-solid fa-envelope" /> info@caobangtravel.com</div>
-              <h5 className="ftv2-heading" style={{ marginTop: 20 }}>HOTLINE</h5>
-              <div className="ftv2-info"><i className="fa-solid fa-phone" /> +84 365 128 823</div>
-              <div className="ftv2-info"><i className="fa-solid fa-phone" /> +84 916 361 128</div>
-            </div>
-
-            {/* ĐĂNG KÝ + SOCIAL */}
-            <div className="ftv2-col">
-              <h5 className="ftv2-heading">Liên Hệ Chúng Tôi</h5>
-              <form onSubmit={handleContactSubmit}>
-                <input type="text" value={contactName} onChange={(e) => setContactName(e.target.value)}
-                  placeholder="Họ và tên" className="ftv2-input" autoComplete="name" required />
-                <input type="email" value={contactEmail} onChange={(e) => setContactEmail(e.target.value)}
-                  placeholder="Địa chỉ Email" className="ftv2-input" autoComplete="email" required />
-                <input type="tel" value={contactPhone} onChange={(e) => setContactPhone(e.target.value)}
-                  placeholder="Số điện thoại" className="ftv2-input" autoComplete="tel" />
-                <textarea value={contactMessage} onChange={(e) => setContactMessage(e.target.value)}
-                  placeholder="Nội dung tin nhắn..." className="ftv2-input ftv2-textarea"
-                  rows={3} required />
-                {!userSession && (
-                  <p style={{ fontSize: ".72rem", color: "#4a6260", fontStyle: "italic", marginBottom: 8, lineHeight: 1.5 }}>
-                    <i className="fa-solid fa-circle-info" style={{ marginRight: 4 }} />
-                    Đăng nhập để xem phản hồi từ chúng tôi trong tài khoản, Hoặc chúng tôi sẽ liên hệ đến bạn sớm nhất có thể. Chân thành cảm ơn !
-                  </p>
-                )}
-                <button type="submit" className="ftv2-send-btn ftv2-send-full" disabled={contactLoading}>
-                  {contactLoading
-                    ? <><i className="fa-solid fa-spinner fa-spin" /> Đang gửi...</>
-                    : <><i className="fa-solid fa-paper-plane" /> Gửi Tin Nhắn</>}
-                </button>
-                {contactSuccess && (
-                  <div style={{ marginTop: 8 }}>
-                    <p style={{ fontSize: ".74rem", color: "#265C59", fontWeight: 700 }}>
-                      <i className="fa-solid fa-circle-check" style={{ marginRight: 4 }} /> Gửi thành công!
-                    </p>
-                    {userSession && (
-                      <a href="/tai-khoan" style={{ fontSize: ".72rem", color: "#265C59", fontWeight: 700, display: "inline-flex", alignItems: "center", gap: 5, marginTop: 4 }}>
-                        <i className="fa-solid fa-envelope-open-text" style={{ fontSize: ".7rem" }} /> Xem phản hồi tại đây
-                      </a>
-                    )}
-                  </div>
-                )}
-                {contactError && (
-                  <p style={{ fontSize: ".74rem", color: "#dc2626", marginTop: 6 }}>{contactError}</p>
-                )}
-              </form>
-
-              <h5 className="ftv2-heading" style={{ marginTop: 20 }}>THEO DÕI CHÚNG TÔI</h5>
-              <div className="ftv2-socials">
-                {[
-                  { icon: "fa-brands fa-facebook-f", href: "#" },
-                  { icon: "fa-brands fa-instagram",  href: "#" },
-                  { icon: "fa-brands fa-tiktok",     href: "#" },
-                ].map(({ icon, href }) => (
-                  <a key={icon} href={href} className="ftv2-social" aria-label={icon}>
-                    <i className={icon} />
-                  </a>
-                ))}
-              </div>
-
-              <a href="/dat-lich" className="ftv2-book-btn">Đặt Lịch Ngay</a>
-            </div>
-          </div>
-
-          {/* BOTTOM BAR */}
-          <div className="ftv2-bottom">
-            <span>Chính sách Cookies</span>
-            <span className="ftv2-bottom-copy">© 2025 Cao Bằng Travel Connect. Bảo lưu mọi quyền.</span>
-            <span>Quyền Riêng Tư</span>
-            <span>Điều Khoản Sử Dụng</span>
-          </div>
-        </div>
-      </footer>
+      <Footer userSession={userSession} scrollToSection={scrollToSection} />
 
       <MusicPlayer src={musicSrc} />
     </>

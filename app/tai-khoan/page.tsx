@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { getTier, pointsToNextTier, TIERS } from "@/lib/loyalty";
 import type { UserProfile, Booking } from "@/lib/database.types";
@@ -17,10 +18,10 @@ interface ContactRow {
   created_at: string;
 }
 
-const STATUS: Record<string, { label: string; color: string; bg: string }> = {
-  pending:   { label: "Chờ xử lý",   color: "#b45309", bg: "#fef3c7" },
-  confirmed: { label: "Đã xác nhận", color: "#15803d", bg: "#dcfce7" },
-  cancelled: { label: "Đã hủy",      color: "#b91c1c", bg: "#fee2e2" },
+const STATUS: Record<string, { label: string; color: string; bg: string; border: string }> = {
+  pending:   { label: "Chờ xử lý",   color: "text-amber-700", bg: "bg-amber-100", border: "border-amber-200" },
+  confirmed: { label: "Đã xác nhận", color: "text-emerald-700", bg: "bg-emerald-100", border: "border-emerald-200" },
+  cancelled: { label: "Đã hủy",      color: "text-red-700", bg: "bg-red-100", border: "border-red-200" },
 };
 
 export default function TaiKhoanPage() {
@@ -96,8 +97,8 @@ export default function TaiKhoanPage() {
   };
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", background: "#f8f9f8" }}>
-      <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 28, color: "#265C59" }} />
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <i className="fa-solid fa-spinner fa-spin text-3xl text-teal-800" />
     </div>
   );
 
@@ -108,98 +109,62 @@ export default function TaiKhoanPage() {
   const pct      = Math.min((pts / maxPts) * 100, 100);
 
   return (
-    <div style={{
-      minHeight: "100vh",
-      background: "#f1f4f1",
-      position: "relative",
-    }}>
+    <div className="min-h-screen bg-slate-100 relative pb-safe">
       {/* Fixed scenic background */}
-      <div style={{
-        position: "fixed", inset: 0, zIndex: 0,
-        backgroundImage: "url('https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=1600&q=70')",
-        backgroundSize: "cover", backgroundPosition: "center",
-        filter: "blur(2px) brightness(.45) saturate(.8)",
-        transform: "scale(1.04)",
-      }} />
-      <div style={{ position: "fixed", inset: 0, zIndex: 0, background: "rgba(10,30,25,.35)" }} />
+      <div className="fixed inset-0 z-0 bg-cover bg-center blur-sm brightness-[0.45] saturate-[0.8] scale-105 pointer-events-none" 
+           style={{ backgroundImage: "url('https://images.unsplash.com/photo-1486870591958-9b9d0d1dda99?w=1600&q=70')" }} />
+      <div className="fixed inset-0 z-0 bg-teal-950/35 pointer-events-none" />
 
       {/* ── Topbar ── */}
-      <header style={{
-        background: "rgba(255,255,255,.92)", backdropFilter: "blur(12px)",
-        borderBottom: "1px solid rgba(255,255,255,.3)",
-        padding: "0 24px", height: 60,
-        display: "flex", alignItems: "center", justifyContent: "space-between",
-        position: "sticky", top: 0, zIndex: 100,
-        boxShadow: "0 1px 20px rgba(0,0,0,.12)",
-      }}>
-        <a href="/" style={{ display: "flex", alignItems: "center", gap: 10, textDecoration: "none" }}>
-          <Image src="/logo.png" alt="Logo" width={34} height={34} style={{ objectFit: "contain", mixBlendMode: "multiply" }} />
-          <div style={{ lineHeight: 1.2 }}>
-            <p style={{ fontWeight: 800, fontSize: ".88rem", color: "#1a2e2e" }}>Cao Bằng Travel Connect</p>
-            <p style={{ fontSize: ".66rem", color: "#94a3b8", fontWeight: 500 }}>Tài khoản thành viên</p>
+      <header className="bg-white/95 backdrop-blur-md border-b border-white/30 px-6 h-[60px] flex items-center justify-between sticky top-0 z-[100] shadow-[0_1px_20px_rgba(0,0,0,0.12)] pt-safe">
+        <Link href="/" className="flex items-center gap-3 no-underline">
+          <Image src="/logo.png" alt="Logo" width={34} height={34} className="object-contain mix-blend-multiply" />
+          <div className="leading-tight">
+            <p className="font-extrabold text-sm text-slate-900">Cao Bằng Travel Connect</p>
+            <p className="text-[10px] text-slate-500 font-medium tracking-wide uppercase">Tài khoản thành viên</p>
           </div>
-        </a>
-        <button onClick={logout} style={{
-          display: "flex", alignItems: "center", gap: 7,
-          padding: "7px 16px", borderRadius: 8,
-          border: "1.5px solid #e4e8e4", background: "none",
-          cursor: "pointer", fontSize: ".8rem", fontWeight: 600, color: "#64748b",
-        }}>
+        </Link>
+        <button onClick={logout} className="flex items-center gap-2 px-4 py-2 rounded-lg border-2 border-slate-200 text-xs font-bold text-slate-500 hover:bg-slate-50 hover:text-slate-800 transition-colors active:scale-95">
           <i className="fa-solid fa-right-from-bracket" /> Đăng xuất
         </button>
       </header>
 
       {/* ── Toast ── */}
       {toast && (
-        <div style={{
-          position: "fixed", top: 72, left: "50%", transform: "translateX(-50%)",
-          background: "#265C59", color: "white",
-          padding: "10px 22px", borderRadius: 10,
-          fontSize: ".83rem", fontWeight: 700, zIndex: 999,
-          boxShadow: "0 4px 16px rgba(38,92,89,.3)",
-        }}>
-          <i className="fa-solid fa-circle-check" style={{ marginRight: 7 }} />{toast}
+        <div className="fixed top-20 left-1/2 -translate-x-1/2 bg-teal-800 text-white px-5 py-2.5 rounded-xl text-sm font-bold z-[999] shadow-[0_4px_16px_rgba(15,118,110,0.3)] flex items-center gap-2 animate-in slide-in-from-top-4 fade-in">
+          <i className="fa-solid fa-circle-check" />{toast}
         </div>
       )}
 
-      <div style={{ maxWidth: 860, margin: "0 auto", padding: "28px 16px 64px", display: "flex", flexDirection: "column", gap: 16, position: "relative", zIndex: 1 }}>
+      <div className="max-w-4xl mx-auto px-4 sm:px-6 py-8 md:py-12 flex flex-col gap-6 relative z-10">
 
         {/* ── Profile card ── */}
-        <div style={{ background: "white", borderRadius: 20, overflow: "hidden", boxShadow: "0 2px 16px rgba(0,0,0,.06)" }}>
-
+        <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
           {/* Slim accent bar */}
-          <div style={{ height: 5, background: `linear-gradient(90deg, ${tier.color}, ${tier.color}60)` }} />
+          <div className="h-1.5 w-full" style={{ background: `linear-gradient(90deg, ${tier.color}, ${tier.color}60)` }} />
 
-          <div style={{ padding: "24px 28px", display: "flex", gap: 20, alignItems: "flex-start", flexWrap: "wrap" }}>
+          <div className="p-6 sm:p-8 flex gap-5 sm:gap-6 items-start flex-wrap sm:flex-nowrap">
             {/* Avatar */}
-            <div style={{
-              width: 72, height: 72, borderRadius: 18,
-              background: `linear-gradient(135deg, ${tier.color}30, ${tier.color}15)`,
-              border: `2px solid ${tier.color}30`,
-              display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0,
-            }}>
-              <i className={`fa-solid ${tier.icon}`} style={{ color: tier.color, fontSize: 28 }} />
+            <div className="w-16 h-16 sm:w-20 sm:h-20 rounded-2xl flex items-center justify-center shrink-0" 
+                 style={{ background: `linear-gradient(135deg, ${tier.color}30, ${tier.color}15)`, border: `2px solid ${tier.color}30` }}>
+              <i className={`fa-solid ${tier.icon}`} style={{ color: tier.color, fontSize: 32 }} />
             </div>
 
             {/* Info */}
-            <div style={{ flex: 1, minWidth: 200 }}>
-              <div style={{ display: "flex", alignItems: "center", gap: 10, flexWrap: "wrap", marginBottom: 4 }}>
-                <h1 style={{ fontSize: "1.1rem", fontWeight: 800, color: "#0f172a" }}>
+            <div className="flex-1 min-w-[200px]">
+              <div className="flex items-center gap-3 flex-wrap mb-1.5">
+                <h1 className="text-lg sm:text-xl font-black text-slate-900">
                   {profile?.full_name || "Chưa cập nhật tên"}
                 </h1>
-                <span style={{
-                  display: "inline-flex", alignItems: "center", gap: 5,
-                  padding: "3px 12px", borderRadius: 20,
-                  background: tier.color + "15", color: tier.color,
-                  fontSize: ".72rem", fontWeight: 800,
-                }}>
+                <span className="inline-flex items-center gap-1.5 px-3 py-1 rounded-full text-[11px] font-black tracking-wide" 
+                      style={{ background: tier.color + "15", color: tier.color }}>
                   <i className={`fa-solid ${tier.icon}`} /> Hạng {tier.label}
                 </span>
               </div>
-              <p style={{ fontSize: ".82rem", color: "#64748b", marginBottom: 2 }}>{email}</p>
+              <p className="text-sm text-slate-500 mb-1 font-medium">{email}</p>
               {profile?.phone && (
-                <p style={{ fontSize: ".82rem", color: "#64748b" }}>
-                  <i className="fa-solid fa-phone" style={{ fontSize: ".72rem", marginRight: 5, color: "#94a3b8" }} />
+                <p className="text-sm text-slate-500 font-medium flex items-center gap-1.5">
+                  <i className="fa-solid fa-phone text-xs text-slate-400" />
                   {profile.phone}
                 </p>
               )}
@@ -207,106 +172,94 @@ export default function TaiKhoanPage() {
 
             {/* Edit button */}
             {!editing && (
-              <button onClick={openEdit} style={{
-                display: "flex", alignItems: "center", gap: 6,
-                padding: "8px 16px", borderRadius: 9,
-                border: "1.5px solid #e2e8f0", background: "none",
-                cursor: "pointer", fontSize: ".79rem", fontWeight: 700, color: "#334155",
-              }}>
-                <i className="fa-solid fa-pen" /> Chỉnh sửa
+              <button onClick={openEdit} className="w-full sm:w-auto mt-2 sm:mt-0 flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border-2 border-slate-200 text-sm font-bold text-slate-700 hover:bg-slate-50 transition-colors active:scale-95">
+                <i className="fa-solid fa-pen text-xs" /> Chỉnh sửa
               </button>
             )}
           </div>
 
           {/* Edit form */}
           {editing && (
-            <div style={{ padding: "0 28px 24px", display: "flex", gap: 10, flexWrap: "wrap" }}>
+            <div className="px-6 sm:px-8 pb-6 sm:pb-8 flex gap-3 flex-col sm:flex-row">
               <input value={editName} onChange={(e) => setEditName(e.target.value)} placeholder="Họ và tên"
-                style={{ flex: 1, minWidth: 160, padding: "9px 13px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: ".85rem", outline: "none", fontFamily: "inherit" }} />
+                className="flex-1 px-4 py-2.5 border-2 border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-teal-600 transition-colors" />
               <input value={editPhone} onChange={(e) => setEditPhone(e.target.value)} placeholder="Số điện thoại" type="tel"
-                style={{ flex: 1, minWidth: 140, padding: "9px 13px", border: "1.5px solid #e2e8f0", borderRadius: 9, fontSize: ".85rem", outline: "none", fontFamily: "inherit" }} />
-              <button onClick={handleSave} disabled={saving}
-                style={{ padding: "9px 18px", borderRadius: 9, border: "none", background: "#265C59", color: "white", fontFamily: "inherit", fontWeight: 700, fontSize: ".82rem", cursor: "pointer" }}>
-                {saving ? "Đang lưu..." : "Lưu"}
-              </button>
-              <button onClick={() => setEditing(false)}
-                style={{ padding: "9px 14px", borderRadius: 9, border: "1.5px solid #e2e8f0", background: "none", fontFamily: "inherit", fontSize: ".82rem", cursor: "pointer" }}>
-                Hủy
-              </button>
+                className="flex-1 px-4 py-2.5 border-2 border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-teal-600 transition-colors" />
+              <div className="flex gap-2">
+                <button onClick={handleSave} disabled={saving}
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl bg-teal-800 text-white font-bold text-sm hover:bg-teal-900 transition-colors disabled:opacity-50">
+                  {saving ? "Đang lưu..." : "Lưu"}
+                </button>
+                <button onClick={() => setEditing(false)}
+                  className="flex-1 sm:flex-none px-6 py-2.5 rounded-xl border-2 border-slate-200 font-bold text-sm text-slate-600 hover:bg-slate-50 transition-colors">
+                  Hủy
+                </button>
+              </div>
             </div>
           )}
         </div>
 
         {/* ── Points + Tiers ── */}
-        <div className="tk-tiers-grid" style={{ display: "grid", gridTemplateColumns: "1fr 1fr", gap: 16 }}>
+        <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
 
           {/* Points */}
-          <div style={{ background: "white", borderRadius: 18, padding: "22px 24px", boxShadow: "0 2px 12px rgba(0,0,0,.05)" }}>
-            <p style={{ fontSize: ".68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".09em", marginBottom: 16 }}>Điểm Tích Lũy</p>
+          <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm">
+            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Điểm Tích Lũy</p>
 
-            <div style={{ display: "flex", alignItems: "baseline", gap: 8, marginBottom: 6 }}>
-              <span style={{ fontSize: "2.8rem", fontWeight: 900, color: tier.color, lineHeight: 1 }}>{pts}</span>
-              <span style={{ fontSize: ".8rem", color: "#94a3b8", fontWeight: 600 }}>điểm</span>
+            <div className="flex items-baseline gap-2 mb-1.5">
+              <span className="text-4xl sm:text-5xl font-black leading-none" style={{ color: tier.color }}>{pts}</span>
+              <span className="text-sm text-slate-400 font-bold">điểm</span>
             </div>
 
-            <p style={{ fontSize: ".75rem", color: "#94a3b8", marginBottom: 14 }}>+50 điểm cho mỗi lần đặt tour</p>
+            <p className="text-xs text-slate-400 mb-4 font-medium">+50 điểm cho mỗi lần đặt tour</p>
 
             {/* Progress */}
-            <div style={{ height: 8, background: "#f1f5f9", borderRadius: 99, overflow: "hidden", marginBottom: 8 }}>
-              <div style={{
-                height: "100%", width: `${pct}%`, borderRadius: 99,
-                background: `linear-gradient(90deg, ${tier.color}70, ${tier.color})`,
-                transition: "width .9s cubic-bezier(.4,0,.2,1)",
-              }} />
+            <div className="h-2.5 bg-slate-100 rounded-full overflow-hidden mb-2.5">
+              <div className="h-full rounded-full transition-all duration-1000 ease-out"
+                   style={{ width: `${pct}%`, background: `linear-gradient(90deg, ${tier.color}70, ${tier.color})` }} />
             </div>
 
-            <p style={{ fontSize: ".74rem", color: "#64748b" }}>
+            <p className="text-[11px] text-slate-500 font-medium">
               {nextTier
-                ? <>Cần thêm <strong style={{ color: tier.color }}>{nextTier.needed}</strong> điểm → <strong>{nextTier.next}</strong></>
-                : <span style={{ color: tier.color, fontWeight: 800 }}><i className="fa-solid fa-crown" style={{ marginRight: 5 }} />Hạng cao nhất!</span>}
+                ? <>Cần thêm <strong style={{ color: tier.color }}>{nextTier.needed}</strong> điểm → <strong className="text-slate-800">{nextTier.next}</strong></>
+                : <span className="font-black" style={{ color: tier.color }}><i className="fa-solid fa-crown mr-1.5" />Hạng cao nhất!</span>}
             </p>
 
             {/* Discount badge */}
             {tier.discount > 0 && (
-              <div style={{
-                marginTop: 16, padding: "10px 14px", borderRadius: 10,
-                background: tier.color + "0f", border: `1px solid ${tier.color}25`,
-                display: "flex", alignItems: "center", gap: 8,
-              }}>
-                <i className="fa-solid fa-tag" style={{ color: tier.color, fontSize: ".85rem" }} />
+              <div className="mt-5 p-3.5 rounded-xl flex items-center gap-3 border" style={{ background: tier.color + "0f", borderColor: tier.color + "25" }}>
+                <i className="fa-solid fa-tag" style={{ color: tier.color }} />
                 <div>
-                  <p style={{ fontSize: ".78rem", fontWeight: 800, color: tier.color }}>Ưu đãi: -{tier.discount}%</p>
-                  <p style={{ fontSize: ".7rem", color: "#94a3b8", marginTop: 1 }}>+5% thêm khi book HDV từ 3 lần</p>
+                  <p className="text-[13px] font-black" style={{ color: tier.color }}>Ưu đãi: -{tier.discount}%</p>
+                  <p className="text-[11px] text-slate-500 font-medium mt-0.5">+5% thêm khi book HDV từ 3 lần</p>
                 </div>
               </div>
             )}
           </div>
 
           {/* Tier table */}
-          <div style={{ background: "white", borderRadius: 18, padding: "22px 24px", boxShadow: "0 2px 12px rgba(0,0,0,.05)" }}>
-            <p style={{ fontSize: ".68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".09em", marginBottom: 16 }}>Bảng Hạng Thành Viên</p>
-            <div style={{ display: "flex", flexDirection: "column", gap: 8 }}>
+          <div className="bg-white rounded-2xl p-6 sm:p-7 shadow-sm">
+            <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest mb-4">Bảng Hạng Thành Viên</p>
+            <div className="flex flex-col gap-2">
               {[...TIERS].reverse().map((t) => {
                 const active = t.name === tier.name;
                 return (
-                  <div key={t.name} style={{
-                    display: "flex", alignItems: "center", gap: 11,
-                    padding: "10px 12px", borderRadius: 11,
-                    background: active ? t.color + "10" : "#f8fafc",
-                    border: `1.5px solid ${active ? t.color + "35" : "transparent"}`,
-                    transition: "all .2s",
-                  }}>
-                    <div style={{ width: 30, height: 30, borderRadius: 8, background: t.color + "20", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <i className={`fa-solid ${t.icon}`} style={{ color: t.color, fontSize: 12 }} />
+                  <div key={t.name} className={`flex items-center gap-3.5 p-3 rounded-xl border-2 transition-all ${active ? "bg-opacity-10" : "bg-slate-50 border-transparent"}`}
+                       style={{ 
+                         backgroundColor: active ? t.color + "15" : "", 
+                         borderColor: active ? t.color + "35" : "" 
+                       }}>
+                    <div className="w-9 h-9 rounded-lg flex items-center justify-center shrink-0" style={{ background: t.color + "20" }}>
+                      <i className={`fa-solid ${t.icon}`} style={{ color: t.color, fontSize: 14 }} />
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <p style={{ fontSize: ".79rem", fontWeight: 700, color: active ? t.color : "#475569" }}>
+                    <div className="flex-1">
+                      <p className="text-xs sm:text-sm font-black flex items-center gap-2" style={{ color: active ? t.color : "#475569" }}>
                         {t.label}
-                        {active && <span style={{ marginLeft: 6, fontSize: ".65rem", background: t.color, color: "white", padding: "1px 7px", borderRadius: 20 }}>Hiện tại</span>}
+                        {active && <span className="text-[9px] px-2 py-0.5 rounded-full text-white font-bold tracking-wider" style={{ background: t.color }}>HIỆN TẠI</span>}
                       </p>
-                      <p style={{ fontSize: ".68rem", color: "#94a3b8" }}>Từ {t.min} điểm</p>
+                      <p className="text-[11px] text-slate-500 font-medium">Từ {t.min} điểm</p>
                     </div>
-                    <span style={{ fontSize: ".8rem", fontWeight: 800, color: t.discount > 0 ? t.color : "#cbd5e1" }}>
+                    <span className="text-sm font-black" style={{ color: t.discount > 0 ? t.color : "#cbd5e1" }}>
                       {t.discount > 0 ? `-${t.discount}%` : "—"}
                     </span>
                   </div>
@@ -317,35 +270,30 @@ export default function TaiKhoanPage() {
         </div>
 
         {/* ── Booking history ── */}
-        <div style={{ background: "white", borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.05)" }}>
-          <div style={{ padding: "20px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9" }}>
+        <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+          <div className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100">
             <div>
-              <p style={{ fontSize: ".68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".09em" }}>Lịch Sử Đặt Tour</p>
-              <p style={{ fontSize: ".88rem", fontWeight: 800, color: "#0f172a", marginTop: 2 }}>{bookings.length} booking</p>
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Lịch Sử Đặt Tour</p>
+              <p className="text-sm font-black text-slate-900 mt-1">{bookings.length} booking</p>
             </div>
-            <a href="/dat-lich" style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              padding: "8px 16px", borderRadius: 9,
-              background: "#265C59", color: "white",
-              textDecoration: "none", fontSize: ".79rem", fontWeight: 700,
-            }}>
+            <Link href="/dat-lich" className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl bg-teal-800 hover:bg-teal-900 text-white text-sm font-bold transition-colors active:scale-95 shadow-md shadow-teal-900/10 w-full sm:w-auto">
               <i className="fa-solid fa-plus" /> Đặt mới
-            </a>
+            </Link>
           </div>
 
           {bookings.length === 0 ? (
-            <div style={{ padding: "48px 20px", textAlign: "center", color: "#94a3b8" }}>
-              <i className="fa-solid fa-calendar-xmark" style={{ fontSize: 34, marginBottom: 12, display: "block" }} />
-              <p style={{ fontWeight: 600, marginBottom: 4 }}>Chưa có lịch đặt nào</p>
-              <p style={{ fontSize: ".82rem" }}>Đặt tour đầu tiên để bắt đầu tích điểm!</p>
+            <div className="py-12 px-6 text-center text-slate-400">
+              <i className="fa-solid fa-calendar-xmark text-4xl mb-4 opacity-50 block" />
+              <p className="font-bold text-slate-600 mb-1">Chưa có lịch đặt nào</p>
+              <p className="text-xs font-medium">Đặt tour đầu tiên để bắt đầu tích điểm!</p>
             </div>
           ) : (
-            <div style={{ overflowX: "auto" }}>
-              <table style={{ width: "100%", borderCollapse: "collapse" }}>
+            <div className="overflow-x-auto">
+              <table className="w-full border-collapse text-left min-w-[700px]">
                 <thead>
-                  <tr style={{ background: "#f8fafc" }}>
+                  <tr className="bg-slate-50 border-b border-slate-100">
                     {["Gói tour", "HDV", "Trạng thái", "Điểm", "Giảm giá", "Ngày", ""].map((h) => (
-                      <th key={h} style={{ padding: "10px 18px", textAlign: "left", fontSize: ".67rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".07em", borderBottom: "1px solid #f1f5f9", whiteSpace: "nowrap" }}>{h}</th>
+                      <th key={h} className="py-3 px-5 text-[10px] font-black text-slate-400 uppercase tracking-widest whitespace-nowrap">{h}</th>
                     ))}
                   </tr>
                 </thead>
@@ -353,21 +301,23 @@ export default function TaiKhoanPage() {
                   {bookings.map((b) => {
                     const s = STATUS[b.status] ?? STATUS.pending;
                     return (
-                      <tr key={b.id} style={{ borderBottom: "1px solid #f8fafc" }}>
-                        <td style={{ padding: "13px 18px", fontWeight: 700, color: "#0f172a", fontSize: ".84rem" }}>{b.package_type || "—"}</td>
-                        <td style={{ padding: "13px 18px", color: "#475569", fontSize: ".84rem" }}>{b.guides?.name ?? "—"}</td>
-                        <td style={{ padding: "13px 18px" }}>
-                          <span style={{ padding: "3px 11px", borderRadius: 20, fontSize: ".72rem", fontWeight: 700, background: s.bg, color: s.color }}>{s.label}</span>
+                      <tr key={b.id} className="border-b border-slate-50 last:border-0 hover:bg-slate-50/50 transition-colors">
+                        <td className="py-4 px-5 text-[13px] font-bold text-slate-900">{b.package_type || "—"}</td>
+                        <td className="py-4 px-5 text-[13px] font-medium text-slate-600">{b.guides?.name ?? "—"}</td>
+                        <td className="py-4 px-5">
+                          <span className={`inline-flex items-center px-3 py-1 rounded-full text-[11px] font-black border ${s.bg} ${s.color} ${s.border}`}>
+                            {s.label}
+                          </span>
                         </td>
-                        <td style={{ padding: "13px 18px", fontWeight: 800, color: "#265C59", fontSize: ".84rem" }}>{b.points_earned > 0 ? `+${b.points_earned}` : "—"}</td>
-                        <td style={{ padding: "13px 18px", fontWeight: 800, color: "#d97706", fontSize: ".84rem" }}>{b.discount_pct > 0 ? `-${b.discount_pct}%` : "—"}</td>
-                        <td style={{ padding: "13px 18px", color: "#94a3b8", fontSize: ".8rem", whiteSpace: "nowrap" }}>
+                        <td className="py-4 px-5 text-[13px] font-black text-teal-700">{b.points_earned > 0 ? `+${b.points_earned}` : "—"}</td>
+                        <td className="py-4 px-5 text-[13px] font-black text-amber-600">{b.discount_pct > 0 ? `-${b.discount_pct}%` : "—"}</td>
+                        <td className="py-4 px-5 text-[12px] font-medium text-slate-500 whitespace-nowrap">
                           {new Date(b.created_at).toLocaleDateString("vi-VN")}
                         </td>
-                        <td style={{ padding: "13px 18px" }}>
+                        <td className="py-4 px-5 text-right">
                           {b.status === "pending" && (
                             <button onClick={() => setCancelId(b.id)}
-                              style={{ padding: "5px 12px", borderRadius: 8, border: "1.5px solid #fca5a5", background: "white", color: "#dc2626", fontWeight: 700, fontSize: ".72rem", cursor: "pointer", whiteSpace: "nowrap" }}>
+                              className="px-3.5 py-1.5 rounded-lg border-2 border-red-100 text-red-600 font-bold text-[11px] hover:bg-red-50 hover:border-red-200 transition-colors active:scale-95 whitespace-nowrap">
                               Hủy
                             </button>
                           )}
@@ -383,24 +333,24 @@ export default function TaiKhoanPage() {
 
         {/* ── Cancel confirmation ── */}
         {cancelId && (
-          <div style={{ position: "fixed", inset: 0, zIndex: 999, background: "rgba(0,0,0,.5)", display: "flex", alignItems: "center", justifyContent: "center", padding: 16 }}
-            onClick={() => setCancelId(null)}>
-            <div style={{ background: "white", borderRadius: 16, padding: 28, maxWidth: 380, width: "100%", boxShadow: "0 16px 48px rgba(0,0,0,.2)" }}
-              onClick={(e) => e.stopPropagation()}>
-              <div style={{ width: 48, height: 48, borderRadius: "50%", background: "#fee2e2", display: "flex", alignItems: "center", justifyContent: "center", margin: "0 auto 16px" }}>
-                <i className="fa-solid fa-calendar-xmark" style={{ color: "#dc2626", fontSize: 20 }} />
+          <div className="fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"
+               onClick={() => setCancelId(null)}>
+            <div className="bg-white rounded-2xl p-8 max-w-[360px] w-full shadow-2xl animate-in zoom-in-95"
+                 onClick={(e) => e.stopPropagation()}>
+              <div className="w-14 h-14 rounded-full bg-red-100 flex items-center justify-center mx-auto mb-5">
+                <i className="fa-solid fa-calendar-xmark text-red-600 text-xl" />
               </div>
-              <h3 style={{ textAlign: "center", fontWeight: 800, color: "#1a2e2e", marginBottom: 8 }}>Hủy đặt lịch?</h3>
-              <p style={{ textAlign: "center", fontSize: ".84rem", color: "#64748b", lineHeight: 1.6, marginBottom: 20 }}>
+              <h3 className="text-center font-black text-slate-900 text-lg mb-2">Hủy đặt lịch?</h3>
+              <p className="text-center text-sm text-slate-500 mb-6 font-medium leading-relaxed">
                 Bạn có chắc muốn hủy lịch này? Sau khi hủy sẽ không thể hoàn tác.
               </p>
-              <div style={{ display: "flex", gap: 10 }}>
+              <div className="flex gap-3">
                 <button onClick={() => setCancelId(null)}
-                  style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "1.5px solid #e2e8f0", background: "white", fontWeight: 700, fontSize: ".85rem", cursor: "pointer", color: "#475569" }}>
+                  className="flex-1 py-2.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-colors">
                   Không hủy
                 </button>
                 <button onClick={() => cancelBooking(cancelId)} disabled={cancelling}
-                  style={{ flex: 1, padding: "10px 0", borderRadius: 10, border: "none", background: "#dc2626", color: "white", fontWeight: 700, fontSize: ".85rem", cursor: "pointer", opacity: cancelling ? .6 : 1 }}>
+                  className="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-700 transition-colors disabled:opacity-60 flex justify-center items-center">
                   {cancelling ? <i className="fa-solid fa-spinner fa-spin" /> : "Xác nhận hủy"}
                 </button>
               </div>
@@ -409,71 +359,67 @@ export default function TaiKhoanPage() {
         )}
 
         {/* ── Tin nhắn & phản hồi ── */}
-        <div style={{ background: "white", borderRadius: 18, overflow: "hidden", boxShadow: "0 2px 12px rgba(0,0,0,.05)" }}>
-          <div style={{ padding: "20px 24px", display: "flex", alignItems: "center", justifyContent: "space-between", borderBottom: "1px solid #f1f5f9" }}>
+        <div className="bg-white rounded-2xl overflow-hidden shadow-sm">
+          <div className="p-5 sm:p-6 flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-slate-100">
             <div>
-              <p style={{ fontSize: ".68rem", fontWeight: 700, color: "#94a3b8", textTransform: "uppercase", letterSpacing: ".09em" }}>Tin Nhắn Liên Hệ</p>
-              <p style={{ fontSize: ".88rem", fontWeight: 800, color: "#0f172a", marginTop: 2 }}>
+              <p className="text-[11px] font-black text-slate-400 uppercase tracking-widest">Tin Nhắn Liên Hệ</p>
+              <p className="text-sm font-black text-slate-900 mt-1">
                 {contacts.length > 0 ? `${contacts.length} tin nhắn` : "Chưa có tin nhắn nào"}
               </p>
             </div>
-            <a href="/#lien-he" style={{
-              display: "inline-flex", alignItems: "center", gap: 6,
-              padding: "8px 16px", borderRadius: 9,
-              border: "1.5px solid #265C59", color: "#265C59",
-              textDecoration: "none", fontSize: ".79rem", fontWeight: 700, background: "white",
-            }}>
+            <Link href="/#lien-he" className="inline-flex items-center justify-center gap-2 px-5 py-2.5 rounded-xl border-2 border-teal-800 text-teal-800 text-sm font-bold hover:bg-teal-50 transition-colors active:scale-95 w-full sm:w-auto">
               <i className="fa-solid fa-paper-plane" /> Gửi tin nhắn
-            </a>
+            </Link>
           </div>
 
           {contacts.length === 0 ? (
-            <div style={{ padding: "40px 24px", textAlign: "center", color: "#94a3b8" }}>
-              <i className="fa-solid fa-comments" style={{ fontSize: 32, marginBottom: 12, display: "block" }} />
-              <p style={{ fontWeight: 600, marginBottom: 4, color: "#64748b" }}>Bạn chưa gửi tin nhắn nào</p>
-              <p style={{ fontSize: ".82rem" }}>Gửi tin nhắn để được tư vấn và nhận phản hồi tại đây.</p>
+            <div className="py-12 px-6 text-center text-slate-400">
+              <i className="fa-solid fa-comments text-4xl mb-4 opacity-50 block" />
+              <p className="font-bold text-slate-600 mb-1">Bạn chưa gửi tin nhắn nào</p>
+              <p className="text-xs font-medium">Gửi tin nhắn để được tư vấn và nhận phản hồi tại đây.</p>
             </div>
           ) : (
-            <div style={{ display: "flex", flexDirection: "column" }}>
+            <div className="flex flex-col">
               {contacts.map((c, i) => (
-                <div key={c.id} style={{ padding: "18px 24px", borderBottom: i < contacts.length - 1 ? "1px solid #f8fafc" : "none" }}>
+                <div key={c.id} className={`p-5 sm:p-6 ${i < contacts.length - 1 ? "border-b border-slate-50" : ""}`}>
                   {/* Tin nhắn của khách */}
-                  <div style={{ display: "flex", gap: 12, marginBottom: 10 }}>
-                    <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#f1f5f9", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                      <i className="fa-solid fa-user" style={{ color: "#94a3b8", fontSize: 13 }} />
+                  <div className="flex gap-4 mb-4">
+                    <div className="w-10 h-10 rounded-full bg-slate-100 flex items-center justify-center shrink-0">
+                      <i className="fa-solid fa-user text-slate-400 text-sm" />
                     </div>
-                    <div style={{ flex: 1 }}>
-                      <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 4 }}>
-                        <span style={{ fontSize: ".72rem", fontWeight: 700, color: "#64748b" }}>Tin nhắn của bạn</span>
-                        <span style={{ fontSize: ".7rem", color: "#94a3b8" }}>{new Date(c.created_at).toLocaleDateString("vi-VN")}</span>
+                    <div className="flex-1">
+                      <div className="flex justify-between items-center mb-1">
+                        <span className="text-[11px] font-bold text-slate-500 uppercase tracking-wider">Tin nhắn của bạn</span>
+                        <span className="text-[11px] font-medium text-slate-400">{new Date(c.created_at).toLocaleDateString("vi-VN")}</span>
                       </div>
-                      <p style={{ fontSize: ".85rem", color: "#334155", lineHeight: 1.7, margin: 0 }}>{c.message}</p>
+                      <p className="text-sm text-slate-700 leading-relaxed font-medium">{c.message}</p>
                     </div>
                   </div>
 
                   {/* Phản hồi admin */}
                   {c.admin_reply ? (
-                    <div style={{ display: "flex", gap: 12 }}>
-                      <div style={{ width: 34, height: 34, borderRadius: "50%", background: "#265C59", display: "flex", alignItems: "center", justifyContent: "center", flexShrink: 0 }}>
-                        <i className="fa-solid fa-headset" style={{ color: "white", fontSize: 13 }} />
+                    <div className="flex gap-4">
+                      <div className="w-10 h-10 rounded-full bg-teal-800 flex items-center justify-center shrink-0">
+                        <i className="fa-solid fa-headset text-white text-sm" />
                       </div>
-                      <div style={{ flex: 1, background: "#f0faf9", border: "1.5px solid #b2dfdb", borderRadius: 12, padding: "12px 16px" }}>
-                        <div style={{ display: "flex", justifyContent: "space-between", alignItems: "center", marginBottom: 6 }}>
-                          <span style={{ fontSize: ".72rem", fontWeight: 700, color: "#265C59" }}>
-                            <i className="fa-solid fa-circle" style={{ fontSize: 6, marginRight: 5, verticalAlign: "middle" }} />
+                      <div className="flex-1 bg-teal-50 border border-teal-100 rounded-2xl p-4 relative">
+                        <div className="absolute top-4 -left-2 w-4 h-4 bg-teal-50 border-t border-l border-teal-100 rotate-[-45deg]" />
+                        <div className="flex justify-between items-center mb-2 relative z-10">
+                          <span className="text-[11px] font-black text-teal-800 uppercase tracking-wider flex items-center gap-1.5">
+                            <i className="fa-solid fa-circle text-[6px]" />
                             {c.replied_by || "Cao Bằng Travel Connect"}
                           </span>
                           {c.replied_at && (
-                            <span style={{ fontSize: ".7rem", color: "#94a3b8" }}>{new Date(c.replied_at).toLocaleString("vi-VN")}</span>
+                            <span className="text-[11px] font-medium text-teal-600/60">{new Date(c.replied_at).toLocaleString("vi-VN")}</span>
                           )}
                         </div>
-                        <p style={{ fontSize: ".85rem", color: "#1e293b", lineHeight: 1.7, margin: 0 }}>{c.admin_reply}</p>
+                        <p className="text-sm text-slate-800 leading-relaxed font-medium relative z-10">{c.admin_reply}</p>
                       </div>
                     </div>
                   ) : (
-                    <div style={{ marginLeft: 46, background: "#fffbeb", borderRadius: 10, padding: "10px 14px" }}>
-                      <p style={{ fontSize: ".78rem", color: "#92400e", margin: 0 }}>
-                        <i className="fa-solid fa-clock" style={{ marginRight: 6 }} />
+                    <div className="ml-14 bg-amber-50 border border-amber-100 rounded-xl p-3 flex items-start gap-2.5">
+                      <i className="fa-solid fa-clock text-amber-600 text-xs mt-0.5 shrink-0" />
+                      <p className="text-xs font-bold text-amber-700">
                         Chưa có phản hồi — chúng tôi sẽ trả lời sớm nhất có thể.
                       </p>
                     </div>

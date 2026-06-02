@@ -4,6 +4,7 @@ import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
 import { supabase } from "@/lib/supabase";
 import type { Guide } from "@/lib/database.types";
+import StickyBottomBar from "@/app/components/ui/StickyBottomBar";
 
 interface Tour {
   id: string;
@@ -125,7 +126,7 @@ export default function TourDetailPage() {
       </div>
 
       {/* Content */}
-      <div className="page-grid-main">
+      <div className="page-grid-main pb-28 md:pb-0">
 
         {/* Left: tour info */}
         <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
@@ -292,22 +293,11 @@ export default function TourDetailPage() {
         </div>
       </div>
 
-      <div className="mobile-book-bar" role="region" aria-label="Đặt tour nhanh">
-        <div className="mobile-book-bar-price">
-          <strong>{tour.price_from > 0 ? tour.price_from.toLocaleString("vi-VN") + "đ" : "Liên hệ"}</strong>
-          {tour.price_from > 0 && <span>/ người</span>}
-        </div>
-        <div className="mobile-book-bar-actions">
-          {tour.zalo_number && (
-            <a href={`https://zalo.me/${tour.zalo_number}`} target="_blank" rel="noopener noreferrer" className="btn-book-zalo" aria-label="Chat Zalo">
-              <i className="fa-brands fa-comment-dots" />
-            </a>
-          )}
-          <button type="button" className="btn-book-primary" onClick={handleBook}>
-            <i className="fa-solid fa-calendar-check" /> Đặt tour
-          </button>
-        </div>
-      </div>
+      <StickyBottomBar
+        priceFrom={tour.price_from}
+        zaloNumber={tour.zalo_number}
+        onBook={handleBook}
+      />
     </div>
   );
 }

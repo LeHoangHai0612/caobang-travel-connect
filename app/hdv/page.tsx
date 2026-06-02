@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import type { Guide } from "@/lib/database.types";
 
@@ -8,13 +9,13 @@ const LANGS = ["Tiếng Việt", "English", "中文", "한국어"];
 
 function StarIcons({ rating }: { rating: number }) {
   return (
-    <>
+    <div className="flex gap-0.5">
       {[1, 2, 3, 4, 5].map((s) => {
         const full = s <= Math.floor(rating);
         const half = !full && rating >= s - 0.5;
-        return <i key={s} className={`fa-${full || half ? "solid" : "regular"} ${full ? "fa-star" : half ? "fa-star-half-stroke" : "fa-star"}`} style={{ color: "#E5A919", fontSize: ".75rem" }} />;
+        return <i key={s} className={`fa-${full || half ? "solid" : "regular"} ${full ? "fa-star" : half ? "fa-star-half-stroke" : "fa-star"} text-amber-500 text-xs`} />;
       })}
-    </>
+    </div>
   );
 }
 
@@ -53,130 +54,156 @@ export default function AllGuidesPage() {
   const hasFilter = search || filterLang || filterRating || filterSpec;
 
   return (
-    <div style={{ minHeight: "100vh", background: "#f8f9f8" }}>
+    <div className="min-h-screen bg-slate-50 pb-safe">
       {/* Header */}
-      <header className="page-header page-header--teal">
-        <a href="/" className="page-header-brand">
-          <img src="/logo.png" alt="Logo" width={32} height={32} style={{ objectFit: "contain", filter: "brightness(0) invert(1)", flexShrink: 0 }} />
-          <span style={{ color: "white" }}>Cao Bằng Travel Connect</span>
+      <header className="relative z-10 px-6 h-14 flex items-center justify-between border-b border-white/10 bg-teal-900 pt-safe">
+        <a href="/" className="flex items-center gap-2.5 no-underline">
+          <Image src="/logo.png" alt="Logo" width={30} height={30} className="object-contain invert brightness-0 shrink-0" />
+          <span className="text-white font-extrabold text-sm md:text-base">Cao Bằng Travel Connect</span>
         </a>
-        <a href="/" className="page-header-back" style={{ color: "rgba(255,255,255,.85)" }}>
-          <i className="fa-solid fa-arrow-left" /> Trang chủ
+        <a href="/" className="text-white/80 text-sm font-semibold no-underline flex items-center gap-1.5">
+          <i className="fa-solid fa-arrow-left" /> <span className="hidden sm:inline">Trang chủ</span>
         </a>
       </header>
 
       {/* Hero */}
-      <div className="subpage-hero" style={{ background: "linear-gradient(135deg,#1a3c3a,#265C59,#3a9490)", padding: "48px 24px 40px", textAlign: "center" }}>
-        <span style={{ background: "rgba(255,255,255,.15)", color: "rgba(255,255,255,.85)", fontSize: ".72rem", fontWeight: 700, padding: "4px 14px", borderRadius: 20, letterSpacing: ".1em", textTransform: "uppercase" }}>
+      <div className="bg-gradient-to-br from-teal-900 via-teal-800 to-teal-700 pt-12 pb-10 px-6 text-center">
+        <span className="inline-block bg-white/15 text-white/90 text-[11px] font-bold px-3.5 py-1 rounded-full tracking-widest uppercase">
           Đội Ngũ Chuyên Nghiệp
         </span>
-        <h1 style={{ color: "white", fontWeight: 900, fontSize: "clamp(1.5rem,4vw,2.4rem)", margin: "14px 0 10px" }}>
+        <h1 className="text-white font-black text-2xl md:text-4xl mt-3 mb-2 drop-shadow-md">
           Tất Cả Hướng Dẫn Viên
         </h1>
-        <p style={{ color: "rgba(255,255,255,.7)", fontSize: ".9rem", margin: "0 auto 28px", maxWidth: 500 }}>
+        <p className="text-white/75 text-sm max-w-lg mx-auto mb-7">
           {loading ? "Đang tải..." : `${guides.length} hướng dẫn viên giàu kinh nghiệm tại Cao Bằng`}
         </p>
 
         {/* Search bar */}
-        <div style={{ maxWidth: 560, margin: "0 auto", position: "relative" }}>
-          <i className="fa-solid fa-magnifying-glass" style={{ position: "absolute", left: 16, top: "50%", transform: "translateY(-50%)", color: "#94a3b8" }} />
+        <div className="max-w-xl mx-auto relative">
+          <i className="fa-solid fa-magnifying-glass absolute left-4 top-1/2 -translate-y-1/2 text-slate-400" />
           <input type="text" value={search} onChange={(e) => setSearch(e.target.value)}
             placeholder="Tìm theo tên, chuyên môn, giới thiệu..."
-            style={{ width: "100%", padding: "14px 16px 14px 44px", borderRadius: 12, border: "none", fontSize: ".9rem", outline: "none", boxSizing: "border-box", boxShadow: "0 4px 20px rgba(0,0,0,.15)" }} />
+            className="w-full pl-11 pr-4 py-3.5 rounded-xl border-none text-sm outline-none shadow-lg focus:ring-2 focus:ring-teal-400 min-h-[44px]" />
         </div>
       </div>
 
-      <div className="subpage-content" style={{ maxWidth: 1200, margin: "0 auto", padding: "24px 16px 60px" }}>
-        {/* Filters */}
-        <div className="hdv-filters" style={{ display: "flex", gap: 10, flexWrap: "wrap", marginBottom: 24, alignItems: "center" }}>
-          <select value={filterRating} onChange={(e) => setFilterRating(e.target.value)}
-            style={{ padding: "8px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", fontSize: ".83rem", outline: "none", cursor: "pointer", background: "white" }}>
-            <option value="">⭐ Tất cả đánh giá</option>
-            <option value="5">⭐ 5 sao</option>
-            <option value="4.5">⭐ 4.5+ sao</option>
-            <option value="4">⭐ 4+ sao</option>
-          </select>
-          <select value={filterLang} onChange={(e) => setFilterLang(e.target.value)}
-            style={{ padding: "8px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", fontSize: ".83rem", outline: "none", cursor: "pointer", background: "white" }}>
-            <option value="">🌐 Tất cả ngôn ngữ</option>
-            {LANGS.map((l) => <option key={l} value={l}>{l}</option>)}
-          </select>
-          <select value={filterSpec} onChange={(e) => setFilterSpec(e.target.value)}
-            style={{ padding: "8px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", fontSize: ".83rem", outline: "none", cursor: "pointer", background: "white" }}>
-            <option value="">🗺 Tất cả chuyên môn</option>
-            {specialties.map((s) => <option key={s} value={s}>{s}</option>)}
-          </select>
-          {hasFilter && (
-            <button onClick={() => { setSearch(""); setFilterLang(""); setFilterRating(""); setFilterSpec(""); }}
-              style={{ padding: "8px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", background: "white", fontSize: ".83rem", cursor: "pointer", color: "#64748b", display: "flex", alignItems: "center", gap: 6 }}>
-              <i className="fa-solid fa-xmark" /> Xóa lọc
-            </button>
-          )}
-          <span style={{ marginLeft: "auto", fontSize: ".82rem", color: "#94a3b8", fontWeight: 600 }}>
-            {filtered.length} / {guides.length} HDV
-          </span>
+      <div className="max-w-6xl mx-auto px-4 py-6 md:py-8 mb-10">
+        {/* Filters - Horizontal scrolling chips on mobile */}
+        <div className="flex flex-col gap-3 mb-6">
+          <div className="flex items-center justify-between">
+            <span className="text-xs font-bold text-slate-500 uppercase tracking-wider">Bộ lọc</span>
+            {hasFilter && (
+              <button onClick={() => { setSearch(""); setFilterLang(""); setFilterRating(""); setFilterSpec(""); }}
+                className="text-xs font-bold text-teal-700 flex items-center gap-1 active:scale-95 transition-transform min-h-[32px]">
+                <i className="fa-solid fa-rotate-left" /> Đặt lại
+              </button>
+            )}
+          </div>
+          
+          <div className="flex overflow-x-auto pb-2 -mx-4 px-4 sm:mx-0 sm:px-0 gap-2 custom-scrollbar snap-x">
+            {/* Rating Filter */}
+            <div className="flex gap-2 snap-start shrink-0 pr-2 border-r border-slate-200">
+              <button onClick={() => setFilterRating("")}
+                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors border-2 min-h-[40px] ${!filterRating ? "bg-teal-800 text-white border-teal-800" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300"}`}>
+                Tất cả đánh giá
+              </button>
+              <button onClick={() => setFilterRating("5")}
+                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors border-2 min-h-[40px] ${filterRating === "5" ? "bg-teal-800 text-white border-teal-800" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300"}`}>
+                ⭐ 5 sao
+              </button>
+              <button onClick={() => setFilterRating("4")}
+                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors border-2 min-h-[40px] ${filterRating === "4" ? "bg-teal-800 text-white border-teal-800" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300"}`}>
+                ⭐ 4+ sao
+              </button>
+            </div>
+            
+            {/* Lang Filter */}
+            <div className="flex gap-2 snap-start shrink-0 pr-2 border-r border-slate-200">
+              <button onClick={() => setFilterLang("")}
+                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors border-2 min-h-[40px] ${!filterLang ? "bg-teal-800 text-white border-teal-800" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300"}`}>
+                Mọi ngôn ngữ
+              </button>
+              {LANGS.map(l => (
+                <button key={l} onClick={() => setFilterLang(l)}
+                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors border-2 min-h-[40px] ${filterLang === l ? "bg-teal-800 text-white border-teal-800" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300"}`}>
+                  {l}
+                </button>
+              ))}
+            </div>
+
+            {/* Specialty Filter */}
+            <div className="flex gap-2 snap-start shrink-0 pr-4">
+              <button onClick={() => setFilterSpec("")}
+                className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors border-2 min-h-[40px] ${!filterSpec ? "bg-teal-800 text-white border-teal-800" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300"}`}>
+                Mọi chuyên môn
+              </button>
+              {specialties.map(s => (
+                <button key={s} onClick={() => setFilterSpec(s)}
+                  className={`px-4 py-2 rounded-full text-xs font-bold whitespace-nowrap transition-colors border-2 min-h-[40px] ${filterSpec === s ? "bg-teal-800 text-white border-teal-800" : "bg-white text-slate-600 border-slate-200 hover:border-teal-300"}`}>
+                  {s}
+                </button>
+              ))}
+            </div>
+          </div>
+          <div className="text-xs text-slate-500 font-semibold mt-1">
+            Đang hiển thị {filtered.length} HDV
+          </div>
         </div>
 
         {/* Grid */}
         {loading ? (
-          <div style={{ textAlign: "center", padding: "80px 0", color: "#265C59" }}>
-            <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 32 }} />
-            <p style={{ marginTop: 14, fontWeight: 600 }}>Đang tải danh sách HDV...</p>
+          <div className="text-center py-20 text-teal-800">
+            <i className="fa-solid fa-spinner fa-spin text-3xl" />
+            <p className="mt-3 font-semibold">Đang tải danh sách HDV...</p>
           </div>
         ) : filtered.length === 0 ? (
-          <div style={{ textAlign: "center", padding: "64px 0", color: "#94a3b8" }}>
-            <i className="fa-solid fa-person-hiking" style={{ fontSize: 40, marginBottom: 14, display: "block" }} />
-            <p style={{ fontWeight: 700, fontSize: "1rem", color: "#475569" }}>Không tìm thấy HDV phù hợp</p>
-            <p style={{ fontSize: ".85rem", marginTop: 6 }}>Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
+          <div className="text-center py-16 text-slate-400">
+            <i className="fa-solid fa-person-hiking text-5xl mb-4 opacity-50" />
+            <p className="font-bold text-slate-600 text-base">Không tìm thấy HDV phù hợp</p>
+            <p className="text-sm mt-1">Thử điều chỉnh bộ lọc hoặc từ khóa tìm kiếm</p>
           </div>
         ) : (
-          <div className="hdv-cards-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(260px,1fr))", gap: 20 }}>
+          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filtered.map((g) => (
-              <a key={g.id} href={`/hdv/${g.id}`} style={{ textDecoration: "none", display: "block" }}>
-                <div style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: g.is_featured ? "0 4px 24px rgba(229,169,25,.25)" : "0 2px 12px rgba(0,0,0,.06)", border: g.is_featured ? "2px solid #E5A919" : "none", transition: "transform .2s,box-shadow .2s", cursor: "pointer" }}
-                  onMouseEnter={(e) => { (e.currentTarget as HTMLDivElement).style.transform = "translateY(-4px)"; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 8px 28px rgba(0,0,0,.12)"; }}
-                  onMouseLeave={(e) => { (e.currentTarget as HTMLDivElement).style.transform = ""; (e.currentTarget as HTMLDivElement).style.boxShadow = "0 2px 12px rgba(0,0,0,.06)"; }}>
+              <a key={g.id} href={`/hdv/${g.id}`} className="block group">
+                <div className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 h-full flex flex-col ${g.is_featured ? "shadow-[0_4px_24px_rgba(229,169,25,0.25)] border-2 border-amber-500 group-hover:-translate-y-1 group-hover:shadow-[0_8px_28px_rgba(229,169,25,0.35)]" : "shadow-sm border border-slate-100 group-hover:shadow-xl group-hover:-translate-y-1"}`}>
                   {/* Image */}
-                  <div style={{ position: "relative", aspectRatio: "4/3", overflow: "hidden", background: "#f1f5f9" }}>
-                    <img src={g.image_url} alt={g.name} style={{ width: "100%", height: "100%", objectFit: "cover", transition: "transform .3s" }} />
-                    <div style={{ position: "absolute", top: 10, right: 10, background: "rgba(0,0,0,.6)", color: "#E5A919", borderRadius: 8, padding: "4px 10px", fontSize: ".78rem", fontWeight: 800 }}>
+                  <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden shrink-0">
+                    <Image src={g.image_url} alt={g.name} fill className="object-cover transition-transform duration-500 group-hover:scale-105" sizes="(max-width: 640px) 100vw, (max-width: 1024px) 50vw, 33vw" />
+                    <div className="absolute top-2 right-2 bg-black/60 text-amber-500 rounded-lg px-2.5 py-1 text-xs font-black backdrop-blur-md">
                       {g.rating}★
                     </div>
-                    {g.is_featured && (
-                      <div style={{ position: "absolute", top: 10, left: 10, background: "#E5A919", color: "white", borderRadius: 6, padding: "3px 10px", fontSize: ".65rem", fontWeight: 800, display: "flex", alignItems: "center", gap: 3 }}>
-                        ⭐ Nổi Bật
-                      </div>
-                    )}
-                    {!g.is_featured && g.languages?.includes("English") && (
-                      <div style={{ position: "absolute", top: 10, left: 10, background: "#265C59", color: "white", borderRadius: 6, padding: "3px 8px", fontSize: ".65rem", fontWeight: 700 }}>EN</div>
-                    )}
-                    {g.is_featured && g.languages?.includes("English") && (
-                      <div style={{ position: "absolute", top: 36, left: 10, background: "#265C59", color: "white", borderRadius: 6, padding: "3px 8px", fontSize: ".65rem", fontWeight: 700 }}>EN</div>
-                    )}
+                    <div className="absolute top-2 left-2 flex flex-col gap-1.5 items-start">
+                      {g.is_featured && (
+                        <div className="bg-amber-500 text-white rounded-lg px-2.5 py-1 text-[10px] font-black uppercase tracking-wider flex items-center gap-1 shadow-sm">
+                          <i className="fa-solid fa-star" /> Nổi Bật
+                        </div>
+                      )}
+                      {g.languages?.includes("English") && (
+                        <div className="bg-teal-800 text-white rounded-lg px-2 py-0.5 text-[10px] font-bold shadow-sm">EN</div>
+                      )}
+                    </div>
                   </div>
                   {/* Info */}
-                  <div style={{ padding: "16px 18px" }}>
-                    <h3 style={{ fontWeight: 800, color: "#0f172a", fontSize: ".95rem", margin: "0 0 4px" }}>{g.name}</h3>
-                    <p style={{ color: "#265C59", fontSize: ".75rem", fontWeight: 700, margin: "0 0 6px" }}>{g.specialty}</p>
-                    {g.bio && <p style={{ color: "#64748b", fontSize: ".78rem", lineHeight: 1.6, margin: "0 0 12px", display: "-webkit-box", WebkitLineClamp: 2, WebkitBoxOrient: "vertical", overflow: "hidden" }}>{g.bio}</p>}
-                    <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", flexWrap: "wrap", gap: 8 }}>
-                      <div style={{ display: "flex", gap: 2 }}>
-                        <StarIcons rating={g.rating} />
-                      </div>
-                      <div style={{ display: "flex", gap: 6 }}>
-                        {g.years_experience > 0 && (
-                          <span style={{ background: "#f0faf9", color: "#265C59", borderRadius: 6, padding: "3px 8px", fontSize: ".7rem", fontWeight: 700 }}>
-                            {g.years_experience} năm KN
-                          </span>
-                        )}
-                      </div>
+                  <div className="p-4 md:p-5 flex flex-col flex-1">
+                    <h3 className="font-extrabold text-slate-900 text-base mb-1 truncate">{g.name}</h3>
+                    <p className="text-teal-800 text-xs font-bold mb-2 truncate">{g.specialty}</p>
+                    {g.bio && <p className="text-slate-500 text-xs leading-relaxed mb-3 line-clamp-2">{g.bio}</p>}
+                    
+                    <div className="flex items-center justify-between flex-wrap gap-2 mt-auto">
+                      <StarIcons rating={g.rating} />
+                      {g.years_experience > 0 && (
+                        <span className="bg-teal-50 text-teal-800 rounded-md px-2 py-1 text-[10px] font-bold border border-teal-100">
+                          {g.years_experience} năm KN
+                        </span>
+                      )}
                     </div>
+                    
                     {g.zalo_number && (
-                      <a href={`https://zalo.me/${g.zalo_number}`} target="_blank" rel="noopener noreferrer"
-                        onClick={(e) => e.stopPropagation()}
-                        style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 6, marginTop: 12, padding: "8px 0", borderRadius: 8, background: "#265C59", color: "white", fontWeight: 700, fontSize: ".78rem", textDecoration: "none" }}>
-                        <i className="fa-brands fa-comment-dots" /> Chat Zalo
-                      </a>
+                      <button onClick={(e) => { e.preventDefault(); window.open(`https://zalo.me/${g.zalo_number}`, "_blank"); }}
+                        className="w-full mt-4 py-2.5 rounded-xl bg-teal-50 hover:bg-teal-800 text-teal-800 hover:text-white border border-teal-100 hover:border-teal-800 font-bold text-xs transition-colors flex items-center justify-center gap-2 min-h-[44px]">
+                        <i className="fa-brands fa-comment-dots text-sm" /> Chat Zalo
+                      </button>
                     )}
                   </div>
                 </div>

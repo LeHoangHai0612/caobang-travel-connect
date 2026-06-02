@@ -2,8 +2,10 @@
 
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
+import Image from "next/image";
 import { supabase } from "@/lib/supabase";
 import type { Guide } from "@/lib/database.types";
+import StickyBottomBar from "@/app/components/ui/StickyBottomBar";
 
 const VI_DAYS_SHORT = ["CN","T2","T3","T4","T5","T6","T7"];
 const VI_MONTHS_FULL = ["Tháng 1","Tháng 2","Tháng 3","Tháng 4","Tháng 5","Tháng 6",
@@ -58,41 +60,41 @@ function GuideCalendar({ guideId }: { guideId: string }) {
   return (
     <div>
       {/* Month nav */}
-      <div style={{ display: "flex", alignItems: "center", justifyContent: "space-between", marginBottom: 14 }}>
+      <div className="flex items-center justify-between mb-4">
         <button onClick={prev}
-          style={{ background: "#f0faf9", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#265C59", fontWeight: 800, fontSize: "1rem" }}>
-          ‹
+          className="bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-xl w-10 h-10 flex items-center justify-center transition-colors active:scale-95">
+          <i className="fa-solid fa-chevron-left" />
         </button>
-        <div style={{ textAlign: "center" }}>
-          <p style={{ fontWeight: 800, fontSize: ".92rem", color: "#1a2e2e", margin: 0 }}>
+        <div className="text-center">
+          <p className="font-extrabold text-[15px] text-slate-800 m-0">
             {VI_MONTHS_FULL[viewMonth]} {viewYear}
           </p>
           {!loading && (
-            <p style={{ fontSize: ".68rem", color: "#94a3b8", margin: "2px 0 0" }}>
+            <p className="text-[11px] text-slate-500 font-semibold mt-0.5">
               {freeThisMonth} ngày trống · {busyThisMonth} ngày bận
             </p>
           )}
         </div>
         <button onClick={next}
-          style={{ background: "#f0faf9", border: "none", borderRadius: 8, width: 32, height: 32, cursor: "pointer", color: "#265C59", fontWeight: 800, fontSize: "1rem" }}>
-          ›
+          className="bg-teal-50 hover:bg-teal-100 text-teal-800 rounded-xl w-10 h-10 flex items-center justify-center transition-colors active:scale-95">
+          <i className="fa-solid fa-chevron-right" />
         </button>
       </div>
 
       {/* Day headers */}
-      <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3, marginBottom: 3 }}>
+      <div className="grid grid-cols-7 gap-1 mb-1">
         {VI_DAYS_SHORT.map((d) => (
-          <div key={d} style={{ textAlign: "center", fontSize: ".62rem", fontWeight: 700, color: "#94a3b8", padding: "3px 0" }}>{d}</div>
+          <div key={d} className="text-center text-[10px] font-bold text-slate-400 py-1 uppercase">{d}</div>
         ))}
       </div>
 
       {/* Grid */}
       {loading ? (
-        <div style={{ textAlign: "center", padding: "24px 0", color: "#94a3b8" }}>
-          <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 18 }} />
+        <div className="text-center py-8 text-slate-400">
+          <i className="fa-solid fa-spinner fa-spin text-xl" />
         </div>
       ) : (
-        <div style={{ display: "grid", gridTemplateColumns: "repeat(7,1fr)", gap: 3 }}>
+        <div className="grid grid-cols-7 gap-1 md:gap-1.5">
           {cells.map((day, i) => {
             if (!day) return <div key={i} />;
             const k       = `${viewYear}-${String(viewMonth + 1).padStart(2,"0")}-${String(day).padStart(2,"0")}`;
@@ -100,21 +102,21 @@ function GuideCalendar({ guideId }: { guideId: string }) {
             const isToday = k === todayKey;
             const isBusy  = busyDates.has(k);
 
-            let bg     = "white";
-            let color  = "#1e293b";
-            let border = "1.5px solid #e2e8f0";
+            let bg     = "bg-white";
+            let color  = "text-slate-700";
+            let border = "border-slate-200";
             let label  = "";
 
-            if (isPast)    { bg = "#f8fafc"; color = "#cbd5e1"; border = "1.5px solid #f1f5f9"; }
-            if (isBusy && !isPast) { bg = "#fee2e2"; color = "#dc2626"; border = "1.5px solid #fca5a5"; label = "Bận"; }
-            if (isToday)   { border = "2px solid #265C59"; }
-            if (!isBusy && !isPast) { bg = "#f0fdf4"; color = "#166534"; border = "1.5px solid #bbf7d0"; }
+            if (isPast)    { bg = "bg-slate-50"; color = "text-slate-300"; border = "border-slate-100"; }
+            if (isBusy && !isPast) { bg = "bg-red-50"; color = "text-red-600"; border = "border-red-200"; label = "Bận"; }
+            if (isToday)   { border = "border-teal-800"; }
+            if (!isBusy && !isPast) { bg = "bg-green-50"; color = "text-green-700"; border = "border-green-200"; }
 
             return (
               <div key={i} title={isBusy && !isPast ? "HDV đã có lịch ngày này" : (!isPast ? "Còn trống" : "")}
-                style={{ background: bg, color, border, borderRadius: 7, padding: "5px 0 4px", textAlign: "center", fontSize: ".75rem", fontWeight: isToday ? 800 : 600 }}>
-                {day}
-                {label && <div style={{ fontSize: ".52rem", lineHeight: 1, marginTop: 1 }}>{label}</div>}
+                className={`flex flex-col items-center justify-center rounded-lg border-2 py-1.5 md:py-2 min-h-[44px] ${bg} ${color} ${border} ${isToday ? "border-2 shadow-sm font-black" : "font-bold"}`}>
+                <span className="text-sm">{day}</span>
+                {label && <span className="text-[9px] leading-none mt-0.5 font-bold uppercase tracking-wider">{label}</span>}
               </div>
             );
           })}
@@ -122,15 +124,15 @@ function GuideCalendar({ guideId }: { guideId: string }) {
       )}
 
       {/* Legend */}
-      <div style={{ display: "flex", gap: 14, marginTop: 12, justifyContent: "center", flexWrap: "wrap" }}>
+      <div className="flex gap-4 mt-4 justify-center flex-wrap">
         {[
-          { bg: "#f0fdf4", border: "#bbf7d0", label: "Còn trống" },
-          { bg: "#fee2e2", border: "#fca5a5", label: "Đã có lịch" },
-          { bg: "#f8fafc", border: "#f1f5f9", label: "Đã qua" },
+          { bg: "bg-green-50", border: "border-green-200", label: "Còn trống" },
+          { bg: "bg-red-50", border: "border-red-200", label: "Đã có lịch" },
+          { bg: "bg-slate-50", border: "border-slate-200", label: "Đã qua" },
         ].map((l) => (
-          <div key={l.label} style={{ display: "flex", alignItems: "center", gap: 5 }}>
-            <div style={{ width: 12, height: 12, borderRadius: 3, background: l.bg, border: `1.5px solid ${l.border}` }} />
-            <span style={{ fontSize: ".68rem", color: "#64748b", fontWeight: 600 }}>{l.label}</span>
+          <div key={l.label} className="flex items-center gap-1.5">
+            <div className={`w-3 h-3 rounded shadow-sm border-2 ${l.bg} ${l.border}`} />
+            <span className="text-[11px] text-slate-500 font-bold uppercase tracking-wider">{l.label}</span>
           </div>
         ))}
       </div>
@@ -140,9 +142,9 @@ function GuideCalendar({ guideId }: { guideId: string }) {
 
 function StarRow({ rating }: { rating: number }) {
   return (
-    <span style={{ color: "#E5A919", letterSpacing: 2 }}>
+    <span className="text-amber-500 tracking-wider flex gap-0.5">
       {[1,2,3,4,5].map((s) => (
-        <i key={s} className={`fa-${s <= Math.floor(rating) ? "solid" : rating >= s - 0.5 ? "solid fa-star-half-stroke" : "regular"} fa-star`} style={{ fontSize: ".9rem" }} />
+        <i key={s} className={`fa-${s <= Math.floor(rating) ? "solid" : rating >= s - 0.5 ? "solid fa-star-half-stroke" : "regular"} fa-star text-sm`} />
       ))}
     </span>
   );
@@ -165,16 +167,18 @@ export default function GuideProfilePage() {
   }, [id]);
 
   if (loading) return (
-    <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", fontFamily: "'Be Vietnam Pro', sans-serif", background: "#f0f2f0" }}>
-      <i className="fa-solid fa-spinner fa-spin" style={{ fontSize: 26, color: "#265C59" }} />
+    <div className="min-h-screen flex items-center justify-center bg-slate-50">
+      <i className="fa-solid fa-spinner fa-spin text-3xl text-teal-800" />
     </div>
   );
 
   if (notFound || !guide) return (
-    <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", fontFamily: "'Be Vietnam Pro', sans-serif", background: "#f0f2f0", gap: 16 }}>
-      <i className="fa-solid fa-user-slash" style={{ fontSize: 40, color: "#94a3b8" }} />
-      <p style={{ fontWeight: 700, color: "#334155" }}>Không tìm thấy hướng dẫn viên</p>
-      <a href="/#team" style={{ color: "#265C59", fontWeight: 600, textDecoration: "none" }}>← Quay lại danh sách</a>
+    <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
+      <i className="fa-solid fa-user-slash text-5xl text-slate-300" />
+      <p className="font-bold text-slate-700">Không tìm thấy hướng dẫn viên</p>
+      <a href="/hdv" className="text-teal-800 font-bold hover:underline flex items-center gap-2">
+        <i className="fa-solid fa-arrow-left" /> Quay lại danh sách
+      </a>
     </div>
   );
 
@@ -183,265 +187,190 @@ export default function GuideProfilePage() {
   const hasBio = guide.bio && guide.bio.trim().length > 0;
 
   return (
-    <>
-      <style>{`
-        *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
-        .hdv-page { min-height: 100vh; background: #f0f2f0; font-family: 'Be Vietnam Pro', sans-serif; }
+    <div className="min-h-screen bg-slate-50 pb-safe">
+      {/* Topbar */}
+      <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/60 px-6 h-14 flex items-center justify-between pt-safe">
+        <a href="/hdv" className="flex items-center gap-2 text-teal-800 font-bold text-sm hover:gap-3 transition-all">
+          <i className="fa-solid fa-arrow-left" /> <span className="hidden sm:inline">Danh sách HDV</span>
+        </a>
+        <a href="/" className="flex items-center gap-2">
+          <Image src="/logo.png" alt="Logo" width={28} height={28} className="object-contain brightness-0" />
+          <span className="font-extrabold text-[13px] text-slate-800 hidden sm:inline">Cao Bằng Travel Connect</span>
+        </a>
+      </header>
 
-        /* Topbar */
-        .hdv-topbar {
-          position: sticky; top: 0; z-index: 100;
-          background: rgba(255,255,255,.92); backdrop-filter: blur(10px);
-          border-bottom: 1px solid rgba(0,0,0,.06);
-          padding: 0 24px; height: 58px;
-          display: flex; align-items: center; justify-content: space-between;
-        }
-        .hdv-back { display: flex; align-items: center; gap: 8px; text-decoration: none; color: #265C59; font-weight: 700; font-size: .85rem; transition: gap .2s; }
-        .hdv-back:hover { gap: 12px; }
-        .hdv-logo { display: flex; align-items: center; gap: 8px; text-decoration: none; }
-        .hdv-logo img { height: 32px; width: 32px; object-fit: contain; mix-blend-mode: multiply; }
-        .hdv-logo span { font-weight: 800; font-size: .82rem; color: #1a2e2e; }
-
-        /* Hero */
-        .hdv-hero {
-          position: relative; min-height: 340px;
-          display: flex; align-items: flex-end;
-          overflow: hidden;
-        }
-        .hdv-hero-bg {
-          position: absolute; inset: 0;
-          background-size: cover; background-position: center top;
-          filter: blur(18px) brightness(.55) saturate(.8);
-          transform: scale(1.08);
-        }
-        .hdv-hero-overlay {
-          position: absolute; inset: 0;
-          background: linear-gradient(to bottom, rgba(10,30,30,.2) 0%, rgba(10,30,30,.75) 100%);
-        }
-        .hdv-hero-content {
-          position: relative; z-index: 2;
-          width: 100%; max-width: 900px; margin: 0 auto;
-          padding: 0 24px 36px;
-          display: flex; align-items: flex-end; gap: 28px; flex-wrap: wrap;
-        }
-        .hdv-photo {
-          width: 130px; height: 130px; border-radius: 18px;
-          object-fit: cover; object-position: top;
-          border: 4px solid rgba(255,255,255,.25);
-          box-shadow: 0 8px 32px rgba(0,0,0,.35);
-          flex-shrink: 0;
-        }
-        .hdv-hero-info { flex: 1; min-width: 200px; padding-bottom: 4px; }
-        .hdv-hero-role { font-size: .72rem; font-weight: 700; color: rgba(255,255,255,.65); text-transform: uppercase; letter-spacing: .1em; margin-bottom: 6px; }
-        .hdv-hero-name { font-size: clamp(1.6rem, 4vw, 2.2rem); font-weight: 900; color: white; line-height: 1.15; margin-bottom: 8px; }
-        .hdv-hero-spec { font-size: .88rem; color: rgba(255,255,255,.8); margin-bottom: 12px; }
-        .hdv-hero-rating { display: flex; align-items: center; gap: 8px; }
-        .hdv-hero-rating-num { font-size: 1.1rem; font-weight: 900; color: #E5A919; }
-        .hdv-hero-actions { display: flex; gap: 10px; margin-top: 16px; flex-wrap: wrap; }
-        .hdv-btn-zalo {
-          display: inline-flex; align-items: center; gap: 7px;
-          padding: 10px 20px; border-radius: 10px;
-          background: #0068FF; color: white;
-          font-family: 'Be Vietnam Pro', sans-serif; font-size: .82rem; font-weight: 700;
-          text-decoration: none; transition: opacity .2s;
-        }
-        .hdv-btn-zalo:hover { opacity: .88; }
-        .hdv-btn-book {
-          display: inline-flex; align-items: center; gap: 7px;
-          padding: 10px 20px; border-radius: 10px;
-          background: rgba(255,255,255,.15); color: white;
-          border: 1.5px solid rgba(255,255,255,.35);
-          font-family: 'Be Vietnam Pro', sans-serif; font-size: .82rem; font-weight: 700;
-          text-decoration: none; transition: background .2s;
-          backdrop-filter: blur(4px);
-        }
-        .hdv-btn-book:hover { background: rgba(255,255,255,.25); }
-
-        /* Body */
-        .hdv-body { max-width: 900px; margin: 0 auto; padding: 28px 24px 64px; display: grid; grid-template-columns: 1fr 300px; gap: 20px; }
-        @media (max-width: 700px) { .hdv-body { grid-template-columns: 1fr; } }
-
-        /* Cards */
-        .hdv-card { background: white; border-radius: 16px; padding: 24px; box-shadow: 0 2px 12px rgba(0,0,0,.06); }
-        .hdv-card-title { font-size: .7rem; font-weight: 700; color: #94a3b8; text-transform: uppercase; letter-spacing: .09em; margin-bottom: 14px; display: flex; align-items: center; gap: 8px; }
-        .hdv-card-title i { color: #265C59; }
-
-        /* Bio */
-        .hdv-bio-text { font-size: .9rem; color: #334155; line-height: 1.8; }
-        .hdv-bio-placeholder { font-size: .88rem; color: #94a3b8; line-height: 1.7; font-style: italic; }
-
-        /* Info grid */
-        .hdv-info-item { display: flex; align-items: flex-start; gap: 12px; padding: 12px 0; border-bottom: 1px solid #f1f5f9; }
-        .hdv-info-item:last-child { border-bottom: none; }
-        .hdv-info-icon { width: 34px; height: 34px; border-radius: 9px; background: #f0faf9; display: flex; align-items: center; justify-content: center; flex-shrink: 0; }
-        .hdv-info-icon i { color: #265C59; font-size: .85rem; }
-        .hdv-info-label { font-size: .7rem; color: #94a3b8; font-weight: 600; text-transform: uppercase; letter-spacing: .06em; }
-        .hdv-info-value { font-size: .88rem; color: #1e293b; font-weight: 600; margin-top: 2px; }
-
-        /* Specialty tags */
-        .hdv-tags { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 14px; }
-        .hdv-tag { padding: 5px 14px; border-radius: 20px; font-size: .78rem; font-weight: 600; background: rgba(38,92,89,.08); color: #265C59; }
-
-        /* CTA card */
-        .hdv-cta { background: linear-gradient(135deg, #265C59, #3a9490); border-radius: 16px; padding: 24px; color: white; margin-top: 20px; }
-        .hdv-cta h3 { font-size: 1rem; font-weight: 800; margin-bottom: 8px; }
-        .hdv-cta p { font-size: .83rem; opacity: .85; line-height: 1.6; margin-bottom: 16px; }
-        .hdv-cta-btn { display: flex; align-items: center; justify-content: center; gap: 8px; padding: 12px; border-radius: 10px; background: white; color: #265C59; font-family: 'Be Vietnam Pro', sans-serif; font-size: .85rem; font-weight: 800; text-decoration: none; transition: opacity .2s; }
-        .hdv-cta-btn:hover { opacity: .92; }
-      `}</style>
-
-      <div className="hdv-page">
-        {/* Topbar */}
-        <header className="hdv-topbar">
-          <a href="/#team" className="hdv-back">
-            <i className="fa-solid fa-arrow-left" /> Danh sách HDV
-          </a>
-          <a href="/" className="hdv-logo">
-            <img src="/logo.png" alt="Logo" />
-            <span>Cao Bằng Travel Connect</span>
-          </a>
-        </header>
-
-        {/* Hero */}
-        <div className="hdv-hero">
-          <div className="hdv-hero-bg" style={{ backgroundImage: `url('${guide.image_url}')` }} />
-          <div className="hdv-hero-overlay" />
-          <div className="hdv-hero-content">
-            <img src={guide.image_url} alt={guide.name} className="hdv-photo" />
-            <div className="hdv-hero-info">
-              <p className="hdv-hero-role">{guide.role}</p>
-              <h1 className="hdv-hero-name">{guide.name}</h1>
-              <p className="hdv-hero-spec">{guide.specialty}</p>
-              <div className="hdv-hero-rating">
-                <span className="hdv-hero-rating-num">{guide.rating}</span>
-                <StarRow rating={guide.rating} />
-                <span style={{ color: "rgba(255,255,255,.6)", fontSize: ".8rem" }}>Đánh giá</span>
-              </div>
-              <div className="hdv-hero-actions">
-                {guide.zalo_number && (
-                  <a href={`https://zalo.me/${guide.zalo_number}`} target="_blank" rel="noopener noreferrer" className="hdv-btn-zalo">
-                    <i className="fa-brands fa-comment-dots" /> Chat Zalo
-                  </a>
-                )}
-                <a href={`/dat-lich?guide=${guide.id}`} className="hdv-btn-book">
-                  <i className="fa-solid fa-calendar-check" /> Đặt Lịch Ngay
-                </a>
-              </div>
-            </div>
-          </div>
+      {/* Hero */}
+      <div className="relative min-h-[380px] flex items-end overflow-hidden">
+        <div className="absolute inset-0">
+          <Image src={guide.image_url} alt="Background" fill className="object-cover object-top blur-xl brightness-[0.55] saturate-75 scale-110" />
         </div>
-
-        {/* Body */}
-        <div className="hdv-body">
-          {/* Left column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            {/* Bio */}
-            <div className="hdv-card">
-              <p className="hdv-card-title"><i className="fa-solid fa-id-card" /> Giới Thiệu</p>
-              {hasBio
-                ? <p className="hdv-bio-text">{guide.bio}</p>
-                : <p className="hdv-bio-placeholder">
-                    {guide.name} là hướng dẫn viên địa phương với {guide.years_experience} năm kinh nghiệm dẫn tour tại Cao Bằng.
-                    Chuyên về {guide.specialty.replace("HDV ·", "").trim()}, {guide.name.split(" ").pop()} am hiểu sâu về địa lý, văn hóa và lịch sử vùng đất biên giới này.
-                    Mỗi chuyến đi cùng {guide.name} đều được cá nhân hóa để phù hợp với nhu cầu và sở thích của du khách.
-                  </p>
-              }
-
-              {/* Specialty tags */}
-              <div className="hdv-tags">
-                {specialties.map((s, i) => <span key={i} className="hdv-tag">{s}</span>)}
-              </div>
-            </div>
-
-            {/* Lịch làm việc */}
-            <div className="hdv-card">
-              <p className="hdv-card-title">
-                <i className="fa-solid fa-calendar-days" /> Lịch Làm Việc
-              </p>
-              <p style={{ fontSize: ".78rem", color: "#64748b", marginBottom: 14, lineHeight: 1.6 }}>
-                Xem ngày HDV còn trống để chọn thời gian phù hợp khi đặt lịch.
-              </p>
-              <GuideCalendar guideId={guide.id} />
-              <a href={`/dat-lich?guide=${guide.id}`} style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 7, marginTop: 16, padding: "10px", borderRadius: 10, background: "#265C59", color: "white", textDecoration: "none", fontWeight: 700, fontSize: ".82rem", fontFamily: "inherit" }}>
-                <i className="fa-solid fa-calendar-check" /> Đặt Lịch Ngay
-              </a>
-            </div>
-
-            {/* CTA */}
-            <div className="hdv-cta">
-              <h3><i className="fa-solid fa-calendar-check" style={{ marginRight: 8 }} />Đặt Lịch Với {guide.name.split(" ").pop()}</h3>
-              <p>Liên hệ trực tiếp qua Zalo hoặc điền form đặt lịch. Chúng tôi sẽ xác nhận trong vòng 24 giờ.</p>
-              <a href={`/dat-lich?guide=${guide.id}`} className="hdv-cta-btn">
-                <i className="fa-solid fa-arrow-right" /> Xem Gói Tour & Đặt Lịch
-              </a>
-            </div>
+        <div className="absolute inset-0 bg-gradient-to-t from-slate-900/90 via-slate-900/40 to-transparent" />
+        
+        <div className="relative z-10 w-full max-w-5xl mx-auto px-6 pb-8 md:pb-10 pt-20 flex flex-col sm:flex-row items-center sm:items-end gap-6 text-center sm:text-left">
+          <div className="w-32 h-32 md:w-40 md:h-40 rounded-2xl md:rounded-3xl border-4 border-white/20 shadow-2xl overflow-hidden shrink-0 relative bg-slate-200">
+            <Image src={guide.image_url} alt={guide.name} fill className="object-cover object-top" sizes="160px" />
           </div>
-
-          {/* Right column */}
-          <div style={{ display: "flex", flexDirection: "column", gap: 20 }}>
-            {/* Quick info */}
-            <div className="hdv-card">
-              <p className="hdv-card-title"><i className="fa-solid fa-circle-info" /> Thông Tin</p>
-
-              <div className="hdv-info-item">
-                <div className="hdv-info-icon"><i className="fa-solid fa-briefcase" /></div>
-                <div>
-                  <p className="hdv-info-label">Kinh Nghiệm</p>
-                  <p className="hdv-info-value">{guide.years_experience} năm</p>
-                </div>
-              </div>
-
-              <div className="hdv-info-item">
-                <div className="hdv-info-icon"><i className="fa-solid fa-star" /></div>
-                <div>
-                  <p className="hdv-info-label">Đánh Giá</p>
-                  <p className="hdv-info-value">{guide.rating} / 5.0 ★</p>
-                </div>
-              </div>
-
-              <div className="hdv-info-item">
-                <div className="hdv-info-icon"><i className="fa-solid fa-language" /></div>
-                <div>
-                  <p className="hdv-info-label">Ngôn Ngữ</p>
-                  <p className="hdv-info-value">{langs.join(" · ")}</p>
-                </div>
-              </div>
-
-              <div className="hdv-info-item">
-                <div className="hdv-info-icon"><i className="fa-solid fa-map-location-dot" /></div>
-                <div>
-                  <p className="hdv-info-label">Khu Vực</p>
-                  <p className="hdv-info-value">Cao Bằng, Việt Nam</p>
-                </div>
-              </div>
-
-              {guide.zalo_number && (
-                <div className="hdv-info-item">
-                  <div className="hdv-info-icon"><i className="fa-brands fa-comment-dots" style={{ color: "#0068FF" }} /></div>
-                  <div>
-                    <p className="hdv-info-label">Zalo</p>
-                    <p className="hdv-info-value">{guide.zalo_number}</p>
-                  </div>
-                </div>
-              )}
+          <div className="flex-1 min-w-0 flex flex-col items-center sm:items-start">
+            <p className="text-[11px] md:text-xs font-black text-white/70 uppercase tracking-[0.15em] mb-1.5">{guide.role}</p>
+            <h1 className="text-3xl md:text-5xl font-black text-white mb-2 tracking-tight drop-shadow-md">{guide.name}</h1>
+            <p className="text-white/80 font-semibold mb-4 drop-shadow">{guide.specialty}</p>
+            
+            <div className="flex items-center gap-3 bg-white/10 backdrop-blur-md rounded-xl px-4 py-2 border border-white/10 mb-5">
+              <span className="text-xl font-black text-amber-500">{guide.rating}</span>
+              <StarRow rating={guide.rating} />
+              <div className="w-px h-5 bg-white/20 mx-1" />
+              <span className="text-xs font-bold text-white/70">Đánh giá</span>
             </div>
-
-            {/* Contact card */}
-            {guide.zalo_number && (
-              <div className="hdv-card" style={{ textAlign: "center" }}>
-                <p className="hdv-card-title" style={{ justifyContent: "center" }}><i className="fa-solid fa-headset" /> Liên Hệ Nhanh</p>
-                <p style={{ fontSize: ".82rem", color: "#64748b", marginBottom: 14, lineHeight: 1.6 }}>
-                  Nhắn tin Zalo để tư vấn tour miễn phí và đặt lịch ngay hôm nay
-                </p>
-                <a href={`https://zalo.me/${guide.zalo_number}`} target="_blank" rel="noopener noreferrer"
-                  style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, padding: "12px", borderRadius: 10, background: "#0068FF", color: "white", textDecoration: "none", fontWeight: 800, fontSize: ".85rem", fontFamily: "inherit" }}>
-                  <i className="fa-brands fa-comment-dots" /> Chat Zalo Ngay
-                </a>
-              </div>
-            )}
+            
+            <div className="flex flex-wrap items-center justify-center sm:justify-start gap-3 w-full">
+              {guide.zalo_number && (
+                <button onClick={() => window.open(`https://zalo.me/${guide.zalo_number}`, "_blank")} 
+                  className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-colors shadow-lg shadow-blue-900/20 active:scale-95 min-w-[140px]">
+                  <i className="fa-brands fa-comment-dots text-lg" /> Chat Zalo
+                </button>
+              )}
+              <a href={`/dat-lich?guide=${guide.id}`} 
+                className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 h-12 rounded-xl bg-white/15 hover:bg-white/25 border border-white/30 text-white font-bold text-sm transition-colors backdrop-blur-md active:scale-95 min-w-[140px]">
+                <i className="fa-solid fa-calendar-check text-lg" /> Đặt Lịch
+              </a>
+            </div>
           </div>
         </div>
       </div>
-    </>
+
+      {/* Body */}
+      <div className="max-w-5xl mx-auto px-4 sm:px-6 py-8 md:py-12 pb-28 md:pb-12 grid grid-cols-1 lg:grid-cols-[1fr_340px] gap-6 md:gap-8">
+        
+        {/* Left column */}
+        <div className="flex flex-col gap-6 md:gap-8">
+          
+          {/* Bio */}
+          <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100">
+            <h2 className="flex items-center gap-2.5 text-xs font-black text-slate-400 uppercase tracking-widest mb-5">
+              <i className="fa-solid fa-id-card text-teal-700 text-sm" /> Giới Thiệu
+            </h2>
+            
+            {hasBio ? (
+              <p className="text-sm md:text-[15px] text-slate-700 leading-relaxed font-medium">{guide.bio}</p>
+            ) : (
+              <p className="text-sm md:text-[15px] text-slate-500 leading-relaxed italic font-medium">
+                {guide.name} là hướng dẫn viên địa phương với {guide.years_experience} năm kinh nghiệm dẫn tour tại Cao Bằng.
+                Chuyên về {guide.specialty.replace("HDV ·", "").trim()}, {guide.name.split(" ").pop()} am hiểu sâu về địa lý, văn hóa và lịch sử vùng đất biên giới này.
+                Mỗi chuyến đi cùng {guide.name} đều được cá nhân hóa để phù hợp với nhu cầu và sở thích của du khách.
+              </p>
+            )}
+
+            {/* Specialty tags */}
+            <div className="flex flex-wrap gap-2 mt-6 pt-6 border-t border-slate-100">
+              {specialties.map((s, i) => (
+                <span key={i} className="px-3.5 py-1.5 rounded-full text-xs font-bold bg-teal-50 text-teal-800 border border-teal-100">
+                  {s}
+                </span>
+              ))}
+            </div>
+          </div>
+
+          {/* Lịch làm việc */}
+          <div className="bg-white rounded-2xl md:rounded-3xl p-6 md:p-8 shadow-sm border border-slate-100">
+            <h2 className="flex items-center gap-2.5 text-xs font-black text-slate-400 uppercase tracking-widest mb-2">
+              <i className="fa-solid fa-calendar-days text-teal-700 text-sm" /> Lịch Làm Việc
+            </h2>
+            <p className="text-xs font-semibold text-slate-500 mb-6">
+              Xem ngày HDV còn trống để chọn thời gian phù hợp khi đặt lịch.
+            </p>
+            
+            <div className="bg-slate-50 rounded-2xl p-4 md:p-6 border border-slate-100 mb-6">
+              <GuideCalendar guideId={guide.id} />
+            </div>
+            
+            <a href={`/dat-lich?guide=${guide.id}`} 
+              className="flex items-center justify-center gap-2 w-full h-12 rounded-xl bg-gradient-to-r from-teal-800 to-teal-700 hover:from-teal-900 hover:to-teal-800 text-white font-bold text-sm shadow-lg shadow-teal-900/20 active:scale-95 transition-all">
+              <i className="fa-solid fa-calendar-check" /> Đặt Lịch Ngày Trống
+            </a>
+          </div>
+          
+        </div>
+
+        {/* Right column */}
+        <div className="flex flex-col gap-6 md:gap-8">
+          
+          {/* Quick info */}
+          <div className="bg-white rounded-2xl md:rounded-3xl p-6 shadow-sm border border-slate-100">
+            <h2 className="flex items-center gap-2.5 text-xs font-black text-slate-400 uppercase tracking-widest mb-6">
+              <i className="fa-solid fa-circle-info text-teal-700 text-sm" /> Thông Tin Nhanh
+            </h2>
+
+            <div className="flex flex-col gap-4">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
+                  <i className="fa-solid fa-briefcase text-teal-700 text-lg" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Kinh Nghiệm</p>
+                  <p className="text-sm font-bold text-slate-800">{guide.years_experience} năm dẫn tour</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
+                  <i className="fa-solid fa-star text-teal-700 text-lg" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Đánh Giá</p>
+                  <p className="text-sm font-bold text-slate-800">{guide.rating} / 5.0 ★ trung bình</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
+                  <i className="fa-solid fa-language text-teal-700 text-lg" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Ngôn Ngữ</p>
+                  <p className="text-sm font-bold text-slate-800">{langs.join(" · ")}</p>
+                </div>
+              </div>
+
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 rounded-xl bg-teal-50 flex items-center justify-center shrink-0">
+                  <i className="fa-solid fa-map-location-dot text-teal-700 text-lg" />
+                </div>
+                <div>
+                  <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider mb-0.5">Khu Vực</p>
+                  <p className="text-sm font-bold text-slate-800">Cao Bằng, Việt Nam</p>
+                </div>
+              </div>
+            </div>
+          </div>
+
+          {/* Contact card */}
+          {guide.zalo_number && (
+            <div className="bg-gradient-to-br from-blue-600 to-blue-800 rounded-2xl md:rounded-3xl p-6 md:p-8 text-center shadow-lg shadow-blue-900/20 text-white relative overflow-hidden">
+              <i className="fa-brands fa-whatsapp absolute -right-6 -bottom-6 text-9xl opacity-10" />
+              <div className="relative z-10">
+                <h2 className="flex items-center justify-center gap-2.5 text-[11px] font-black text-blue-200 uppercase tracking-widest mb-3">
+                  <i className="fa-solid fa-headset text-sm" /> Liên Hệ Nhanh
+                </h2>
+                <p className="text-[13px] text-blue-100 mb-6 font-semibold leading-relaxed">
+                  Nhắn tin Zalo để tư vấn tour miễn phí và đặt lịch ngay hôm nay với {guide.name.split(" ").pop()}
+                </p>
+                <button onClick={() => window.open(`https://zalo.me/${guide.zalo_number}`, "_blank")}
+                  className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-white text-blue-700 font-black text-sm active:scale-95 transition-transform shadow-lg">
+                  <i className="fa-brands fa-comment-dots text-lg" /> Chat Zalo Ngay
+                </button>
+              </div>
+            </div>
+          )}
+          
+        </div>
+      </div>
+
+      <StickyBottomBar
+        leftTitle="Hướng Dẫn Viên"
+        leftSubtitle={guide.name}
+        zaloNumber={guide.zalo_number}
+        onBook={() => window.location.href = `/dat-lich?guide=${guide.id}`}
+      />
+    </div>
   );
 }
