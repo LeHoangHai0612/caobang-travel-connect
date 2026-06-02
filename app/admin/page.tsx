@@ -48,6 +48,12 @@ export default function AdminDashboard() {
 
   useEffect(() => {
     async function loadStats() {
+      const { data: { session } } = await supabase.auth.getSession();
+      if (!session) { window.location.href = "/dang-nhap"; return; }
+      
+      const { data: profile } = await supabase.from("user_profiles").select("is_admin").eq("id", session.user.id).single();
+      if (!profile?.is_admin) { window.location.href = "/"; return; }
+
       const sixMonthsAgo = new Date();
       sixMonthsAgo.setMonth(sixMonthsAgo.getMonth() - 5);
       sixMonthsAgo.setDate(1);
@@ -94,6 +100,19 @@ export default function AdminDashboard() {
     }
     loadStats();
   }, []);
+
+  const updateBookingStatus = async (id: string, status: string) => {
+    setLoading(true);
+    await supabase.from("bookings").update({ status }).eq("id", id);
+    setRecentBookings((prev) => prev.map((b) => b.id === id ? { ...b, status } : b));
+    if (status === "confirmed") {
+      setStats((prev) => ({ ...prev, pendingBookings: Math.max(0, prev.pendingBookings - 1) }));
+    }
+    if (status === "cancelled") {
+      setStats((prev) => ({ ...prev, pendingBookings: Math.max(0, prev.pendingBookings - 1) }));
+    }
+    setLoading(false);
+  };
 
   const statusLabel: Record<string, string> = {
     pending:   "Chờ xử lý",
@@ -209,17 +228,31 @@ export default function AdminDashboard() {
               ) : (
                 <div className="flex flex-col">
                   {recentBookings.map((b, i) => (
-                    <div key={b.id} className={`flex items-center gap-3 py-3 ${i !== recentBookings.length - 1 ? "border-b border-slate-100" : ""}`}>
-                      <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center shrink-0">
-                        <span className="font-black text-sm text-teal-800">{b.client_name[0].toUpperCase()}</span>
+                    <div key={b.id} className={`flex flex-col sm:flex-row sm:items-center justify-between gap-3 py-3 ${i !== recentBookings.length - 1 ? "border-b border-slate-100" : ""}`}>
+                      <div className="flex items-center gap-3 min-w-0">
+                        <div className="w-10 h-10 rounded-full bg-teal-50 flex items-center justify-center shrink-0">
+                          <span className="font-black text-sm text-teal-800">{b.client_name[0].toUpperCase()}</span>
+                        </div>
+                        <div className="flex-1 min-w-0">
+                          <p className="font-bold text-sm text-slate-900 truncate">{b.client_name}</p>
+                          <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">{b.package_type}</p>
+                        </div>
                       </div>
-                      <div className="flex-1 min-w-0">
-                        <p className="font-bold text-sm text-slate-900 truncate">{b.client_name}</p>
-                        <p className="text-[11px] text-slate-500 font-medium truncate mt-0.5">{b.package_type}</p>
+                      <div className="flex items-center gap-2 shrink-0 ml-13 sm:ml-0">
+                        <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide ${statusColors[b.status] || "bg-slate-100 text-slate-600"}`}>
+                          {statusLabel[b.status] ?? b.status}
+                        </span>
+                        {b.status === "pending" && (
+                          <div className="flex gap-1 ml-2">
+                            <button onClick={() => updateBookingStatus(b.id, "confirmed")} className="w-7 h-7 rounded-lg bg-emerald-50 text-emerald-600 hover:bg-emerald-100 flex items-center justify-center transition-colors" title="Duyệt">
+                              <i className="fa-solid fa-check text-xs" />
+                            </button>
+                            <button onClick={() => updateBookingStatus(b.id, "cancelled")} className="w-7 h-7 rounded-lg bg-red-50 text-red-600 hover:bg-red-100 flex items-center justify-center transition-colors" title="Hủy">
+                              <i className="fa-solid fa-xmark text-xs" />
+                            </button>
+                          </div>
+                        )}
                       </div>
-                      <span className={`px-2.5 py-1 rounded-full text-[10px] font-black uppercase tracking-wide shrink-0 ${statusColors[b.status] || "bg-slate-100 text-slate-600"}`}>
-                        {statusLabel[b.status] ?? b.status}
-                      </span>
                     </div>
                   ))}
                 </div>

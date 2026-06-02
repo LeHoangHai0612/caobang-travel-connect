@@ -37,6 +37,10 @@ export default function TaiKhoanPage() {
   const [toast, setToast]         = useState("");
   const [cancelId, setCancelId]   = useState<string | null>(null);
   const [cancelling, setCancelling] = useState(false);
+  const [reviewBooking, setReviewBooking] = useState<BookingRow | null>(null);
+  const [reviewStars, setReviewStars] = useState(5);
+  const [reviewText, setReviewText] = useState("");
+  const [submittingReview, setSubmittingReview] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -93,6 +97,31 @@ export default function TaiKhoanPage() {
     setCancelId(null);
     setCancelling(false);
     setToast("Đã hủy lịch đặt.");
+    setTimeout(() => setToast(""), 2500);
+  };
+
+  const submitReview = async () => {
+    if (!reviewBooking || !profile) return;
+    if (reviewText.trim().length < 10) {
+      setToast("Vui lòng viết tối thiểu 10 ký tự.");
+      setTimeout(() => setToast(""), 2500);
+      return;
+    }
+    setSubmittingReview(true);
+    await supabase.from("reviews").insert({
+      reviewer_name: profile.full_name || "Khách ẩn danh",
+      reviewer_location: "Từ hệ thống",
+      stars: reviewStars,
+      review_text: reviewText.trim(),
+      avatar_url: "/av1.jpg",
+      user_id: profile.id,
+      is_approved: false
+    });
+    setSubmittingReview(false);
+    setReviewBooking(null);
+    setReviewText("");
+    setReviewStars(5);
+    setToast("Đã gửi đánh giá! Admin sẽ duyệt sớm.");
     setTimeout(() => setToast(""), 2500);
   };
 
@@ -321,6 +350,12 @@ export default function TaiKhoanPage() {
                               Hủy
                             </button>
                           )}
+                          {b.status === "confirmed" && (
+                            <button onClick={() => setReviewBooking(b)}
+                              className="px-3.5 py-1.5 rounded-lg border-2 border-teal-100 text-teal-700 font-bold text-[11px] hover:bg-teal-50 hover:border-teal-200 transition-colors active:scale-95 whitespace-nowrap">
+                              Đánh giá
+                            </button>
+                          )}
                         </td>
                       </tr>
                     );
@@ -352,6 +387,50 @@ export default function TaiKhoanPage() {
                 <button onClick={() => cancelBooking(cancelId)} disabled={cancelling}
                   className="flex-1 py-2.5 rounded-xl bg-red-600 text-white font-bold text-sm hover:bg-red-700 transition-colors disabled:opacity-60 flex justify-center items-center">
                   {cancelling ? <i className="fa-solid fa-spinner fa-spin" /> : "Xác nhận hủy"}
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* ── Review Modal ── */}
+        {reviewBooking && (
+          <div className="fixed inset-0 z-[999] bg-slate-900/60 backdrop-blur-sm flex items-center justify-center p-4 animate-in fade-in"
+               onClick={() => !submittingReview && setReviewBooking(null)}>
+            <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-[420px] w-full shadow-2xl animate-in zoom-in-95"
+                 onClick={(e) => e.stopPropagation()}>
+              <h3 className="font-black text-slate-900 text-lg mb-1">Đánh giá trải nghiệm</h3>
+              <p className="text-sm text-slate-500 mb-6 font-medium">
+                Cảm ơn bạn đã đồng hành cùng chúng tôi trong tour <strong className="text-slate-800">{reviewBooking.package_type}</strong>!
+              </p>
+              
+              <div className="mb-5">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Mức độ hài lòng</label>
+                <div className="flex gap-2">
+                  {[1,2,3,4,5].map((s) => (
+                    <button key={s} onClick={() => setReviewStars(s)} className="text-2xl transition-transform hover:scale-110"
+                            style={{ color: s <= reviewStars ? "#f59e0b" : "#e2e8f0" }}>
+                      <i className="fa-solid fa-star" />
+                    </button>
+                  ))}
+                </div>
+              </div>
+              
+              <div className="mb-6">
+                <label className="block text-xs font-bold text-slate-500 uppercase tracking-widest mb-2">Chia sẻ của bạn</label>
+                <textarea value={reviewText} onChange={(e) => setReviewText(e.target.value)}
+                  placeholder="HDV nhiệt tình, cảnh quan tuyệt đẹp..."
+                  className="w-full p-4 border-2 border-slate-200 rounded-xl text-sm font-medium outline-none focus:border-teal-600 transition-colors resize-none h-28" />
+              </div>
+
+              <div className="flex gap-3">
+                <button onClick={() => setReviewBooking(null)} disabled={submittingReview}
+                  className="flex-1 py-2.5 rounded-xl border-2 border-slate-200 text-slate-600 font-bold text-sm hover:bg-slate-50 transition-colors">
+                  Hủy
+                </button>
+                <button onClick={submitReview} disabled={submittingReview}
+                  className="flex-1 py-2.5 rounded-xl bg-teal-800 text-white font-bold text-sm hover:bg-teal-900 transition-colors disabled:opacity-60 flex justify-center items-center">
+                  {submittingReview ? <i className="fa-solid fa-spinner fa-spin" /> : "Gửi đánh giá"}
                 </button>
               </div>
             </div>
