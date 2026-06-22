@@ -1,11 +1,22 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
+
+interface CamNangTip {
+  id: string;
+  icon: string;
+  tag: string;
+  color: string;
+  title: string;
+  description: string;
+  sort_order?: number;
+}
 
 interface CamNangSectionProps {
   camNangBg: string;
   camNangFromDB: boolean;
-  camNangTips: any[];
+  camNangTips: CamNangTip[];
 }
 
 export default function CamNangSection({ camNangBg, camNangFromDB, camNangTips }: CamNangSectionProps) {
@@ -47,14 +58,14 @@ export default function CamNangSection({ camNangBg, camNangFromDB, camNangTips }
               </>
             );
             return camNangFromDB
-              ? <a key={id} href={`/cam-nang/${id}`} className="cam-nang-card fade-up" style={{ textDecoration: "none", display: "block" }}>{cardInner}</a>
+              ? <Link key={id} href={`/cam-nang/${id}`} className="cam-nang-card fade-up" style={{ textDecoration: "none", display: "block" }}>{cardInner}</Link>
               : <article key={id} className="cam-nang-card fade-up">{cardInner}</article>;
           })}
         </div>
         <div style={{ textAlign: "center", marginTop: 36 }}>
-          <a href="/cam-nang" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
+          <Link href="/cam-nang" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid rgba(255,255,255,.5)", color: "white", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", backdropFilter: "blur(6px)", background: "rgba(255,255,255,.1)", letterSpacing: ".04em" }}>
             <i className="fa-solid fa-book-open" /> Xem Tất Cả Cẩm Nang <i className="fa-solid fa-arrow-right" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

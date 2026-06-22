@@ -2,6 +2,7 @@
 
 import { useEffect, useState, useCallback } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import { getTier, POINTS_PER_BOOKING, GUIDE_LOYALTY_THRESHOLD, GUIDE_LOYALTY_BONUS_PCT } from "@/lib/loyalty";
 import type { Guide, UserProfile } from "@/lib/database.types";
@@ -51,6 +52,7 @@ export default function DatLichPage() {
     const initPkg    = p.get("package") ?? "";
     const tourId     = p.get("tour") ?? "";
     const initGuide  = p.get("guide") ?? "";
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- cap nhat state co chu dich khi tai du lieu / khoi tao
     if (initPkg)   setPkg(initPkg);
     if (initGuide) setGuideId(initGuide);
 
@@ -94,6 +96,7 @@ export default function DatLichPage() {
   }, []);
 
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- cap nhat state co chu dich khi tai du lieu / khoi tao
     if (!session || !guideId) { setGuideBookingCount(0); return; }
     supabase.from("bookings").select("id", { count: "exact", head: true })
       .eq("user_id", session.user.id).eq("guide_id", guideId).eq("status", "confirmed")
@@ -164,13 +167,13 @@ export default function DatLichPage() {
 
       {/* Header */}
       <header className="relative z-10 px-6 h-14 flex items-center justify-between border-b border-white/10 bg-black/20 backdrop-blur-md pt-safe">
-        <a href="/" className="flex items-center gap-2.5 no-underline">
+        <Link href="/" className="flex items-center gap-2.5 no-underline">
           <Image src="/logo.png" alt="Logo" width={30} height={30} className="object-contain invert brightness-0" />
           <span className="text-white font-extrabold text-sm md:text-base">Cao Bằng Travel Connect</span>
-        </a>
-        <a href="/" className="text-white/75 text-sm font-semibold no-underline flex items-center gap-1.5">
+        </Link>
+        <Link href="/" className="text-white/75 text-sm font-semibold no-underline flex items-center gap-1.5">
           <i className="fa-solid fa-arrow-left" /> <span className="hidden sm:inline">Trang chủ</span>
-        </a>
+        </Link>
       </header>
 
       {/* Content */}
@@ -208,12 +211,12 @@ export default function DatLichPage() {
               </div>
             )}
             <div className="flex flex-col sm:flex-row gap-3">
-              <a href="/" className="flex-1 py-3 rounded-xl bg-teal-800 text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform min-h-[44px]">
+              <Link href="/" className="flex-1 py-3 rounded-xl bg-teal-800 text-white font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform min-h-[44px]">
                 <i className="fa-solid fa-house" /> Về trang chủ
-              </a>
-              <a href="/tai-khoan" className="flex-1 py-3 rounded-xl border-2 border-teal-800 text-teal-800 font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform min-h-[44px]">
+              </Link>
+              <Link href="/tai-khoan" className="flex-1 py-3 rounded-xl border-2 border-teal-800 text-teal-800 font-bold text-sm flex items-center justify-center gap-2 active:scale-95 transition-transform min-h-[44px]">
                 <i className="fa-solid fa-user" /> Tài khoản
-              </a>
+              </Link>
             </div>
           </div>
         ) : (

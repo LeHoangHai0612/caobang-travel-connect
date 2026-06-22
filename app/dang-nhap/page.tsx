@@ -3,7 +3,6 @@
 import { useState, useEffect } from "react";
 import { supabase } from "@/lib/supabase";
 import Link from "next/link";
-import Image from "next/image";
 
 const TIERS = [
   { label: "Đồng",      color: "#cd7f32", icon: "fa-award",  pct: "0%",   min: "0 điểm"   },

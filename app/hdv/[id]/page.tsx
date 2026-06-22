@@ -3,6 +3,7 @@
 import { useEffect, useState, useCallback } from "react";
 import { useParams } from "next/navigation";
 import Image from "next/image";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { Guide } from "@/lib/database.types";
 import StickyBottomBar from "@/app/components/ui/StickyBottomBar";
@@ -31,6 +32,7 @@ function GuideCalendar({ guideId }: { guideId: string }) {
     setLoading(false);
   }, [guideId, viewYear]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- cap nhat state co chu dich khi tai du lieu / khoi tao
   useEffect(() => { load(); }, [load]);
 
   function prev() {
@@ -176,9 +178,9 @@ export default function GuideProfilePage() {
     <div className="min-h-screen flex flex-col items-center justify-center bg-slate-50 gap-4">
       <i className="fa-solid fa-user-slash text-5xl text-slate-300" />
       <p className="font-bold text-slate-700">Không tìm thấy hướng dẫn viên</p>
-      <a href="/hdv" className="text-teal-800 font-bold hover:underline flex items-center gap-2">
+      <Link href="/hdv" className="text-teal-800 font-bold hover:underline flex items-center gap-2">
         <i className="fa-solid fa-arrow-left" /> Quay lại danh sách
-      </a>
+      </Link>
     </div>
   );
 
@@ -190,13 +192,13 @@ export default function GuideProfilePage() {
     <div className="min-h-screen bg-slate-50 pb-safe">
       {/* Topbar */}
       <header className="sticky top-0 z-50 bg-white/90 backdrop-blur-md border-b border-slate-200/60 px-6 h-14 flex items-center justify-between pt-safe">
-        <a href="/hdv" className="flex items-center gap-2 text-teal-800 font-bold text-sm hover:gap-3 transition-all">
+        <Link href="/hdv" className="flex items-center gap-2 text-teal-800 font-bold text-sm hover:gap-3 transition-all">
           <i className="fa-solid fa-arrow-left" /> <span className="hidden sm:inline">Danh sách HDV</span>
-        </a>
-        <a href="/" className="flex items-center gap-2">
+        </Link>
+        <Link href="/" className="flex items-center gap-2">
           <Image src="/logo.png" alt="Logo" width={28} height={28} className="object-contain brightness-0" />
           <span className="font-extrabold text-[13px] text-slate-800 hidden sm:inline">Cao Bằng Travel Connect</span>
-        </a>
+        </Link>
       </header>
 
       {/* Hero */}

@@ -1,6 +1,4 @@
 import React from "react";
-import { Card, CardContent, CardFooter, CardHeader } from "@/app/components/ui/card";
-import { Button } from "@/app/components/ui/button";
 
 interface TourCardProps {
   id: string;
@@ -9,60 +7,89 @@ interface TourCardProps {
   locationTag: string;
   duration: string;
   price: string;
+  transport?: string; // "motorbike" | "jeep" | "van"
+  isHot?: boolean;
   onBookNow?: () => void;
 }
 
+function TransportIcon({ type }: { type?: string }) {
+  if (type === "jeep")
+    return (
+      <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+        <rect x="1" y="3" width="15" height="13" rx="2"/><path d="M16 8h4l3 5v3h-7V8z"/><circle cx="5.5" cy="18.5" r="2.5"/><circle cx="18.5" cy="18.5" r="2.5"/>
+      </svg>
+    );
+  // motorbike default
+  return (
+    <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+      <circle cx="5.5" cy="17.5" r="3.5"/><circle cx="18.5" cy="17.5" r="3.5"/>
+      <path d="M15 6H9l-2 6h10l-2-6z"/><path d="M15 6l2 5"/><path d="M9 6L7 11"/>
+    </svg>
+  );
+}
+
 export default function TourCard({
-  id,
   title,
   imageUrl,
   locationTag,
   duration,
   price,
-  onBookNow
+  transport = "motorbike",
+  isHot = true,
+  onBookNow,
 }: TourCardProps) {
   return (
-    <Card className="overflow-hidden group flex flex-col h-full hover:shadow-lg transition-shadow duration-300">
-      <div className="relative aspect-[4/3] overflow-hidden bg-slate-100">
+    <div className="cb-tour-card">
+      {/* Image */}
+      <div className="cb-tour-card__img-wrap">
         {imageUrl ? (
-          <img
-            src={imageUrl}
-            alt={title}
-            className="w-full h-full object-cover group-hover:scale-105 transition-transform duration-500"
-            loading="lazy"
-          />
+          <img src={imageUrl} alt={title} className="cb-tour-card__img" loading="lazy" />
         ) : (
-          <div className="flex items-center justify-center w-full h-full">
-            <i className="fa-solid fa-map text-4xl text-slate-400" />
+          <div className="cb-tour-card__img-placeholder">
+            <i className="fa-solid fa-map" />
           </div>
         )}
-        <div className="absolute top-3 left-3 bg-white/90 backdrop-blur-sm text-nature-green text-xs font-bold px-2.5 py-1 rounded-full uppercase tracking-wider">
-          {locationTag}
-        </div>
+        {isHot && <span className="cb-tour-card__badge">Hot deal</span>}
       </div>
 
-      <CardContent className="flex-1 p-5 flex flex-col gap-3">
-        <div className="flex items-center text-xs text-text-light font-medium gap-1.5">
-          <i className="fa-regular fa-clock" />
-          <span>{duration}</span>
+      {/* Body */}
+      <div className="cb-tour-card__body">
+        {/* Meta chips */}
+        <div className="cb-tour-card__meta">
+          <span className="cb-tour-card__meta-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M21 10c0 7-9 13-9 13s-9-6-9-13a9 9 0 0118 0z"/><circle cx="12" cy="10" r="3"/>
+            </svg>
+            {locationTag}
+          </span>
+          <span className="cb-tour-card__meta-item">
+            <TransportIcon type={transport} />
+            {transport === "jeep" ? "Jeep" : "Motorbike"}
+          </span>
+          <span className="cb-tour-card__meta-item">
+            <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/>
+            </svg>
+            {duration}
+          </span>
         </div>
-        <h3 className="text-lg font-bold text-text-dark font-geist leading-tight line-clamp-2">
-          {title}
-        </h3>
-        <div className="mt-auto pt-2">
-          <div className="text-sm text-text-mid font-medium">Giá từ</div>
-          <div className="text-xl font-black text-nature-green">{price}</div>
-        </div>
-      </CardContent>
 
-      <CardFooter className="p-5 pt-0">
-        <Button 
-          onClick={onBookNow} 
-          className="w-full bg-warm-yellow hover:bg-yellow-500 text-nature-green font-bold text-sm h-11"
-        >
-          Book Now
-        </Button>
-      </CardFooter>
-    </Card>
+        {/* Title */}
+        <h3 className="cb-tour-card__title">{title}</h3>
+
+        {/* Footer: price + CTA */}
+        <div className="cb-tour-card__footer">
+          <div className="cb-tour-card__price">
+            <span className="cb-tour-card__price-from">From</span>
+            <span className="cb-tour-card__price-value">{price}</span>
+          </div>
+          <button onClick={onBookNow} className="cb-tour-card__cta" aria-label="Book tour">
+            <svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+              <line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/>
+            </svg>
+          </button>
+        </div>
+      </div>
+    </div>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 interface Contact {
@@ -77,7 +78,7 @@ export default function TinNhanPage() {
               <p style={{ color: "#64748b", fontSize: ".88rem" }}>
                 Tin nhắn không tồn tại. Vui lòng kiểm tra lại đường link hoặc gửi tin nhắn mới từ trang chủ.
               </p>
-              <a href="/#lien-he" className="tm-back">← Quay về trang chủ</a>
+              <Link href="/#lien-he" className="tm-back">← Quay về trang chủ</Link>
             </div>
           </div>
         ) : (
@@ -118,9 +119,9 @@ export default function TinNhanPage() {
                 </div>
               )}
 
-              <a href="/" className="tm-back">
+              <Link href="/" className="tm-back">
                 <i className="fa-solid fa-arrow-left" /> Quay về trang chủ
-              </a>
+              </Link>
             </div>
           </div>
         )}

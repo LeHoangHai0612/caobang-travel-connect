@@ -81,6 +81,7 @@ export default function AdminBookings() {
     setLoading(false);
   }, [filter]);
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- cap nhat state co chu dich khi tai du lieu / khoi tao
   useEffect(() => { load(); }, [load]);
 
   async function getAdminInfo() {

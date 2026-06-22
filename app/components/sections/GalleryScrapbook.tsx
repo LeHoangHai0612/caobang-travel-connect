@@ -2,8 +2,12 @@
 
 import React from "react";
 
+interface GalleryImage {
+  image_url: string;
+}
+
 interface GalleryScrapbookProps {
-  galleryImages: any[];
+  galleryImages: GalleryImage[];
 }
 
 export default function GalleryScrapbook({ galleryImages }: GalleryScrapbookProps) {

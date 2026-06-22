@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { Guide } from "@/lib/database.types";
 import StickyBottomBar from "@/app/components/ui/StickyBottomBar";
@@ -78,7 +79,7 @@ export default function TourDetailPage() {
     <div style={{ minHeight: "100vh", display: "flex", alignItems: "center", justifyContent: "center", flexDirection: "column", gap: 12 }}>
       <i className="fa-solid fa-circle-exclamation" style={{ fontSize: 36, color: "#94a3b8" }} />
       <p style={{ fontWeight: 700, color: "#475569" }}>Không tìm thấy tour</p>
-      <a href="/" style={{ color: "#265C59", fontWeight: 700, textDecoration: "none" }}>← Về trang chủ</a>
+      <Link href="/" style={{ color: "#265C59", fontWeight: 700, textDecoration: "none" }}>← Về trang chủ</Link>
     </div>
   );
 
@@ -89,13 +90,13 @@ export default function TourDetailPage() {
     <div style={{ minHeight: "100vh", background: "#f8f9f8" }}>
       {/* Header */}
       <header className="page-header">
-        <a href="/" className="page-header-brand">
+        <Link href="/" className="page-header-brand">
           <img src="/logo.png" alt="Logo" width={28} height={28} style={{ objectFit: "contain", mixBlendMode: "multiply", flexShrink: 0 }} />
           <span>Cao Bằng Travel Connect</span>
-        </a>
-        <a href="/" className="page-header-back">
+        </Link>
+        <Link href="/" className="page-header-back">
           <i className="fa-solid fa-arrow-left" /> Trang chủ
-        </a>
+        </Link>
       </header>
 
       {/* Hero image */}

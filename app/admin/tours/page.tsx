@@ -41,6 +41,7 @@ export default function AdminTours() {
     setTours(data ?? []);
     setLoading(false);
   }
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- cap nhat state co chu dich khi tai du lieu / khoi tao
   useEffect(() => { load(); }, []);
 
   function openAdd() { setEditId(null); setForm(EMPTY); setError(""); setModalOpen(true); }

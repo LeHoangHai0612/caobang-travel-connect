@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 interface Dest {
@@ -43,7 +44,7 @@ export default function DiemDenDetail() {
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f0f2f0", gap: 16 }}>
       <i className="fa-solid fa-map-location-dot" style={{ fontSize: 40, color: "#94a3b8" }} />
       <p style={{ fontWeight: 700, color: "#334155" }}>Không tìm thấy điểm đến này.</p>
-      <a href="/diem-den" style={{ color: "#265C59", fontWeight: 600, textDecoration: "none" }}>← Quay lại Điểm Đến</a>
+      <Link href="/diem-den" style={{ color: "#265C59", fontWeight: 600, textDecoration: "none" }}>← Quay lại Điểm Đến</Link>
     </div>
   );
 
@@ -142,13 +143,13 @@ export default function DiemDenDetail() {
 
       <div className="dd-page">
         <header className="dd-topbar">
-          <a href="/diem-den" className="dd-back">
+          <Link href="/diem-den" className="dd-back">
             <i className="fa-solid fa-arrow-left" /> Điểm Đến
-          </a>
-          <a href="/" className="dd-logo">
+          </Link>
+          <Link href="/" className="dd-logo">
             <img src="/logo.png" alt="Logo" />
             <span>Cao Bằng Travel Connect</span>
-          </a>
+          </Link>
         </header>
 
         <div className="dd-hero">
@@ -162,12 +163,12 @@ export default function DiemDenDetail() {
               </p>
               <h1 className="dd-hero-title">{dest.title}</h1>
               <div className="dd-hero-actions">
-                <a href={`/dat-lich?destination=${encodeURIComponent(dest.title)}`} className="dd-btn-primary">
+                <Link href={`/dat-lich?destination=${encodeURIComponent(dest.title)}`} className="dd-btn-primary">
                   <i className="fa-solid fa-calendar-check" /> Đặt Tour Tham Quan
-                </a>
-                <a href="/diem-den" className="dd-btn-ghost">
+                </Link>
+                <Link href="/diem-den" className="dd-btn-ghost">
                   <i className="fa-solid fa-grid-2" /> Tất Cả Điểm Đến
-                </a>
+                </Link>
               </div>
             </div>
           </div>

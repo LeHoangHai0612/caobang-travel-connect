@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import type { Tour } from "@/lib/database.types";
 
 interface TourGridProps {
@@ -19,7 +20,7 @@ export default function TourGrid({ toursBg, tours }: TourGridProps) {
         </div>
         <div className="tours-grid" style={{ display: "grid", gridTemplateColumns: "repeat(auto-fill,minmax(300px,1fr))", gap: 20, marginBottom: 28 }}>
           {tours.map((t) => (
-            <a key={t.id} href={`/tour/${t.id}`} style={{ textDecoration: "none", display: "block" }}>
+            <Link key={t.id} href={`/tour/${t.id}`} style={{ textDecoration: "none", display: "block" }}>
               <div style={{ background: "white", borderRadius: 16, overflow: "hidden", boxShadow: "0 2px 14px rgba(0,0,0,.07)", transition: "transform .2s,box-shadow .2s", cursor: "pointer", height: "100%", display: "flex", flexDirection: "column" }}
                 onMouseEnter={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.transform = "translateY(-4px)"; el.style.boxShadow = "0 10px 30px rgba(0,0,0,.13)"; }}
                 onMouseLeave={(e) => { const el = e.currentTarget as HTMLDivElement; el.style.transform = ""; el.style.boxShadow = "0 2px 14px rgba(0,0,0,.07)"; }}>
@@ -62,13 +63,13 @@ export default function TourGrid({ toursBg, tours }: TourGridProps) {
                   </div>
                 </div>
               </div>
-            </a>
+            </Link>
           ))}
         </div>
         <div style={{ textAlign: "center", marginTop: 36 }}>
-          <a href="/tour" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid #265C59", color: "#265C59", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", background: "white", letterSpacing: ".04em" }}>
+          <Link href="/tour" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "11px 28px", borderRadius: 50, border: "2px solid #265C59", color: "#265C59", fontWeight: 700, fontSize: ".84rem", textDecoration: "none", background: "white", letterSpacing: ".04em" }}>
             <i className="fa-solid fa-map" /> Xem Tất Cả Gói Tour <i className="fa-solid fa-arrow-right" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

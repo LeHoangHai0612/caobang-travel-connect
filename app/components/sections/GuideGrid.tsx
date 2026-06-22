@@ -1,6 +1,7 @@
 "use client";
 
 import React, { useState } from "react";
+import Link from "next/link";
 import type { Guide } from "@/lib/database.types";
 
 interface GuideGridProps {
@@ -84,7 +85,7 @@ export default function GuideGrid({ teamBg, guides }: GuideGridProps) {
             </div>
           ) : filteredGuides.map((member) => (
             <article key={member.id} className="team-card fade-up">
-              <a href={`/hdv/${member.id}`} className="team-card-img-wrap" aria-label={`Xem hồ sơ ${member.name}`} style={{ display: "block", textDecoration: "none", cursor: "pointer", background: "#e2e8f0" }}>
+              <Link href={`/hdv/${member.id}`} className="team-card-img-wrap" aria-label={`Xem hồ sơ ${member.name}`} style={{ display: "block", textDecoration: "none", cursor: "pointer", background: "#e2e8f0" }}>
                 {member.image_url ? (
                   <img className="team-card-img" src={member.image_url} alt={`HDV ${member.name}`} loading="lazy" />
                 ) : (
@@ -98,7 +99,7 @@ export default function GuideGrid({ teamBg, guides }: GuideGridProps) {
                     <i className="fa-solid fa-eye" style={{ marginRight: 5 }} />Xem hồ sơ
                   </span>
                 </span>
-              </a>
+              </Link>
               <h3>{member.name}</h3>
               <p>{member.specialty}</p>
               <p className="hdv-role">{member.role}</p>
@@ -115,10 +116,10 @@ export default function GuideGrid({ teamBg, guides }: GuideGridProps) {
         </div>
 
         <div style={{ textAlign: "center", marginTop: 32, display: "flex", gap: 12, justifyContent: "center", flexWrap: "wrap" }}>
-          <a href="/hdv"
+          <Link href="/hdv"
             style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 32px", borderRadius: 12, border: "2px solid #265C59", background: "#265C59", color: "white", fontWeight: 700, fontSize: ".9rem", textDecoration: "none", boxShadow: "0 4px 16px rgba(38,92,89,.25)" }}>
             <i className="fa-solid fa-users" />Xem tất cả hướng dẫn viên
-          </a>
+          </Link>
         </div>
       </div>
     </section>

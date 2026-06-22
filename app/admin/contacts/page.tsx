@@ -33,6 +33,7 @@ export default function AdminContacts() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- cap nhat state co chu dich khi tai du lieu / khoi tao
   useEffect(() => { load(); }, []);
 
   async function markRead(id: number, is_read: boolean) {

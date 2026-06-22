@@ -1,6 +1,7 @@
 "use client";
 import { useEffect, useState } from "react";
 import { useParams } from "next/navigation";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 
 interface Tip {
@@ -50,7 +51,7 @@ export default function CamNangDetail() {
     <div style={{ minHeight: "100vh", display: "flex", flexDirection: "column", alignItems: "center", justifyContent: "center", background: "#f0f2f0", gap: 16 }}>
       <i className="fa-solid fa-book-open" style={{ fontSize: 40, color: "#94a3b8" }} />
       <p style={{ fontWeight: 700, color: "#334155" }}>Không tìm thấy bài cẩm nang này.</p>
-      <a href="/cam-nang" style={{ color: "#265C59", fontWeight: 600, textDecoration: "none" }}>← Quay lại Cẩm Nang</a>
+      <Link href="/cam-nang" style={{ color: "#265C59", fontWeight: 600, textDecoration: "none" }}>← Quay lại Cẩm Nang</Link>
     </div>
   );
 
@@ -151,13 +152,13 @@ export default function CamNangDetail() {
 
       <div className="cn-page">
         <header className="cn-topbar">
-          <a href="/cam-nang" className="cn-back">
+          <Link href="/cam-nang" className="cn-back">
             <i className="fa-solid fa-arrow-left" /> Cẩm Nang
-          </a>
-          <a href="/" className="cn-logo">
+          </Link>
+          <Link href="/" className="cn-logo">
             <img src="/logo.png" alt="Logo" />
             <span>Cao Bằng Travel Connect</span>
-          </a>
+          </Link>
         </header>
 
         <div className="cn-hero">
@@ -174,12 +175,12 @@ export default function CamNangDetail() {
               </p>
               <h1 className="cn-hero-title">{tip.title}</h1>
               <div className="cn-hero-actions">
-                <a href="/dat-lich" className="cn-btn-primary">
+                <Link href="/dat-lich" className="cn-btn-primary">
                   <i className="fa-solid fa-calendar-check" /> Đặt Tour Ngay
-                </a>
-                <a href="/cam-nang" className="cn-btn-ghost">
+                </Link>
+                <Link href="/cam-nang" className="cn-btn-ghost">
                   <i className="fa-solid fa-book-open" /> Tất Cả Cẩm Nang
-                </a>
+                </Link>
               </div>
             </div>
           </div>

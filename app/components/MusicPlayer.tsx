@@ -2,11 +2,34 @@
 
 import { useEffect, useRef, useState } from "react";
 
+interface YTPlayer {
+  setVolume: (v: number) => void;
+  playVideo: () => void;
+  pauseVideo: () => void;
+  destroy: () => void;
+}
+interface YTNamespace {
+  Player: new (elId: string, config: unknown) => YTPlayer;
+  PlayerState?: { PLAYING: number };
+}
+interface SCWidget {
+  bind: (event: string, cb: () => void) => void;
+  setVolume: (v: number) => void;
+  play: () => void;
+  pause: () => void;
+}
+interface SCNamespace {
+  Widget: {
+    (el: HTMLIFrameElement): SCWidget;
+    Events: { READY: string; PLAY: string; PAUSE: string; ERROR: string };
+  };
+}
+
 declare global {
   interface Window {
-    YT: any;
+    YT?: YTNamespace;
     onYouTubeIframeAPIReady: () => void;
-    SC: any;
+    SC?: SCNamespace;
   }
 }
 
@@ -66,8 +89,8 @@ function Mp3Player({ src }: { src: string }) {
 
 /* ─── YouTube Player ─── */
 function YouTubePlayer({ videoId }: { videoId: string }) {
-  const ytRef               = useRef<any>(null);
-  const playerDivId         = useRef(`yt-bg-${videoId}`);
+  const ytRef               = useRef<YTPlayer | null>(null);
+  const [playerDivId]       = useState(() => `yt-bg-${videoId}`);
   const [playing, setPlaying]   = useState(false);
   const [volume, setVolume]     = useState(100);
   const [expanded, setExpanded] = useState(false);
@@ -77,13 +100,13 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
     let cancelled = false;
 
     const createPlayer = () => {
-      if (cancelled) return;
-      ytRef.current = new window.YT.Player(playerDivId.current, {
+      if (cancelled || !window.YT) return;
+      ytRef.current = new window.YT.Player(playerDivId, {
         height: "120", width: "120",
         videoId,
         playerVars: { autoplay: 1, loop: 1, playlist: videoId, controls: 0, rel: 0, iv_load_policy: 3 },
         events: {
-          onReady: (e: any) => {
+          onReady: (e: { target: YTPlayer }) => {
             if (cancelled) return;
             e.target.setVolume(100);
             setStatus("ready");
@@ -94,7 +117,7 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
             document.addEventListener("click",      onInteract, { once: true });
             document.addEventListener("touchstart", onInteract, { once: true });
           },
-          onStateChange: (e: any) => {
+          onStateChange: (e: { data: number }) => {
             if (!cancelled) setPlaying(e.data === window.YT?.PlayerState?.PLAYING);
           },
           onError: () => { if (!cancelled) setStatus("error"); },
@@ -122,7 +145,7 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
       cancelled = true;
       try { ytRef.current?.destroy(); } catch { /* ignore */ }
     };
-  }, [videoId]);
+  }, [videoId, playerDivId]);
 
   useEffect(() => { try { ytRef.current?.setVolume(volume); } catch { /* ignore */ } }, [volume]);
 
@@ -139,7 +162,7 @@ function YouTubePlayer({ videoId }: { videoId: string }) {
     toggle={toggle} status={status}>
     {/* YouTube player — cần trong viewport để browser load */}
     <div style={{ position: "fixed", bottom: 80, right: 22, opacity: 0, pointerEvents: "none", zIndex: -1 }}>
-      <div id={playerDivId.current} style={{ width: 120, height: 120 }} />
+      <div id={playerDivId} style={{ width: 120, height: 120 }} />
     </div>
   </PlayerShell>;
 }
@@ -224,7 +247,7 @@ function PlayerShell({ playing, expanded, setExpanded, volume, setVolume, toggle
 /* ─── SoundCloud Player ─── */
 function SoundCloudPlayer({ trackUrl }: { trackUrl: string }) {
   const iframeRef           = useRef<HTMLIFrameElement>(null);
-  const widgetRef           = useRef<any>(null);
+  const widgetRef           = useRef<SCWidget | null>(null);
   const [playing, setPlaying]   = useState(false);
   const [volume, setVolume]     = useState(100);
   const [expanded, setExpanded] = useState(false);
@@ -241,9 +264,9 @@ function SoundCloudPlayer({ trackUrl }: { trackUrl: string }) {
       widgetRef.current = SC.Widget(iframeRef.current);
       widgetRef.current.bind(SC.Widget.Events.READY, () => {
         if (cancelled) return;
-        widgetRef.current.setVolume(100);
+        widgetRef.current?.setVolume(100);
         setStatus("ready");
-        try { widgetRef.current.play(); } catch { /* blocked */ }
+        try { widgetRef.current?.play(); } catch { /* blocked */ }
         const onInteract = () => {
           try { widgetRef.current?.play(); } catch { /* ignore */ }
         };

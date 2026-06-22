@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import type { Session } from "@supabase/supabase-js";
 
 interface MobileNavProps {
@@ -21,55 +22,76 @@ export default function MobileNav({
   return (
     <>
       {/* Drawer menu for secondary items on mobile */}
-      <nav className={`mobile-nav ${isMobileMenuOpen ? "open" : ""}`} aria-label="Menu điều hướng di động">
-        {[
-          { id: "hero",         label: "Trang Chủ" },
-          { id: "why-us",       label: "Giới Thiệu" },
-          { id: "team",         label: "HDV" },
-          { id: "tours",        label: "Tours" },
-          { id: "destinations", label: "Điểm Đến" },
-          { id: "gallery",      label: "Hình Ảnh" },
-          { id: "cam-nang",     label: "Cẩm Nang" },
-          { id: "pricing",      label: "Bảng Giá" },
-          { id: "footer",       label: "Liên Hệ" },
-        ].map(({ id, label }) => (
-          <a key={id} href={`#${id}`} onClick={(e) => scrollToSection(e, id)}>{label}</a>
-        ))}
-        <a href="#pricing" className="btn-cta" onClick={(e) => scrollToSection(e, "pricing")}>
-          <i className="fa-solid fa-calendar-check" /> ĐẶT HDV NGAY
-        </a>
-        <a
-          href={userSession ? "/tai-khoan" : "/dang-nhap"}
-          className="mobile-nav-account btn-cta"
+      {/* Overlay */}
+      {isMobileMenuOpen && (
+        <div
+          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm"
           onClick={() => setIsMobileMenuOpen(false)}
-        >
-          <i className={`fa-solid ${userSession ? "fa-user" : "fa-right-to-bracket"}`} />
-          {userSession ? "Tài Khoản" : "Đăng Nhập"}
-        </a>
+        />
+      )}
+
+      <nav
+        className={`cb-mobile-nav${isMobileMenuOpen ? " cb-mobile-nav--open" : ""}`}
+        aria-label="Menu di động"
+      >
+        <div className="cb-mobile-nav__header">
+          <img src="/logo.png" alt="Logo" className="cb-mobile-nav__logo" />
+          <div>
+            <strong className="cb-mobile-nav__brand">Cao Bằng</strong>
+            <span className="cb-mobile-nav__brand-sub">Travel Connect</span>
+          </div>
+          <button onClick={() => setIsMobileMenuOpen(false)} className="cb-mobile-nav__close">✕</button>
+        </div>
+
+        <div className="cb-mobile-nav__items">
+          {[
+            { id: "hero",         label: "Motorbike Tour" },
+            { id: "jeep-tours",   label: "Jeep Tour" },
+            { id: "tours",        label: "Tours" },
+            { id: "destinations", label: "Destinations" },
+            { id: "why-us",       label: "About Us" },
+            { id: "cam-nang",     label: "Blog" },
+            { id: "contact",      label: "Contact Us" },
+          ].map(({ id, label }) => (
+            <a key={id} href={`#${id}`} className="cb-mobile-nav__link" onClick={(e) => { scrollToSection(e, id); setIsMobileMenuOpen(false); }}>
+              {label}
+            </a>
+          ))}
+        </div>
+
+        <div className="cb-mobile-nav__footer">
+          <Link href="/dat-lich" className="cb-mobile-nav__cta" onClick={() => setIsMobileMenuOpen(false)}>
+            Book Now
+          </Link>
+          <Link href={userSession ? "/tai-khoan" : "/dang-nhap"} className="cb-mobile-nav__account" onClick={() => setIsMobileMenuOpen(false)}>
+            {userSession ? "My Account" : "Login"}
+            {unreadReplies > 0 && <span className="cb-header__badge">{unreadReplies}</span>}
+          </Link>
+        </div>
       </nav>
 
       {/* Floating Dock cho Mobile */}
       <nav className="fixed left-4 right-4 z-50 bg-white/85 backdrop-blur-xl shadow-[0_12px_40px_rgba(38,92,89,0.25)] border border-white/50 rounded-full flex justify-around items-center h-[64px] md:!hidden lg:!hidden"
            style={{ bottom: 'calc(env(safe-area-inset-bottom, 0px) + 16px)' }}>
-        <a href="/" className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark">
+        <Link href="/" className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark">
           <i className="fa-solid fa-house text-lg mb-1" />
           <span className="text-[10px] font-bold">Trang Chủ</span>
-        </a>
-        <a href="/hdv" className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark">
+        </Link>
+        <Link href="/hdv" className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark">
           <i className="fa-solid fa-person-hiking text-lg mb-1" />
           <span className="text-[10px] font-bold">HDV</span>
-        </a>
-        <a href="/tour" className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark">
+        </Link>
+        <Link href="/tour" className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark">
           <i className="fa-solid fa-map-location-dot text-lg mb-1" />
           <span className="text-[10px] font-bold">Tours</span>
-        </a>
-        <a href="/dat-lich" className="flex flex-col items-center justify-center w-full h-full text-teal-dark relative">
+        </Link>
+        <Link href="/dat-lich" className="flex flex-col items-center justify-center w-full h-full text-teal-dark relative">
           <div className="absolute -top-5 bg-teal-dark text-white w-12 h-12 rounded-full flex items-center justify-center shadow-lg border-4 border-white">
             <i className="fa-solid fa-calendar-check text-xl" />
           </div>
           <span className="text-[10px] font-bold mt-6">Đặt Lịch</span>
-        </a>
-        <a href={userSession ? "/tai-khoan" : "/dang-nhap"} className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark relative">
+        </Link>
+        <Link href={userSession ? "/tai-khoan" : "/dang-nhap"} className="flex flex-col items-center justify-center w-full h-full text-text-mid hover:text-teal-dark relative">
           <i className="fa-solid fa-user text-lg mb-1" />
           <span className="text-[10px] font-bold">{userSession ? "Tài Khoản" : "Đăng Nhập"}</span>
           {unreadReplies > 0 && (
@@ -77,7 +99,7 @@ export default function MobileNav({
               {unreadReplies}
             </span>
           )}
-        </a>
+        </Link>
       </nav>
     </>
   );

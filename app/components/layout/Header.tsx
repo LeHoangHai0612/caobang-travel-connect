@@ -1,20 +1,8 @@
 "use client";
 
-import React, { useState, useEffect } from "react";
-import { getTier } from "@/lib/loyalty";
+import React, { useState, useRef, useEffect } from "react";
 import type { Session } from "@supabase/supabase-js";
 import type { UserProfile } from "@/lib/database.types";
-import { Button } from "@/app/components/ui/button";
-import {
-  NavigationMenu,
-  NavigationMenuContent,
-  NavigationMenuItem,
-  NavigationMenuLink,
-  NavigationMenuList,
-  NavigationMenuTrigger,
-  navigationMenuTriggerStyle,
-} from "@/app/components/ui/navigation-menu";
-import { Menu, X, User, Bell } from "lucide-react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
 
@@ -29,6 +17,41 @@ interface HeaderProps {
   unreadReplies: number;
 }
 
+const TOUR_MENUS = [
+  {
+    label: "Motorbike Tour",
+    href: "/tour",
+    sub: [
+      { label: "3 days 2 nights", href: "/tour" },
+      { label: "2 days 1 night", href: "/tour" },
+      { label: "Full day", href: "/tour" },
+    ],
+  },
+  {
+    label: "Jeep Tour",
+    href: "/tour",
+    sub: [
+      { label: "3 days 2 nights", href: "/tour" },
+      { label: "2 days 1 night", href: "/tour" },
+      { label: "Full day", href: "/tour" },
+    ],
+  },
+  {
+    label: "Package Tour",
+    href: "/tour",
+    sub: [
+      { label: "Ha Giang – Cao Bang", href: "/tour" },
+    ],
+  },
+  { label: "Customize", href: "/dat-lich", sub: [] },
+];
+
+const RIGHT_NAV = [
+  { label: "Destination", id: "destinations" },
+  { label: "About Us", id: "why-us" },
+  { label: "Blog", id: "cam-nang" },
+];
+
 export default function Header({
   isScrolled,
   isMobileMenuOpen,
@@ -39,125 +62,143 @@ export default function Header({
   userProfile,
   unreadReplies,
 }: HeaderProps) {
-  
-  const navItems = [
-    { id: "hero", label: "Trang Chủ" },
-    { id: "why-us", label: "Giới Thiệu" },
-    { id: "team", label: "HDV" },
-    { id: "tours", label: "Tours" },
-    { id: "destinations", label: "Điểm Đến" },
-    { id: "cam-nang", label: "Cẩm Nang" },
-    { id: "contact", label: "Liên Hệ" },
-  ];
+  const [openMenu, setOpenMenu] = useState<string | null>(null);
+  const closeTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+
+  const handleMouseEnter = (label: string) => {
+    if (closeTimer.current) clearTimeout(closeTimer.current);
+    setOpenMenu(label);
+  };
+  const handleMouseLeave = () => {
+    closeTimer.current = setTimeout(() => setOpenMenu(null), 120);
+  };
+
+  useEffect(() => () => { if (closeTimer.current) clearTimeout(closeTimer.current); }, []);
 
   return (
-    <header
-      className={cn(
-        "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
-        isScrolled 
-          ? "bg-white/90 backdrop-blur-md shadow-sm py-3" 
-          : "bg-transparent py-5"
-      )}
-    >
-      <div className="container flex items-center justify-between px-4">
-        {/* Logo */}
-        <a 
-          href="#hero" 
-          onClick={(e) => scrollToSection(e, "hero")}
-          className="flex items-center gap-2 z-50"
-        >
-          <img 
-            src="/logo.png" 
-            alt="Cao Bằng Travel Connect" 
-            className={cn(
-              "h-10 w-10 object-contain transition-all duration-300",
-              !isScrolled && "brightness-0 invert"
-            )}
-          />
-          <div className={cn(
-            "flex flex-col font-geist transition-colors duration-300",
-            isScrolled ? "text-nature-green" : "text-white"
-          )}>
-            <strong className="text-lg leading-tight font-black">Cao Bằng</strong>
-            <span className="text-[10px] uppercase tracking-widest leading-none font-bold">Travel Connect</span>
-          </div>
-        </a>
+    <>
+      <header
+        className={cn(
+          "cb-header",
+          isScrolled ? "cb-header--scrolled" : "cb-header--top"
+        )}
+        id="site-header"
+      >
+        <div className="cb-header__inner">
+          {/* ── LEFT: Logo icon + Tour menus ── */}
+          <div className="cb-header__left">
+            <a
+              href="#hero"
+              onClick={(e) => scrollToSection(e, "hero")}
+              className="cb-header__home-icon"
+              aria-label="Trang chủ"
+            >
+              <img src="/logo.png" alt="Home" className="cb-header__home-img" />
+            </a>
 
-        {/* Desktop Navigation */}
-        <div className="hidden lg:flex items-center gap-6">
-          <NavigationMenu>
-            <NavigationMenuList className="gap-1">
-              {navItems.map((item) => (
-                <NavigationMenuItem key={item.id}>
-                  <a href={`#${item.id}`} onClick={(e) => scrollToSection(e, item.id)}>
-                    <NavigationMenuLink
-                      className={cn(
-                        navigationMenuTriggerStyle(),
-                        "bg-transparent font-medium cursor-pointer transition-colors duration-200",
-                        activeSection === item.id 
-                          ? (isScrolled ? "text-nature-green bg-nature-green/10" : "text-warm-yellow bg-white/10")
-                          : (isScrolled ? "text-text-mid hover:text-nature-green hover:bg-slate-50" : "text-white/80 hover:text-white hover:bg-white/10")
-                      )}
-                    >
-                      {item.label}
-                    </NavigationMenuLink>
+            <nav className="cb-header__tour-nav">
+              {TOUR_MENUS.map((menu) => (
+                <div
+                  key={menu.label}
+                  className="cb-tour-item"
+                  onMouseEnter={() => menu.sub.length && handleMouseEnter(menu.label)}
+                  onMouseLeave={handleMouseLeave}
+                >
+                  <a href={menu.href} className="cb-tour-item__label">
+                    {menu.label}
+                    {menu.sub.length > 0 && (
+                      <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
+                        <polyline points="6 9 12 15 18 9" />
+                      </svg>
+                    )}
                   </a>
-                </NavigationMenuItem>
-              ))}
-            </NavigationMenuList>
-          </NavigationMenu>
 
-          {/* Account & CTA */}
-          <div className="flex items-center gap-3">
-            {userSession ? (
-              <Button asChild variant="outline" className={cn(
-                "rounded-full border-2 gap-2 font-bold transition-all",
-                isScrolled 
-                  ? "border-nature-green text-nature-green hover:bg-nature-green hover:text-white" 
-                  : "border-white text-white hover:bg-white hover:text-nature-green"
-              )}>
-                <Link href="/tai-khoan">
-                  <User className="w-4 h-4" />
-                  {userProfile?.full_name || "Tài Khoản"}
+                  {menu.sub.length > 0 && openMenu === menu.label && (
+                    <div
+                      className="cb-tour-dropdown"
+                      onMouseEnter={() => handleMouseEnter(menu.label)}
+                      onMouseLeave={handleMouseLeave}
+                    >
+                      <div className="cb-tour-dropdown__menu">
+                        <p className="cb-tour-dropdown__heading">/MENU</p>
+                        <a href={menu.href} className="cb-tour-dropdown__main">
+                          {menu.label}
+                        </a>
+                        {menu.sub.map((s) => (
+                          <a key={s.label} href={s.href} className="cb-tour-dropdown__sub">
+                            {s.label}
+                          </a>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              ))}
+            </nav>
+          </div>
+
+          {/* ── CENTER: Main logo ── */}
+          <a
+            href="#hero"
+            onClick={(e) => scrollToSection(e, "hero")}
+            className="cb-header__logo"
+          >
+            <img src="/logo.png" alt="Cao Bang Travel" className="cb-header__logo-img" />
+            <div className="cb-header__logo-text">
+              <strong>Cao Bằng</strong>
+              <span>Travel Connect</span>
+            </div>
+          </a>
+
+          {/* ── RIGHT: Secondary nav + CTA ── */}
+          <div className="cb-header__right">
+            <nav className="cb-header__right-nav">
+              {RIGHT_NAV.map((item) => (
+                <a
+                  key={item.id}
+                  href={`#${item.id}`}
+                  onClick={(e) => scrollToSection(e, item.id)}
+                  className={cn(
+                    "cb-header__right-link",
+                    activeSection === item.id && "cb-header__right-link--active"
+                  )}
+                >
+                  {item.label}
+                </a>
+              ))}
+              {userSession ? (
+                <Link href="/tai-khoan" className="cb-header__right-link">
+                  {userProfile?.full_name || "Account"}
                   {unreadReplies > 0 && (
-                    <span className="bg-red-500 text-white text-[10px] w-4 h-4 flex items-center justify-center rounded-full ml-1">
-                      {unreadReplies}
-                    </span>
+                    <span className="cb-header__badge">{unreadReplies}</span>
                   )}
                 </Link>
-              </Button>
-            ) : (
-              <Button asChild variant="outline" className={cn(
-                "rounded-full border-2 font-bold transition-all",
-                isScrolled 
-                  ? "border-nature-green text-nature-green hover:bg-nature-green hover:text-white" 
-                  : "border-white text-white hover:bg-white hover:text-nature-green"
-              )}>
-                <Link href="/dang-nhap">Đăng Nhập</Link>
-              </Button>
-            )}
+              ) : (
+                <Link href="/dang-nhap" className="cb-header__right-link">Login</Link>
+              )}
+            </nav>
 
-            <Button 
-              onClick={(e) => scrollToSection(e as any, "pricing")}
-              className="bg-warm-yellow hover:bg-yellow-500 text-nature-green font-bold rounded-full px-6"
+            <a
+              href="#contact"
+              onClick={(e) => scrollToSection(e, "contact")}
+              className="cb-header__cta"
             >
-              Đặt Tour Ngay
-            </Button>
+              Contact us
+            </a>
           </div>
-        </div>
 
-        {/* Mobile Toggle */}
-        <button 
-          className="lg:hidden p-2 z-50 text-2xl"
-          onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-        >
-          {isMobileMenuOpen ? (
-            <X className="w-7 h-7 text-nature-green" />
-          ) : (
-            <Menu className={cn("w-7 h-7", isScrolled ? "text-nature-green" : "text-white")} />
-          )}
-        </button>
-      </div>
-    </header>
+          {/* ── Mobile toggle ── */}
+          <button
+            className={cn("cb-header__hamburger", isMobileMenuOpen && "cb-header__hamburger--open")}
+            onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
+            aria-label="Menu"
+          >
+            <span />
+            <span />
+            <span />
+          </button>
+        </div>
+      </header>
+    </>
   );
 }

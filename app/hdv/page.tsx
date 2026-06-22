@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import { supabase } from "@/lib/supabase";
 import type { Guide } from "@/lib/database.types";
 
@@ -57,13 +58,13 @@ export default function AllGuidesPage() {
     <div className="min-h-screen bg-slate-50 pb-safe">
       {/* Header */}
       <header className="relative z-10 px-6 h-14 flex items-center justify-between border-b border-white/10 bg-teal-900 pt-safe">
-        <a href="/" className="flex items-center gap-2.5 no-underline">
+        <Link href="/" className="flex items-center gap-2.5 no-underline">
           <Image src="/logo.png" alt="Logo" width={30} height={30} className="object-contain invert brightness-0 shrink-0" />
           <span className="text-white font-extrabold text-sm md:text-base">Cao Bằng Travel Connect</span>
-        </a>
-        <a href="/" className="text-white/80 text-sm font-semibold no-underline flex items-center gap-1.5">
+        </Link>
+        <Link href="/" className="text-white/80 text-sm font-semibold no-underline flex items-center gap-1.5">
           <i className="fa-solid fa-arrow-left" /> <span className="hidden sm:inline">Trang chủ</span>
-        </a>
+        </Link>
       </header>
 
       {/* Hero */}
@@ -165,7 +166,7 @@ export default function AllGuidesPage() {
         ) : (
           <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
             {filtered.map((g) => (
-              <a key={g.id} href={`/hdv/${g.id}`} className="block group">
+              <Link key={g.id} href={`/hdv/${g.id}`} className="block group">
                 <div className={`bg-white rounded-2xl overflow-hidden transition-all duration-300 h-full flex flex-col ${g.is_featured ? "shadow-[0_4px_24px_rgba(229,169,25,0.25)] border-2 border-amber-500 group-hover:-translate-y-1 group-hover:shadow-[0_8px_28px_rgba(229,169,25,0.35)]" : "shadow-sm border border-slate-100 group-hover:shadow-xl group-hover:-translate-y-1"}`}>
                   {/* Image */}
                   <div className="relative aspect-[4/3] bg-slate-100 overflow-hidden shrink-0">
@@ -207,7 +208,7 @@ export default function AllGuidesPage() {
                     )}
                   </div>
                 </div>
-              </a>
+              </Link>
             ))}
           </div>
         )}

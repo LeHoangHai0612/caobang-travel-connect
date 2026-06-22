@@ -1,6 +1,7 @@
 "use client";
 
 import React from "react";
+import Link from "next/link";
 import type { Destination } from "@/lib/database.types";
 
 interface DestinationGridProps {
@@ -58,9 +59,9 @@ export default function DestinationGrid({ destBg, destinations, setSelectedDest 
           ))}
         </div>
         <div style={{ textAlign: "center", marginTop: 32 }}>
-          <a href="/diem-den" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 32px", borderRadius: 50, border: "2px solid #265C59", color: "#265C59", fontWeight: 700, fontSize: ".86rem", textDecoration: "none" }}>
+          <Link href="/diem-den" style={{ display: "inline-flex", alignItems: "center", gap: 8, padding: "12px 32px", borderRadius: 50, border: "2px solid #265C59", color: "#265C59", fontWeight: 700, fontSize: ".86rem", textDecoration: "none" }}>
             Xem Tất Cả Điểm Đến <i className="fa-solid fa-arrow-right" />
-          </a>
+          </Link>
         </div>
       </div>
     </section>

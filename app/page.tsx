@@ -304,6 +304,7 @@ export default function CaoBangEcoTour() {
   useEffect(() => {
     supabase.auth.getSession().then(({ data: { session } }) => {
       setUserSession(session);
+      // eslint-disable-next-line react-hooks/immutability -- ham hoisted, an toan luc chay
       if (session) loadUserProfile(session.user.id);
     });
     const { data: { subscription } } = supabase.auth.onAuthStateChange((_e, session) => {
@@ -329,6 +330,7 @@ export default function CaoBangEcoTour() {
 
   // Check guide loyalty count + busy dates when guide changes
   useEffect(() => {
+    // eslint-disable-next-line react-hooks/set-state-in-effect -- cap nhat state co chu dich khi tai du lieu / khoi tao
     if (!bookingGuideId) { setGuideBookingCount(0); setGuideBusyDates(new Set()); return; }
     if (userSession) {
       supabase
@@ -866,16 +868,50 @@ export default function CaoBangEcoTour() {
           setSelectedDest={setSelectedDest}
         />
 
-        <TourCategory id="tours" title="Các Gói Tour Nổi Bật" subtitle="Lựa chọn hành trình phù hợp — từ tour 1 ngày đến khám phá dài ngày trọn vẹn" bgClass="bg-slate-50">
-          {tours.map((t) => (
+        <TourCategory
+          id="tours"
+          title="MOTORBIKE TOUR"
+          icon="motorbike"
+          seeMoreHref="/tour"
+          tabs={["Cao Bang Loop", "Ha Giang Loop", "Ha Giang + Cao Bang"]}
+        >
+          {tours.filter((t) => !t.title.toLowerCase().includes("jeep")).map((t) => (
             <TourCard
               key={t.id}
               id={t.id}
               title={t.title}
               imageUrl={t.image_url}
-              locationTag={t.group_size || "Tour Cao Bằng"}
+              locationTag={t.group_size || "Cao Bang Loop"}
               duration={t.duration}
-              price={`${t.price_from.toLocaleString("vi-VN")}đ`}
+              price={`$${t.price_from} USD`}
+              transport="motorbike"
+              isHot={true}
+              onBookNow={() => {
+                setBookingPackage(t.title);
+                setIsBookingOpen(true);
+              }}
+            />
+          ))}
+        </TourCategory>
+
+        <TourCategory
+          id="jeep-tours"
+          title="JEEP TOUR"
+          icon="jeep"
+          seeMoreHref="/tour"
+          tabs={["Cao Bang Loop", "Ha Giang Loop", "Ha Giang + Cao Bang"]}
+        >
+          {tours.filter((t) => t.title.toLowerCase().includes("jeep")).map((t) => (
+            <TourCard
+              key={t.id}
+              id={t.id}
+              title={t.title}
+              imageUrl={t.image_url}
+              locationTag={t.group_size || "Cao Bang Loop"}
+              duration={t.duration}
+              price={`$${t.price_from} USD`}
+              transport="jeep"
+              isHot={true}
               onBookNow={() => {
                 setBookingPackage(t.title);
                 setIsBookingOpen(true);

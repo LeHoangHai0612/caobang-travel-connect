@@ -2,7 +2,6 @@
 import { useEffect, useState, useCallback } from "react";
 import Link from "next/link";
 import { supabase } from "@/lib/supabase";
-import Image from "next/image";
 
 interface GalleryImage {
   id: string;
@@ -51,8 +50,8 @@ export default function ThuVienPage() {
 
   const openLightbox = (img: GalleryImage, idx: number) => { setLightbox(img); setLightboxIdx(idx); };
   const closeLightbox = () => setLightbox(null);
-  const prevImg = () => { const idx = (lightboxIdx - 1 + images.length) % images.length; setLightbox(images[idx]); setLightboxIdx(idx); };
-  const nextImg = () => { const idx = (lightboxIdx + 1) % images.length; setLightbox(images[idx]); setLightboxIdx(idx); };
+  const prevImg = useCallback(() => { const idx = (lightboxIdx - 1 + images.length) % images.length; setLightbox(images[idx]); setLightboxIdx(idx); }, [lightboxIdx, images]);
+  const nextImg = useCallback(() => { const idx = (lightboxIdx + 1) % images.length; setLightbox(images[idx]); setLightboxIdx(idx); }, [lightboxIdx, images]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
@@ -63,7 +62,7 @@ export default function ThuVienPage() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [lightbox, lightboxIdx, images]);
+  }, [lightbox, prevImg, nextImg]);
 
   return (
     <>

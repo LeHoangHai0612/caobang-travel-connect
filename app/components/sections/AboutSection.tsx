@@ -75,9 +75,9 @@ export default function AboutSection({ aboutImage, scrollToSection }: AboutSecti
 
       <div style={{ overflow: "hidden", borderTop: "1px solid rgba(45,90,39,.12)", marginTop: 0 }}>
         <div className="about-marquee-track">
-          {[0, 1].map(i => (
+          {[0, 1, 2, 3].map(i => (
             <span key={i} className="about-marquee-text">
-              Chuyên Nghiệp · Am Hiểu · Tận Tâm · Hành Trình Trọn Vẹn ·&nbsp;&nbsp;
+              Cao Bang Travel · The best tour operator&nbsp;&nbsp;★&nbsp;&nbsp;
             </span>
           ))}
         </div>

@@ -35,6 +35,7 @@ export default function ReviewsAdmin() {
     setLoading(false);
   }
 
+  // eslint-disable-next-line react-hooks/set-state-in-effect -- cap nhat state co chu dich khi tai du lieu / khoi tao
   useEffect(() => { fetchReviews(); }, []);
 
   async function approve(id: string) {
