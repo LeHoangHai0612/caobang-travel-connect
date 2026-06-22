@@ -91,10 +91,6 @@ export function initHomeEffects(): () => void {
     on(card, "mouseleave", () => { card.style.transform = ""; });
   });
 
-  // ── hero parallax (mouse) ──
-  const heroBg = q("#nw-heroBg");
-  if (heroBg) on(window, "mousemove", (e: any) => { const x = e.clientX / innerWidth - 0.5, y = e.clientY / innerHeight - 0.5; heroBg.style.transform = `translate(${x * -22}px,${y * -22}px)`; });
-
   // ── journey scroll-telling ──
   (function () {
     const sec = q(".nw-journey"); if (!sec) return;
@@ -110,48 +106,14 @@ export function initHomeEffects(): () => void {
     on(window, "scroll", upd, { passive: true }); on(window, "resize", upd); upd();
   })();
 
-  // ── libs: Three + GSAP + Lenis ──
-  let lenis: any = null, raf3 = 0;
+  // ── libs: GSAP + Lenis ──
+  let lenis: any = null;
   Promise.all([
-    loadScript("https://cdnjs.cloudflare.com/ajax/libs/three.js/r128/three.min.js", "nw-three"),
     loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js", "nw-gsap"),
   ]).then(() => Promise.all([
     loadScript("https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js", "nw-st"),
     loadScript("https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js", "nw-lenis"),
   ])).then(() => {
-    // Three particles
-    const THREE = w.THREE, hero = q(".nw-hero"), cv = q("#nw-gl");
-    const reduceMo = matchMedia('(prefers-reduced-motion: reduce)').matches;
-    if (THREE && hero && cv && innerWidth >= 768 && !reduceMo) {
-      const sc = new THREE.Scene();
-      const cam = new THREE.PerspectiveCamera(60, 1, 1, 1000); cam.position.z = 320;
-      const rn = new THREE.WebGLRenderer({ canvas: cv, alpha: true, antialias: true });
-      const size = () => { const wd = hero.clientWidth, h = hero.clientHeight; rn.setSize(wd, h, false); rn.setPixelRatio(Math.min(devicePixelRatio, 1.5)); cam.aspect = wd / h; cam.updateProjectionMatrix(); };
-      size(); on(window, "resize", size);
-      const N = 360, pos = new Float32Array(N * 3), spd = new Float32Array(N);
-      for (let i = 0; i < N; i++) { pos[i * 3] = (Math.random() - 0.5) * 620; pos[i * 3 + 1] = (Math.random() - 0.5) * 420; pos[i * 3 + 2] = (Math.random() - 0.5) * 360; spd[i] = 0.15 + Math.random() * 0.55; }
-      const g = new THREE.BufferGeometry(); g.setAttribute("position", new THREE.BufferAttribute(pos, 3));
-      const sprite = document.createElement("canvas"); sprite.width = sprite.height = 64;
-      const cx: any = sprite.getContext("2d"); const gr = cx.createRadialGradient(32, 32, 0, 32, 32, 32);
-      gr.addColorStop(0, "rgba(255,228,170,1)"); gr.addColorStop(0.4, "rgba(216,171,109,.6)"); gr.addColorStop(1, "rgba(216,171,109,0)");
-      cx.fillStyle = gr; cx.fillRect(0, 0, 64, 64);
-      const mat = new THREE.PointsMaterial({ size: 6, map: new THREE.CanvasTexture(sprite), transparent: true, blending: THREE.AdditiveBlending, depthWrite: false, opacity: 0.9 });
-      const pts = new THREE.Points(g, mat); sc.add(pts);
-      let tmx = 0, tmy = 0, cmx = 0, cmy = 0;
-      on(window, "mousemove", (e: any) => { tmx = e.clientX / innerWidth - 0.5; tmy = e.clientY / innerHeight - 0.5; });
-      let running = true;
-      const anim = () => {
-        const a = g.attributes.position.array;
-        for (let i = 0; i < N; i++) { a[i * 3 + 1] += spd[i]; a[i * 3] += Math.sin((a[i * 3 + 1] + i) * 0.01) * 0.12; if (a[i * 3 + 1] > 220) a[i * 3 + 1] = -220; }
-        g.attributes.position.needsUpdate = true; pts.rotation.y += 0.0004;
-        cmx += (tmx - cmx) * 0.04; cmy += (tmy - cmy) * 0.04; cam.position.x = cmx * 60; cam.position.y = -cmy * 40; cam.lookAt(sc.position);
-        rn.render(sc, cam); raf3 = running ? requestAnimationFrame(anim) : 0;
-      };
-      const vio = new IntersectionObserver((es) => { running = es[0].isIntersecting; if (running && !raf3) anim(); }, { threshold: 0 });
-      vio.observe(hero);
-      anim();
-      cleanups.push(() => { running = false; cancelAnimationFrame(raf3); vio.disconnect(); rn.dispose(); });
-    }
     // GSAP + Lenis
     const gsap = w.gsap, ST = w.ScrollTrigger, Lenis = w.Lenis;
     if (gsap && ST) {

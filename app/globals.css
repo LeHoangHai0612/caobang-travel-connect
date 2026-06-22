@@ -1983,7 +1983,7 @@ html, body { overflow-x: hidden; }
 .nw-hero{position:relative;height:100vh;min-height:680px;display:flex;align-items:flex-end;color:#fff;overflow:hidden}
 .nw-hero-bg{position:absolute;inset:-6%;z-index:0;will-change:transform}
 .nw-hero-bg::after{content:"";position:absolute;inset:0;background:linear-gradient(180deg,rgba(12,32,25,.55) 0%,rgba(12,32,25,.15) 35%,rgba(12,32,25,.85) 100%)}
-.nw-hero-bg img{width:100%;height:100%;object-fit:cover;transform:scale(1.05);animation:nwZoom 18s ease-in-out infinite alternate}
+.nw-hero-bg img{width:100%;height:100%;object-fit:cover}
 @keyframes nwZoom{to{transform:scale(1.16)}}
 .nw-gl{position:absolute;inset:0;z-index:1;pointer-events:none;opacity:.85}
 .nw-hero-inner{position:relative;z-index:2;width:100%;padding-bottom:64px}
@@ -2021,8 +2021,8 @@ html, body { overflow-x: hidden; }
 .nw-jsticky{position:sticky;top:0;height:100vh;overflow:hidden}
 .nw-jstop{position:absolute;inset:0;opacity:0;transition:opacity .8s ease}
 .nw-jstop.active{opacity:1}
-.nw-jstop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transform:scale(1.12);transition:transform 6s ease}
-.nw-jstop.active img{transform:scale(1)}
+.nw-jstop img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover}
+
 .nw-jstop::after{content:"";position:absolute;inset:0;background:linear-gradient(90deg,rgba(8,20,15,.82) 0%,rgba(8,20,15,.3) 45%,rgba(8,20,15,.15) 100%)}
 .nw-jcap{position:absolute;left:0;bottom:14vh;z-index:3;padding:0 6vw;max-width:680px;color:#fff}
 .nw-jidx{font-family:var(--font-playfair),serif;font-size:15px;color:var(--nw-gold);font-weight:600;letter-spacing:.2em}

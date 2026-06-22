@@ -112,7 +112,6 @@ export default function RedesignHome() {
 
       <section className="nw-hero">
         <div className="nw-hero-bg" id="nw-heroBg"><img src={heroBg} alt="Cao Bằng" /></div>
-        <canvas className="nw-gl" id="nw-gl" />
         <div className="nw-wrap nw-hero-inner">
           <div className="nw-eye"><span className="ln" /> Đông Bắc Việt Nam · Công viên địa chất toàn cầu</div>
           <h1>Lạc bước giữa<br /><em>non nước</em> Cao Bằng</h1>
