@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Be_Vietnam_Pro, Caveat, Lora } from "next/font/google";
 import "./globals.css";
+import SiteFx from "./components/SiteFx";
 
 const beVietnam = Be_Vietnam_Pro({
   subsets: ["vietnamese", "latin"],
@@ -51,6 +52,7 @@ export default function RootLayout({
   return (
     <html lang="vi" suppressHydrationWarning className={`${beVietnam.variable} ${caveat.variable} ${lora.variable}`}>
       <body className={`${beVietnam.className} min-h-full flex flex-col`}>
+        <SiteFx />
         {children}
       </body>
     </html>

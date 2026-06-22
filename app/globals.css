@@ -1283,3 +1283,10 @@ html, body { overflow-x: hidden; }
     grid-template-columns: 1fr !important;
   }
 }
+/* ── Site FX: custom cursor (desktop only) ── */
+@media (hover:hover) and (pointer:fine){
+  body.sfx-on, body.sfx-on * { cursor: none !important; }
+  .sfx-dot{position:fixed;top:0;left:0;width:7px;height:7px;border-radius:50%;background:#265C59;z-index:99999;pointer-events:none;transform:translate(-50%,-50%)}
+  .sfx-ring{position:fixed;top:0;left:0;width:36px;height:36px;border:1.5px solid rgba(38,92,89,.55);border-radius:50%;z-index:99999;pointer-events:none;transform:translate(-50%,-50%);transition:width .25s,height .25s,background .25s,border-color .25s}
+  .sfx-ring.hov{width:62px;height:62px;background:rgba(38,92,89,.12);border-color:transparent}
+}
