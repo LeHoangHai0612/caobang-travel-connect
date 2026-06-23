@@ -127,7 +127,7 @@ body.menu-open { overflow: hidden; }
 
 /* HERO SECTION */
 .hero { position: relative; min-height: 100vh; display: flex; flex-direction: column; align-items: stretch; overflow: hidden; background: var(--teal-dark); }
-.hero-bg { position: absolute; inset: -5%; background-image: url('https://upload.wikimedia.org/wikipedia/commons/thumb/4/42/Ban_Gioc%E2%80%93Detian_Falls.jpg/1280px-Ban_Gioc%E2%80%93Detian_Falls.jpg'); background-size: cover; background-position: center 40%; background-repeat: no-repeat; animation: heroZoom 20s ease-in-out infinite alternate; }
+.hero-bg { position: absolute; inset: -5%; background-image: url('https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=1920&q=75&auto=format'); background-size: cover; background-position: center 40%; background-repeat: no-repeat; animation: heroZoom 20s ease-in-out infinite alternate; }
 @keyframes heroZoom { from { transform: scale(1.00); background-position: center 36%; } to { transform: scale(1.06); background-position: center 46%; } }
 video.hero-bg { position: absolute; inset: 0; width: 100%; height: 100%; object-fit: cover; object-position: center; animation: none; background-image: none; }
 .hero-overlay { position: absolute; inset: 0; background: linear-gradient(to bottom, rgba(0,0,0,.12) 0%, rgba(0,0,0,.25) 55%, rgba(0,0,0,.48) 85%, rgba(0,0,0,.55) 100%); }
