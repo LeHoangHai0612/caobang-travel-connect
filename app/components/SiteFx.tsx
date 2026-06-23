@@ -1,7 +1,7 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// Light site-wide enhancements: scroll reveal, custom cursor (desktop), and
-// Lenis smooth scrolling (loaded from CDN). No layout changes, performance-light.
+// Light site-wide enhancements: scroll reveal + custom cursor (desktop only).
+// No smooth-scroll library (kept native for performance). No layout changes.
 
 import { useEffect } from "react";
 
@@ -39,19 +39,6 @@ export default function SiteFx() {
         dot.remove(); ring.remove(); document.body.classList.remove("sfx-on");
       });
     }
-
-    // ── Lenis smooth scroll (CDN) ──
-    let lenis: any = null, rafL = 0, stop = false;
-    const sc = document.createElement("script");
-    sc.src = "https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"; sc.async = true;
-    sc.onload = () => {
-      const L = (window as any).Lenis; if (!L || stop) return;
-      lenis = new L({ duration: 1.05, smoothWheel: true });
-      const raf = (t: number) => { lenis.raf(t); rafL = requestAnimationFrame(raf); };
-      rafL = requestAnimationFrame(raf);
-    };
-    document.head.appendChild(sc);
-    cleanups.push(() => { stop = true; cancelAnimationFrame(rafL); if (lenis) { try { lenis.destroy(); } catch { /* */ } } });
 
     return () => cleanups.forEach((f) => { try { f(); } catch { /* */ } });
   }, []);
