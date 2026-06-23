@@ -371,7 +371,7 @@ export default function DatLichPage() {
                     {selectedGuide.zalo_number && (
                       <a href={`https://zalo.me/${selectedGuide.zalo_number}`} target="_blank" rel="noopener noreferrer"
                         className="flex items-center justify-center gap-2 py-3 rounded-xl bg-teal-800 text-white font-bold text-sm active:scale-95 transition-transform min-h-[44px]">
-                        <i className="fa-brands fa-comment-dots text-lg" /> Chat Zalo ngay
+                        <i className="fa-solid fa-comment-dots text-lg" /> Chat Zalo ngay
                       </a>
                     )}
                   </div>

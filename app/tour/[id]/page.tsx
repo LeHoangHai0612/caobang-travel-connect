@@ -282,7 +282,7 @@ export default function TourDetailPage() {
             {tour.zalo_number && (
               <a href={`https://zalo.me/${tour.zalo_number}`} target="_blank" rel="noopener noreferrer"
                 style={{ display: "flex", alignItems: "center", justifyContent: "center", gap: 8, marginTop: 10, padding: "11px 0", borderRadius: 12, border: "2px solid #265C59", color: "#265C59", fontWeight: 700, fontSize: ".88rem", textDecoration: "none" }}>
-                <i className="fa-brands fa-comment-dots" />Chat Zalo tư vấn
+                <i className="fa-solid fa-comment-dots" />Chat Zalo tư vấn
               </a>
             )}
 

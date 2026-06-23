@@ -1,13 +1,33 @@
 "use client";
 /* eslint-disable @typescript-eslint/no-explicit-any */
-// Light site-wide enhancements: scroll reveal + custom cursor (desktop only).
-// No smooth-scroll library (kept native for performance). No layout changes.
+// Light site-wide enhancements: broken-image fallback, scroll reveal, custom
+// cursor (desktop only). No smooth-scroll library (native scroll). No layout changes.
 
 import { useEffect } from "react";
 
 export default function SiteFx() {
   useEffect(() => {
     const cleanups: Array<() => void> = [];
+
+    // ── broken-image fallback (site-wide) ──
+    // Hotlinked images (Facebook/news sites) can 403/404; swap to a stable photo,
+    // then to an inline SVG placeholder so a broken image never shows blank.
+    const FALLBACK_PHOTO = "https://images.unsplash.com/photo-1559827260-dc66d52bef19?w=800&q=70&auto=format";
+    const PLACEHOLDER_SVG =
+      "data:image/svg+xml," +
+      encodeURIComponent(
+        "<svg xmlns='http://www.w3.org/2000/svg' width='800' height='600'><rect width='100%' height='100%' fill='#e3ece6'/><path d='M0 600 L300 360 L450 480 L600 290 L800 600 Z' fill='#9fb6a9'/><path d='M0 600 L180 470 L340 560 L520 430 L800 600 Z' fill='#7d9a8b'/><circle cx='650' cy='150' r='56' fill='#cfdcd4'/></svg>"
+      );
+    const onImgError = (e: Event) => {
+      const img = e.target as HTMLElement;
+      if (!(img instanceof HTMLImageElement)) return;
+      const stage = img.dataset.fbk;
+      if (stage === "2") return;
+      if (stage === "1") { img.dataset.fbk = "2"; img.src = PLACEHOLDER_SVG; return; }
+      img.dataset.fbk = "1"; img.src = FALLBACK_PHOTO;
+    };
+    document.addEventListener("error", onImgError, true);
+    cleanups.push(() => document.removeEventListener("error", onImgError, true));
 
     // ── scroll reveal (.fade-up -> .visible) ──
     const io = new IntersectionObserver(

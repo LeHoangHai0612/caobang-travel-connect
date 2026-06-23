@@ -50,7 +50,7 @@ export default function StickyBottomBar({
               aria-label="Chat Zalo"
               className="w-11 h-11 flex items-center justify-center rounded-xl bg-teal-50 text-teal-800 border-2 border-teal-800 active:scale-95 transition-transform shrink-0"
             >
-              <i className="fa-brands fa-comment-dots text-lg" />
+              <i className="fa-solid fa-comment-dots text-lg" />
             </a>
           )}
           <button

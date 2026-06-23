@@ -53,7 +53,7 @@ export default function TourGrid({ toursBg, tours }: TourGridProps) {
                       <a href={`https://zalo.me/${t.zalo_number}`} target="_blank" rel="noopener noreferrer"
                         onClick={(e) => e.stopPropagation()}
                         style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, background: "#265C59", color: "white", fontWeight: 700, fontSize: ".75rem", textDecoration: "none" }}>
-                        <i className="fa-brands fa-comment-dots" />Zalo: {t.zalo_number}
+                        <i className="fa-solid fa-comment-dots" />Zalo: {t.zalo_number}
                       </a>
                     )}
                     <span style={{ display: "flex", alignItems: "center", gap: 5, padding: "7px 14px", borderRadius: 8, border: "1.5px solid #e2e8f0", color: "#475569", fontSize: ".75rem", fontWeight: 600 }}>

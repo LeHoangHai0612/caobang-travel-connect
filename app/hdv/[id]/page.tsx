@@ -226,7 +226,7 @@ export default function GuideProfilePage() {
               {guide.zalo_number && (
                 <button onClick={() => window.open(`https://zalo.me/${guide.zalo_number}`, "_blank")} 
                   className="flex-1 sm:flex-none flex items-center justify-center gap-2 px-6 h-12 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm transition-colors shadow-lg shadow-blue-900/20 active:scale-95 min-w-[140px]">
-                  <i className="fa-brands fa-comment-dots text-lg" /> Chat Zalo
+                  <i className="fa-solid fa-comment-dots text-lg" /> Chat Zalo
                 </button>
               )}
               <a href={`/dat-lich?guide=${guide.id}`} 
@@ -356,7 +356,7 @@ export default function GuideProfilePage() {
                 </p>
                 <button onClick={() => window.open(`https://zalo.me/${guide.zalo_number}`, "_blank")}
                   className="w-full flex items-center justify-center gap-2 h-12 rounded-xl bg-white text-blue-700 font-black text-sm active:scale-95 transition-transform shadow-lg">
-                  <i className="fa-brands fa-comment-dots text-lg" /> Chat Zalo Ngay
+                  <i className="fa-solid fa-comment-dots text-lg" /> Chat Zalo Ngay
                 </button>
               </div>
             </div>

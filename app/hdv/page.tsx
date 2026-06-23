@@ -202,7 +202,7 @@ export default function AllGuidesPage() {
                     {g.zalo_number && (
                       <button onClick={(e) => { e.preventDefault(); window.open(`https://zalo.me/${g.zalo_number}`, "_blank"); }}
                         className="w-full mt-4 py-2.5 rounded-xl bg-teal-50 hover:bg-teal-800 text-teal-800 hover:text-white border border-teal-100 hover:border-teal-800 font-bold text-xs transition-colors flex items-center justify-center gap-2 min-h-[44px]">
-                        <i className="fa-brands fa-comment-dots text-sm" /> Chat Zalo
+                        <i className="fa-solid fa-comment-dots text-sm" /> Chat Zalo
                       </button>
                     )}
                   </div>

@@ -101,7 +101,7 @@ export default function GuideGrid({ teamBg, guides }: GuideGridProps) {
               </div>
               {member.zalo_number && (
                 <a href={`https://zalo.me/${member.zalo_number}`} target="_blank" rel="noopener noreferrer" className="team-zalo-btn" aria-label={`Chat Zalo với ${member.name}`}>
-                  <i className="fa-brands fa-comment-dots" /> Chat Zalo
+                  <i className="fa-solid fa-comment-dots" /> Chat Zalo
                 </a>
               )}
             </article>
